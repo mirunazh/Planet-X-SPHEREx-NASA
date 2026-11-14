@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skyblink</title>
+<link rel="preload" href="fonts/newsreader-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/atkinson-hyperlegible-next-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/plate.css">
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="skip">Skip to the main content</a>
+
+<header class="mast">
+  <a class="wordmark" href="#/"><svg class="reg-glyph" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6"/><path d="M0 12h24M12 0v24"/></svg><span data-name>Skyblink</span></a>
+  <nav class="steps" aria-label="Steps" data-i18n-label="navLabel">
+    <a href="#/look"><span class="n">1</span> <span data-i18n="navLook">Look</span></a>
+    <a href="#/measure"><span class="n">2</span> <span data-i18n="navMeasure">Measure</span></a>
+    <a href="#/elsewhere" data-i18n="navElse">Elsewhere</a>
+  </nav>
+  <div class="tools">
+    <div class="langs" role="group" aria-label="Language">
+      <a href="?lang=en" data-lang="en" lang="en" hreflang="en">English</a>
+      <a href="?lang=ro" data-lang="ro" lang="ro" hreflang="ro">Română</a>
+    </div>
+    <button type="button" class="tool-btn" data-theme-toggle aria-pressed="false"><span class="box" aria-hidden="true"></span><span data-i18n="dark">Darkroom</span></button>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+
+<!-- S1 -->
+<section class="screen s1" data-route="/" aria-labelledby="s1-h">
+  <div class="s1-text">
+    <p class="overline" data-i18n="s1Over">Epsilon Indi B, seen by SPHEREx</p>
+    <h1 id="s1-h" class="display" data-i18n="s1Title" data-html>In 1930, a 24-year-old found Pluto by flipping between two photographs of the same sky.</h1>
+    <p class="lead" data-i18n="s1Lead">These are two real infrared photos of one patch of sky, taken by NASA’s SPHEREx telescope 17 months apart. Most dots stay put. One does not.</p>
+    <div class="actions">
+      <a class="btn-primary" href="#/look" data-i18n="s1Go">Find what moved</a>
+      <a class="quiet" href="#/elsewhere" data-i18n="s1Else">Look somewhere else</a>
+    </div>
+  </div>
+  <div class="s1-plate">
+    <figure class="plate plate-hero" id="plate-s1">
+      <div class="frame">
+        <p class="edge edge-top"><span><span data-i18n="plate">Plate</span> · Epsilon Indi B</span><span class="mono" data-pl-date></span></p>
+        <canvas role="img" data-sky></canvas><svg class="ov" viewBox="0 0 52 52" aria-hidden="true" data-ov></svg>
+        <figcaption class="edge edge-bot"><span class="tone"><span class="ramp" aria-hidden="true"></span><span data-i18n="real">Real photo, only enlarged and toned. Darker means brighter in infrared.</span></span></figcaption>
+      </div>
+    </figure>
+    <div class="blinker">
+      <button type="button" class="blink-key" data-hold aria-pressed="false" aria-describedby="hold-hint">
+        <span class="bk bk-then" data-side="then"><span class="bk-k" data-i18n="then">Then</span><span class="mono" data-then></span></span>
+        <span class="bk bk-mid"><span class="eye" aria-hidden="true"></span><span data-i18n="hold">Hold to blink</span></span>
+        <span class="bk bk-now" data-side="now"><span class="bk-k" data-i18n="now">Now</span><span class="mono" data-now></span></span>
+      </button>
+      <div class="blink-row">
+        <p id="hold-hint" class="hint" data-i18n="holdHint">Press and hold, or hold the Space bar. A quick tap keeps it flipped.</p>
+        <button type="button" class="text-btn" data-blink data-state="paused"><span class="pp" aria-hidden="true"></span><span data-blink-label>Pause</span></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S2 -->
+<section class="screen s2" data-route="/look" aria-labelledby="s2-h" hidden>
+  <div class="s2-plate">
+    <figure class="plate plate-big" id="plate-s2">
+      <div class="frame">
+        <p class="edge edge-top"><span></span><span><span data-i18n="roVisit">Visit</span> <span class="mono" data-pl-n></span> · <span class="mono" data-pl-date></span></span></p>
+        <canvas role="img" data-sky></canvas><svg class="ov" viewBox="0 0 52 52" aria-hidden="true" data-ov></svg>
+        <span class="ptr ptr-x first" data-ptr="first-x" hidden></span><span class="ptr ptr-y first" data-ptr="first-y" hidden></span>
+        <span class="ptr ptr-x now" data-ptr="now-x" hidden></span><span class="ptr ptr-y now" data-ptr="now-y" hidden></span>
+        <p class="edge edge-bot"><span class="scale"><span class="bar" aria-hidden="true"></span><span data-i18n="scale30">30 arcseconds</span></span><span data-i18n="orient">North up, east left</span></p>
+      </div>
+      <figcaption class="plate-foot"><span class="tone"><span class="ramp" aria-hidden="true"></span><span data-i18n="real">Real photo, only enlarged and toned. Darker means brighter in infrared.</span></span></figcaption>
+    </figure>
+  </div>
+
+  <div class="s2-notes">
+    <p class="overline" data-i18n="step1">Step 1 of 2: look</p>
+    <h1 id="s2-h" data-i18n="s2Title">Five visits to one patch of sky</h1>
+    <p class="lead" data-i18n="s2Lead">SPHEREx came back to this patch five times in 17 months. Play the visits and watch for the dot that slides while the stars around it stay put.</p>
+    <div class="player">
+    <div class="axis">
+      <label for="visit" class="axis-label" data-i18n="axisLabel">Visit date</label>
+      <div class="ruler" aria-hidden="true" data-ruler></div>
+      <input type="range" id="visit" data-visit>
+    </div>
+    <div class="strip" role="group" aria-label="Film controls" data-i18n-label="filmLabel">
+      <button type="button" data-step="-1"><span aria-hidden="true">&#8592;</span> <span data-i18n="earlier">Earlier</span></button>
+      <button type="button" data-play data-state="paused"><span class="pp" aria-hidden="true"></span><span data-play-label>Play</span></button>
+      <button type="button" data-step="1"><span data-i18n="later">Later</span> <span aria-hidden="true">&#8594;</span></button>
+    </div>
+    <p class="hint" data-i18n="keysHint">Or use the left and right arrow keys.</p>
+    </div>
+
+    <h2 class="label-h" data-i18n="thisVisit">This visit</h2>
+    <dl class="jacket">
+      <div><dt data-i18n="roVisit">Visit</dt><dd class="mono" data-ro="visit"></dd></div>
+      <div><dt data-i18n="roDates">Dates</dt><dd data-ro="dates"></dd></div>
+      <div><dt data-i18n="roLight">Light</dt><dd><span data-ro="light"></span> <span class="mono nowrap" data-ro="um"></span></dd></div>
+      <div><dt><button type="button" class="term" aria-expanded="false" aria-controls="g-stack" data-i18n="roPhotos">Photos added together</button></dt><dd class="mono" data-ro="photos"></dd></div>
+    </dl>
+    <p class="gloss" id="g-stack" hidden><span class="gl-term" data-i18n="glStackTerm">A stack.</span> <span data-i18n="glStack">Several photos of the same patch added together. Random noise partly cancels out, so faint things show up better than in any single photo.</span></p>
+
+    <h2 class="label-h" data-i18n="marksH">Marks on the plate</h2>
+    <ul class="marks">
+      <li><button type="button" class="mark-btn" aria-pressed="false" data-mark="moved"><svg viewBox="0 0 28 28" aria-hidden="true"><circle class="g-moved" cx="14" cy="14" r="8"/></svg><span data-i18n="mkMoved">Ring the dot that moved</span></button></li>
+      <li><button type="button" class="mark-btn" aria-pressed="false" data-mark="first"><svg viewBox="0 0 28 28" aria-hidden="true"><path class="g-first" d="M14 4v20M4 14h20"/></svg><span data-i18n="mkFirst">Show where it was on visit 1</span></button></li>
+      <li><button type="button" class="mark-btn" aria-pressed="false" data-mark="stars"><svg viewBox="0 0 28 28" aria-hidden="true"><path class="g-star" d="M14 2v8M2 14h8"/><circle class="g-dot" cx="14" cy="14" r="3"/></svg><span data-i18n="mkStars">Tick the stars that stay put</span></button></li>
+    </ul>
+
+    <fieldset class="view">
+      <legend class="label-h" data-i18n="viewH">Plate view</legend>
+      <label><input type="radio" name="view" value="neg"> <span data-i18n="viewNeg">Negative: dark stars on a light plate</span></label>
+      <label><input type="radio" name="view" value="pos"> <span data-i18n="viewPos">Positive: as the camera saw it</span></label>
+      <label class="real"><input type="checkbox" data-real> <span data-i18n="realPx">Real pixels: the honest squares, not enlarged smoothly</span></label>
+    </fieldset>
+
+    <div class="next"><a class="btn-primary" href="#/measure" data-i18n="s2Go">I see it: mark and measure</a></div>
+  </div>
+  <p class="sr-only" role="status" aria-live="polite" data-live></p>
+</section>
+
+<!-- S3 -->
+<section class="screen s3" lang="en" data-route="/measure" aria-labelledby="s3-h" hidden>
+  <div class="s3-head">
+    <p class="overline" data-i18n="step2">Step 2 of 2: mark and measure</p>
+    <h1 id="s3-h" data-i18n="s3Title">Mark it, then measure it</h1>
+    <p class="lead" data-i18n="s3Lead">Your two marks sit on the dot in the first visit and in the last. The gap between them, and the time between the visits, give its speed across the sky.</p>
+  </div>
+  <div class="s3-grid">
+    <figure class="plate" id="plate-s3">
+      <div class="frame">
+        <p class="edge edge-top"><span>Close-up, your marks</span><span class="mono" data-pl-date></span></p>
+        <canvas role="img" data-sky></canvas><svg class="ov" viewBox="0 0 24 24" aria-hidden="true" data-ov></svg>
+        <p class="edge edge-bot"><span class="scale"><span class="bar" aria-hidden="true"></span><span>30 arcseconds</span></span><span class="orient">North up, east left</span></p>
+      </div>
+    </figure>
+
+    <div class="s3-work">
+      <table class="log">
+        <caption class="label-h" data-i18n="yourMarks">Your marks</caption>
+        <thead><tr><th scope="col" data-i18n="thMark">Mark</th><th scope="col" data-i18n="thVisit">Visit</th><th scope="col" class="num" data-i18n="thPos">Position on the plate</th></tr></thead>
+        <tbody data-marks></tbody>
+      </table>
+
+      <section class="result" aria-labelledby="r1-h">
+        <h2 id="r1-h" class="label-h">How fast it slides across the sky</h2>
+        <div class="vs">
+          <p class="big"><span class="mono num-l" data-pm-you>4.58</span> <span class="unit">arcseconds a year<br><span class="who">your measurement</span></span></p>
+          <p class="cat"><span class="mono">4.68</span> <span class="unit">catalogue (Gaia)</span></p>
+        </div>
+        <p class="say" data-pm-say></p>
+      </section>
+    </div>
+  </div>
+
+  <section class="result plx" aria-labelledby="r2-h">
+    <div class="plx-ctl">
+      <h2 id="r2-h" class="label-h"><span>How far away it is</span></h2>
+      <p class="say">Earth circles the Sun, so a near star seems to <button type="button" class="term" aria-expanded="false" aria-controls="g-plx">wobble</button> a little each year. Slide until the curve runs through your five points.</p>
+      <p class="gloss" id="g-plx" hidden><span class="gl-term">Parallax.</span> The small yearly back-and-forth shift of a nearby star, caused by Earth circling the Sun. The closer the star, the bigger the wobble.</p>
+      <label for="plx" class="field-label">Size of the wobble (parallax)</label>
+      <div class="slider-row"><input type="range" id="plx" min="150" max="450" step="1" value="250"><output for="plx" id="plx-out" class="mono"></output></div>
+      <dl class="readout">
+        <div><dt>Distance for this wobble</dt><dd class="mono" id="plx-ly"></dd></div>
+        <div><dt>Misfit (smaller is better)</dt><dd class="mono" id="plx-fit"></dd></div>
+      </dl>
+    </div>
+    <figure class="chart">
+      <svg id="plx-chart" viewBox="0 0 600 250" role="img" aria-labelledby="plx-chart-t"></svg>
+      <figcaption class="legend"><span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2v16" class="c-err"/><circle cx="10" cy="10" r="4" class="c-pt"/></svg>a visit, with its error bar</span><span><svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 10h24" class="c-model"/></svg>the wobble for your setting</span></figcaption>
+    </figure>
+  </section>
+
+  <section class="result" aria-labelledby="r3-h">
+    <h2 id="r3-h" class="label-h">Distance and speed: your result next to the catalogue</h2>
+    <table class="log wide">
+      <thead><tr><th scope="col"></th><th scope="col" class="num">Your best fit</th><th scope="col" class="num">Catalogue (Gaia)</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Wobble (parallax)</th><td class="num mono" data-label="You">306 ± 28 mas</td><td class="num mono" data-label="Catalogue">270.7 mas</td></tr>
+        <tr><th scope="row">Distance</th><td class="num mono" data-label="You">10.7 light years</td><td class="num mono" data-label="Catalogue">12.05 light years</td></tr>
+        <tr><th scope="row">Speed across our view</th><td class="num mono" data-label="You">72.5 km/s</td><td class="num mono" data-label="Catalogue">82.0 km/s</td></tr>
+      </tbody>
+    </table>
+    <p class="say">Your distance comes out 12 percent shorter than the catalogue’s. That is a real difference, not a rounding error: five visits in 17 months give a short, uneven baseline, and your ± 28 range (278 to 334) stops just short of 270.7. The speed uses the catalogue’s 4.68 arcseconds a year with your distance.</p>
+  </section>
+</section>
+
+<!-- S4 -->
+<section class="screen s4" lang="en" data-route="/elsewhere" aria-labelledby="s4-h" hidden>
+  <div class="s4-head">
+    <h1 id="s4-h" data-i18n="s4Title">Look somewhere else</h1>
+    <form class="search" data-search>
+      <label for="q" class="field-label">A star’s name, or its position in the sky</label>
+      <p id="q-hint" class="hint">Try “Barnard’s Star”, or coordinates like <span class="mono nowrap">08 55 10.8 −07 14 42</span></p>
+      <div class="search-row"><input id="q" name="q" type="text" inputmode="text" autocomplete="off" spellcheck="false" aria-describedby="q-hint q-msg"><button type="submit" class="btn-secondary">Look</button></div>
+      <p id="q-msg" class="msg" role="status"></p>
+    </form>
+  </div>
+  <div class="s4-grid">
+    <figure class="plate" id="plate-s4">
+      <div class="plate-label"><span>WISE 0855−0714</span><span class="mono" data-pl-date></span></div>
+      <div class="frame"><canvas width="121" height="121" role="img" data-sky></canvas><svg class="ov" viewBox="0 0 121 121" aria-hidden="true" data-ov></svg></div>
+      <figcaption class="plate-foot">
+        <span class="scale"><span class="bar bar-121" aria-hidden="true"></span><span>60 arcseconds</span></span>
+        <span class="orient">North up, east left</span>
+      </figcaption>
+    </figure>
+    <div class="feature">
+      <p class="overline">The challenge target</p>
+      <h2 class="h2">WISE 0855−0714</h2>
+      <p class="lead">The coldest brown dwarf we know, 7.4 light years away. Since 2010 it has moved 134 arcseconds west, so its old catalogue position now points at empty sky.</p>
+      <ul class="key">
+        <li><svg viewBox="0 0 28 28" aria-hidden="true"><path class="g-first" d="M14 4v20M4 14h20"/></svg>Where the challenge coordinates point (2010)</li>
+        <li><svg viewBox="0 0 28 28" aria-hidden="true"><circle class="g-moved" cx="14" cy="14" r="8"/></svg><span>Where SPHEREx saw it, <span data-w-date></span></span></li>
+      </ul>
+      <p class="say">It glows only at 4 to 5 microns, far past red light, so SPHEREx sees it in its longest-wavelength detectors.</p>
+      <a class="btn-primary" href="#/look">Watch it move</a>
+    </div>
+  </div>
+  <h2 class="label-h list-h">Four more patches of sky</h2>
+  <ul class="targets">
+    <li data-t="barnard"><canvas width="24" height="24" data-thumb="barnard" aria-hidden="true"></canvas><div><a href="#/look">Barnard’s Star</a><p>The fastest-moving star in the sky: 10.4 arcseconds a year to the north. A red dwarf 6 light years away.</p></div><span class="kind">moves</span></li>
+    <li data-t="epsindb"><canvas width="24" height="24" data-thumb="epsindb" aria-hidden="true"></canvas><div><a href="#/look">Epsilon Indi B</a><p>A pair of brown dwarfs 12 light years away, sliding south-east by 4.7 arcseconds a year.</p></div><span class="kind">moves</span></li>
+    <li data-t="rwaur"><canvas width="24" height="24" data-thumb="rwaur" aria-hidden="true"></canvas><div><a href="#/look">RW Aurigae</a><p>A young star in a dusty disk, 500 light years away. SPHEREx saw it about 0.37 magnitudes brighter in 2026 than in September 2025.</p></div><span class="kind">changes brightness</span></li>
+    <li data-t="rdra"><canvas width="24" height="24" data-thumb="rdra" aria-hidden="true"></canvas><div><a href="#/look">R Draconis</a><p>A pulsing red giant 2,600 light years away that swells and fades on a cycle of about 246 days.</p></div><span class="kind">changes brightness</span></li>
+  </ul>
+  <p class="surprise"><button type="button" class="btn-secondary" data-surprise>Surprise me</button></p>
+</section>
+
+</main>
+
+<footer class="foot">
+  <p data-i18n="indep">An independent student project for the 2026 NASA Space Apps Challenge. Not made, reviewed or endorsed by NASA.</p>
+  <p data-i18n="credit">Images: NASA/JPL-Caltech, SPHEREx, via NASA/IPAC IRSA.</p>
+</footer>
+
+<template id="reg"><svg class="reg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5.5"/><path d="M0 12h24M12 0v24"/></svg></template>
+<script src="js/plate.js"></script>
+</body>
+</html>

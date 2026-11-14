@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skyblink: find the star that moved</title>
+<meta name="theme-color" content="#000000">
+<link rel="preload" href="fonts/archivo-latin-standard-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-route="home">
+<a class="vh" href="#main" data-i18n="skip">Skip to the controls</a>
+
+
+
+<header class="bar">
+  <a class="brand" href="#/" translate="no">Skyblink</a>
+  <nav aria-label="Main">
+    <a class="wide" href="#/explore" data-i18n="navExplore">Explore the sky</a>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="en" aria-pressed="true" lang="en">EN</button>
+      <button type="button" data-lang="ro" aria-pressed="false" lang="ro">RO</button>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+  <div class="stage" id="stage" aria-label="Infrared photo of the sky" role="img">
+  <canvas id="sky-then"></canvas>
+  <canvas id="sky-now" class="off"></canvas>
+  <svg class="marks" id="marks" aria-hidden="true"></svg>
+</div>
+  <!-- S1 -->
+  <section class="hero" data-screen="home" aria-labelledby="h-home">
+    <h1 id="h-home" data-i18n="h1">Find the next Tombaugh.</h1>
+    <p data-i18n="lede">Two real photos of the same patch of sky, taken 17 months apart by NASA's SPHEREx telescope. Flip between them and one star jumps.</p>
+    <div class="blink" data-blink></div>
+    <div class="acts">
+      <a class="btn btn-primary" href="#/mission/spot"><span data-i18n="start">Start mission 1</span> <small data-i18n="time">about 3 min</small></a>
+      <a class="btn btn-quiet" href="#/explore" data-i18n="any">Look at any spot in the sky</a>
+    </div>
+  </section>
+
+  <!-- the one panel: S2 to S4 and S6 -->
+  <aside class="panel" id="panel" hidden aria-labelledby="panel-h">
+    <ol class="flight" id="flight" aria-label="Mission 1: Epsilon Indi B">
+      <li data-step="spot"><a href="#/mission/spot"><span class="n">1</span>Spot it</a></li>
+      <li data-step="measure"><a href="#/mission/measure"><span class="n">2</span>Measure it</a></li>
+      <li data-step="distance"><a href="#/mission/distance"><span class="n">3</span>How far</a></li>
+      <li data-step="done"><a href="#/mission/done"><span class="n">4</span>Your patch</a></li>
+    </ol>
+    <div class="panel-body">
+
+      <div data-screen="spot">
+        <h2 id="panel-h-spot">Which dot moved?</h2>
+        <p class="muted" id="spot-help">Hold the key and watch the sky. Then tap the dot that jumps. On a keyboard, arrow keys move the crosshair and Enter marks it.</p>
+        <div class="feedback" id="spot-fb" hidden></div>
+        <div class="blink" data-blink></div>
+        <div class="row" id="spot-row">
+          <button class="btn btn-quiet" type="button" id="show-me">Show me</button>
+        </div>
+      </div>
+
+      <div data-screen="measure">
+        <h2>Measure it</h2>
+        <p class="muted">Your two marks, joined. The ruler on the sky is 10 arcseconds long.</p>
+        <dl class="readout">
+          <div><dt>Distance moved</dt><dd class="num" data-count="6.54" data-dp="2">6.54<small>arcsec</small></dd></div>
+          <div><dt>Time between photos</dt><dd class="num" data-count="1.43" data-dp="2">1.43<small>years</small></dd></div>
+          <div class="you"><dt>Your speed across the sky</dt><dd class="num" data-count="4.58" data-dp="2">4.58<small>arcsec a year</small></dd></div>
+        </dl>
+        <div class="compare">
+          <div class="you"><span>You measured</span><strong class="num">4.58</strong><small>arcsec a year</small></div>
+          <div><span>The catalogue says</span><strong class="num">4.68</strong><small>arcsec a year, Gaia</small></div>
+        </div>
+        <p>2 percent apart. That is a real measurement.</p>
+        <details>
+          <summary>Why is mine a little different?</summary>
+          <p>The star does not only slide. It also wobbles a little, once a year, because we watch it from the Earth and the Earth goes around the Sun. Five photos catch the slide plus a bit of that wobble. The wobble is the next step, and it tells you how far away the star is.</p>
+        </details>
+        <button class="switch" type="button" role="switch" aria-checked="false" id="diff"><i></i><span>Subtract one photo from the other</span></button>
+        <p class="muted" id="diff-note" hidden>Fixed stars cancel out. The mover is left as a pair: bright where it is now, dark where it was.</p>
+        <div class="row"><a class="btn btn-primary" href="#/mission/distance">How far is it?</a></div>
+      </div>
+
+      <div data-screen="distance">
+        <h2>How far is it?</h2>
+        <svg class="diagram" viewBox="0 0 340 120" width="100%" role="img" aria-labelledby="dg-t">
+          <title id="dg-t">Parallax: as the Earth goes around the Sun, a nearby star seems to shift against far-away stars, and back again six months later.</title>
+          <ellipse class="orbit" cx="70" cy="60" rx="46" ry="46"/>
+          <circle class="sun" cx="70" cy="60" r="8"/><text x="70" y="86" text-anchor="middle">Sun</text>
+          <circle class="earth" cx="70" cy="14" r="5"/><text x="82" y="12">Earth in May</text>
+          <circle class="earth" cx="70" cy="106" r="5"/><text x="82" y="116">in November</text>
+          <line class="sight" x1="70" y1="14" x2="250" y2="60"/><line class="sight" x1="70" y1="106" x2="250" y2="60"/>
+          <circle class="star" cx="250" cy="60" r="5"/><text x="250" y="80" text-anchor="middle">nearby star</text>
+          <circle class="far" cx="330" cy="36" r="2"/><circle class="far" cx="326" cy="84" r="2"/><text x="334" y="104" text-anchor="end">far stars</text>
+        </svg>
+        <p>Closer stars wobble more. Slide until the curve runs through your five points.</p>
+        <div class="range">
+          <label for="plx"><span>Size of the wobble</span><output id="plx-out" for="plx">200 milliarcseconds</output></label>
+          <input type="range" id="plx" min="100" max="500" step="1" value="306" aria-describedby="misfit">
+          <span class="misfit" id="misfit">Misfit: 0.00</span>
+        </div>
+        <svg class="chart" id="plx-chart" viewBox="0 0 356 190" width="100%" role="img" aria-labelledby="plx-chart-t"></svg>
+        <div class="compare">
+          <div class="you"><span>You found</span><strong class="num" id="ly-you">10.7</strong><small>light years<br><span id="mas-you">306 &plusmn; 28 milliarcsec</span></small></div>
+          <div><span>The catalogue says</span><strong class="num">12.05</strong><small>light years<br>270.7 milliarcsec</small></div>
+        </div>
+        <p>12 percent apart: close, for five photos.</p>
+        <div class="compare">
+          <div class="you"><span>So it travels at</span><strong class="num" id="v-you">72.5</strong><small>km each second</small></div>
+          <div><span>The catalogue says</span><strong class="num">82.0</strong><small>km each second</small></div>
+        </div>
+        <p class="muted">At 72.5 km a second you would cross from Bucharest to Paris in about 26 seconds.</p>
+        <div class="row"><a class="btn btn-primary" href="#/mission/done">Make my patch</a></div>
+      </div>
+
+      <div data-screen="done">
+        <h2>Mission 1 done</h2>
+        <p>You found a star that moved, measured how fast, and worked out how far away it is, with real NASA SPHEREx data.</p>
+        <dl class="facts">
+          <dt>Speed across the sky</dt><dd><strong>4.58</strong> arcsec a year <span class="muted">(true 4.68)</span></dd>
+          <dt>Distance</dt><dd><strong>10.7</strong> light years <span class="muted">(true 12.05)</span></dd>
+          <dt>Speed through space</dt><dd><strong>72.5</strong> km a second <span class="muted">(true 82.0)</span></dd>
+          <dt>Photos</dt><dd>Apr 2025 to Oct 2026, 93 in all</dd>
+        </dl>
+        <div class="row">
+          <button class="btn btn-primary" type="button" id="copy">Copy link</button>
+          <span class="muted" id="copy-note">The result lives in the link. No account, nothing stored.</span>
+        </div>
+        <h2 style="margin-top:32px">Next missions</h2>
+        <ul class="missions" id="missions"></ul>
+        <div class="row"><a class="btn btn-quiet" href="#/explore">Explore any spot in the sky</a></div>
+      </div>
+
+      <div data-screen="explore">
+        <h2 id="ex-h">Watch any patch of sky</h2>
+        <form class="field" id="ex-form">
+          <label for="ex-q">A name, or a position (RA and Dec)</label>
+          <div class="in"><input id="ex-q" value="WISE 0855-0714" autocomplete="off" spellcheck="false" aria-describedby="ex-hint"><button class="btn btn-ghost" type="submit">Look</button></div>
+          <small id="ex-hint">Degrees like 133.795 &minus;7.245, or hours like 08h55m10.8s &minus;07d14m43s</small>
+        </form>
+        <p class="say"><strong>This object has moved.</strong> In 2010 it was here; now it is 134 arcseconds to the west.</p>
+        <dl class="facts" id="facts"></dl>
+        <details>
+          <summary>What is <span class="term" style="margin-left:4px">infrared</span>?</summary>
+          <p>Light just past red, too long for our eyes. SPHEREx sees 0.75 to 5 microns. This cold object glows only at 4 to 5 microns, so it shows up here and not in the shorter colours.</p>
+        </details>
+        <div class="toggles">
+          <button class="switch" type="button" role="switch" aria-checked="true" data-mark="was"><i></i><svg width="18" height="18" aria-hidden="true"><circle cx="9" cy="9" r="7" class="mark-then"/></svg><span>Where it was in 2010</span></button>
+          <button class="switch" type="button" role="switch" aria-checked="true" data-mark="now"><i></i><svg width="18" height="18" aria-hidden="true"><circle cx="9" cy="9" r="7" class="mark-now"/></svg><span>Where it is now</span></button>
+          <button class="switch" type="button" role="switch" aria-checked="true" data-mark="path"><i></i><svg width="18" height="18" aria-hidden="true"><line x1="2" y1="9" x2="16" y2="9" class="trail"/></svg><span>Its path</span></button>
+        </div>
+        <p class="loading"><i></i>34 of 95 photos, 21 MB</p>
+        <div class="row"><button class="btn btn-ghost" type="button" id="share">Copy link to this spot</button></div>
+      </div>
+      <p class="fine-sheet">An independent student project for the 2026 NASA Space Apps Challenge; not made, reviewed or endorsed by NASA. Images: NASA/JPL-Caltech, SPHEREx, via NASA/IPAC IRSA. Real photo, only enlarged and coloured; colour shows brightness, not real colour.</p>
+    </div>
+  </aside>
+
+  <!-- S5 patch -->
+  <section class="done" data-screen="done" aria-label="Your mission patch">
+    <svg class="patch" id="patch" viewBox="0 0 400 400" role="img" aria-labelledby="patch-t"></svg>
+  </section>
+
+  <!-- S6 time track -->
+  <section class="track" data-screen="explore" aria-label="Visits over time">
+    <div class="rail" id="rail"></div>
+    <div class="dates" id="dates" aria-hidden="true"></div>
+    <div class="ctl">
+      <button class="btn btn-ghost" type="button" id="prev">Earlier</button>
+      <button class="btn btn-ghost" type="button" id="play">Play</button>
+      <button class="btn btn-ghost" type="button" id="next">Later</button>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="skykey">
+    <span class="legend"><i aria-hidden="true"></i><span data-i18n="legend">Real photo, only enlarged and coloured. Colour shows brightness, not real colour.</span></span>
+    <button class="switch" type="button" role="switch" aria-checked="false" id="real"><i></i><span data-i18n="real">Real pixels</span></button>
+  </div>
+  <div class="fine">
+    <span class="indep" data-i18n="indep">An independent student project for the 2026 NASA Space Apps Challenge; not made, reviewed or endorsed by NASA.</span>
+    <span class="credit" data-i18n="credit">Images: NASA/JPL-Caltech, SPHEREx, via NASA/IPAC IRSA.</span>
+  </div>
+</footer>
+
+<div class="vh" aria-live="polite" id="live"></div>
+
+<template id="t-blink">
+  <button class="key" type="button" aria-pressed="false" aria-describedby="live">
+    <b data-i18n="hold">Hold to blink</b>
+    <span><span data-i18n="holdHow">or hold</span> <kbd data-i18n="space">Space</kbd></span>
+  </button>
+  <div class="when">
+    <div data-w="then" data-on><b data-i18n="then">Then</b><span class="num" data-d="then"></span></div>
+    <div data-w="now"><b data-i18n="now">Now</b><span class="num" data-d="now"></span></div>
+    <button class="switch" type="button" role="switch" aria-checked="false" data-keep><i></i><span data-i18n="keep">Keep it flipped</span></button>
+  </div>
+</template>
+
+<script src="app.js" type="module"></script>
+</body>
+</html>

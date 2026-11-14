@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Machete A, B, C</title>
+<style>
+  :root { --bg:#f4f3f0; --ink:#1b1b1b; --muted:#5c5c5c; --line:#d5d3cd; --card:#fff; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:17px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width:1500px; margin:0 auto; padding:32px 24px 96px; }
+  h1 { font-size:30px; margin:0 0 4px; }
+  .lead { color:var(--muted); margin:0 0 24px; max-width:70ch; }
+  nav { position:sticky; top:0; background:var(--bg); padding:12px 0; border-bottom:1px solid var(--line); display:flex; gap:20px; z-index:1; }
+  nav a { color:var(--ink); font-weight:600; }
+  section { padding-top:40px; }
+  h2 { font-size:26px; margin:0 0 6px; }
+  .idea { margin:0 0 4px; max-width:80ch; }
+  .state { color:var(--muted); margin:0 0 14px; max-width:80ch; }
+  .live { display:inline-block; margin:0 0 18px; font-weight:600; color:var(--ink); }
+  h3 { font-size:15px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:22px 0 10px; }
+  .desk { display:grid; grid-template-columns:repeat(auto-fill, minmax(440px, 1fr)); gap:16px; }
+  .phone { display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:16px; }
+  figure { margin:0; background:var(--card); border:1px solid var(--line); }
+  figure img { display:block; width:100%; height:auto; }
+  figcaption { padding:8px 12px; font-size:14px; color:var(--muted); border-top:1px solid var(--line); }
+  figure.missing img { display:none; }
+  figure.missing::before { content:"încă nu există"; display:block; padding:48px 12px; text-align:center; color:var(--muted); }
+  a:focus-visible { outline:3px solid #0b57d0; outline-offset:3px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Machete de design</h1>
+  <p class="lead">Runda 2 (D și E) este sus: format de lecție, cu date reale SPHEREx. Runda 1 (A, B, C) este mai jos. Apasă pe o captură ca să o vezi la mărime întreagă. Reîncarcă pagina ca să apară capturile noi.</p>
+  <nav><a href="#d">D, Observatory</a><a href="#e">E, Workbook</a><a href="#a">A, Plate</a><a href="#b">B, Dial</a><a href="#c">C, Control Room</a></nav>
+  <div id="out"></div>
+</main>
+<script>
+const SCREENS = [
+  ["s1", "1. Primul ecran"],
+  ["s2", "2. Filmul (privește)"],
+  ["s3", "3. Marchează și măsoară"],
+  ["s4", "4. Caută în altă parte"],
+  ["s5", "5. Ecranul 2 pe cealaltă temă"],
+];
+const LESSON = [
+  ["s1", "1. Primul ecran: ține apăsat ca să clipești"],
+  ["s2", "2. Misiune: găsește steaua care s-a mișcat"],
+  ["s3", "3. Misiune: măsoară cât s-a mișcat"],
+  ["s4", "4. Misiune: cât de departe este"],
+  ["s5", "5. Răsplata: insigna ta și misiunile următoare"],
+  ["s6", "6. Explorează orice loc de pe cer"],
+];
+const DIRS = [
+  { id:"d", dir:"d-observatory", name:"D, Observatory (runda 2)", screens:LESSON,
+    idea:"Cerul este pagina: fotografia reală, colorată după căldură, umple ecranul și se pierde în negru. Ții apăsat o tastă mare și tot cerul clipește. Lecție ghidată în patru pași, cu insignă la final.",
+    state:"Gata: toate cele șase ecrane, pe calculator și pe telefon. De reparat: stelele sunt prea pufoase, panoul taie conținutul jos la ecranele 4 și 5." },
+  { id:"e", dir:"e-workbook", name:"E, Workbook (runda 2)", screens:LESSON,
+    idea:"Un caiet de lucru care prinde viață: pagină albă, culori curajoase, cerul într-un ocular rotund. Tot ce face elevul lasă urme ca de creion, iar propozițiile au spații goale care se completează cu măsurătorile lui.",
+    state:"În construcție acum. Capturile apar aici pe măsură ce sunt gata." },
+  { id:"a", dir:"a-plate", name:"A, Plate",
+    idea:"Placa fotografică și caietul observatorului: hârtie crem, cerneală, roșu de creion doar pentru ce s-a mișcat. Leagă produsul de povestea lui Tombaugh din 1930.",
+    state:"Gata: ecranele 1, 2 și 3, cu imaginea ca placă fotografică în negativ. Ecranele 4 și 5 nu au fost construite." },
+  { id:"b", dir:"b-dial", name:"B, Dial",
+    idea:"Un instrument: pagină deschisă, vizor închis și un cadran al timpului cu opriri la datele reale ale vizitelor.",
+    state:"Toate cele cinci ecrane există. De reparat: decupajul imaginii e prea strâns, etichetele cadranului se ating." },
+  { id:"c", dir:"c-control-room", name:"C, Control Room",
+    idea:"Sală de control: fond închis, accent portocaliu, tipografie mare și rece.",
+    state:"Ecranele 1, 2 și 5 sunt stilizate. Ecranele 3 și 4 sunt doar text nestilizat." },
+];
+const out = document.getElementById("out");
+for (const d of DIRS) {
+  const fig = (s, label, kind) =>
+    `<figure><a href="${d.dir}/shots/${s}-${kind}.png"><img loading="lazy" src="${d.dir}/shots/${s}-${kind}.png" alt="${d.name}, ${label}, ${kind === "desktop" ? "calculator" : "telefon"}" onerror="this.closest('figure').classList.add('missing')"></a><figcaption>${label}</figcaption></figure>`;
+  out.insertAdjacentHTML("beforeend", `
+    <section id="${d.id}">
+      <h2>${d.name}</h2>
+      <p class="idea">${d.idea}</p>
+      <p class="state">${d.state}</p>
+      <a class="live" href="${d.dir}/index.html">Deschide macheta live</a>
+      <h3>Calculator, 1440 x 900</h3>
+      <div class="desk">${(d.screens || SCREENS).map(([s, l]) => fig(s, l, "desktop")).join("")}</div>
+      <h3>Telefon, 390 x 844</h3>
+      <div class="phone">${(d.screens || SCREENS).map(([s, l]) => fig(s, l, "phone")).join("")}</div>
+    </section>`);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skyblink</title>
+<meta name="description" content="Find the star that moved in real infrared photos from NASA's SPHEREx telescope, then measure it.">
+<link rel="preload" href="fonts/bricolage-grotesque-latin-standard-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/figtree-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="skip">Skip to the sky picture</a>
+
+<header class="top">
+  <a class="brand" href="#/" translate="no"><svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11"/><circle class="brand-dot" cx="15.5" cy="9.5" r="2.6"/></svg><span data-name>Skyblink</span></a>
+  <nav class="lang" aria-label="Language">
+    <a href="?lang=en" data-lang="en" lang="en" hreflang="en">English</a>
+    <a href="?lang=ro" data-lang="ro" lang="ro" hreflang="ro">Română</a>
+  </nav>
+</header>
+
+<main id="main">
+
+<!-- S1 -->
+<section class="screen s1" data-route="/" aria-labelledby="s1-h">
+  <div class="s1-copy">
+    <h1 id="s1-h" data-i18n="s1Title">Find the next Tombaugh.</h1>
+    <p class="lead" data-i18n="s1Lead">Two real infrared photos of one patch of sky, taken 17 months apart by NASA’s SPHEREx telescope. Hold the button and watch one star jump.</p>
+    <div class="cta-row">
+      <a class="btn btn-go" href="#/mission/spot" data-i18n="s1Go">Start mission 1</a>
+      <span class="cta-meta" data-i18n="s1Time">About 3 minutes</span>
+    </div>
+    <a class="link-quiet" href="#/explore" data-i18n="s1Else">Look at any spot in the sky</a>
+  </div>
+
+  <div class="s1-stage">
+    <div class="block" aria-hidden="true"></div>
+    <figure class="eyepiece" id="ep-s1" data-crop="73,59,46" data-crop-phone="69,60,34">
+      <div class="ep-disc">
+        <canvas class="ep-cv" role="img" aria-label=""></canvas>
+        <svg class="ep-marks" aria-hidden="true"></svg>
+      </div>
+      <figcaption class="sr" data-ep-caption></figcaption>
+    </figure>
+    <p class="epoch" aria-hidden="true"><b data-epoch-word>Then</b><span data-epoch-date>April 2025</span></p>
+    <div class="blink" data-blink="ep-s1">
+      <button class="hold" type="button" data-hold aria-describedby="s1-hold-hint"><span class="hold-face"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5" class="fill"/></svg><span data-hold-label data-i18n="hold">Hold to blink</span></span></button>
+      <div class="seg" role="group" aria-label="Show the photo from" data-i18n-label="segLabel">
+        <button type="button" aria-pressed="true" data-show="then" data-i18n="then">Then</button>
+        <button type="button" aria-pressed="false" data-show="now" data-i18n="now">Now</button>
+      </div>
+      <p class="hint" id="s1-hold-hint" data-i18n="holdHint">Press and hold, or hold the Space bar.</p>
+    </div>
+    <div class="legend">
+      <span class="ramp" aria-hidden="true"></span>
+      <p data-i18n="legend">Colour shows brightness, not real colour. A real photo, only enlarged and coloured.</p>
+    </div>
+  </div>
+</section>
+
+<!-- S2 -->
+<section class="screen spread" data-route="/mission/spot" aria-labelledby="s2-h">
+  <div class="sheet">
+    <ol class="path" aria-label="Mission 1, Epsilon Indi B">
+      <li aria-current="step"><span class="n">1</span><span>Spot it</span></li>
+      <li><span class="n">2</span><span>Measure it</span></li>
+      <li><span class="n">3</span><span>How far?</span></li>
+      <li><span class="n">4</span><span>Your patch</span></li>
+    </ol>
+    <h1 id="s2-h">Which dot moved?</h1>
+    <p class="body">Hold the button to flip between April 2025 and October 2026. One dot jumps. Tap it in the eyepiece.</p>
+    <p class="fill" aria-live="off">It slid <span class="blank" data-blank="s2-arc">___</span> arcseconds in <span class="blank" data-blank="s2-mo">___</span> months.</p>
+    <div class="blink" data-blink="ep-s2">
+      <button class="hold" type="button" data-hold aria-describedby="s2-hold-hint"><span class="hold-face"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5" class="fill"/></svg><span data-hold-label>Hold to blink</span></span></button>
+      <div class="seg" role="group" aria-label="Show the photo from">
+        <button type="button" aria-pressed="true" data-show="then">Then</button>
+        <button type="button" aria-pressed="false" data-show="now">Now</button>
+      </div>
+      <p class="hint" id="s2-hold-hint">Keyboard: hold Space to blink, arrows move the crosshair, Enter marks.</p>
+    </div>
+    <div class="feedback" data-feedback="s2" role="status" hidden></div>
+    <div class="actions">
+      <button class="btn-text" type="button" data-showme="s2">Show me</button>
+      <a class="btn btn-go" href="#/mission/measure" data-next="s2" aria-disabled="true">Next: measure it</a>
+    </div>
+  </div>
+  <div class="page-r">
+    <figure class="eyepiece pickable" id="ep-s2" data-crop="73,59,46" data-crop-phone="69,60,34">
+      <div class="ep-disc" tabindex="0" role="application" aria-roledescription="sky picture" aria-describedby="s2-hold-hint">
+        <canvas class="ep-cv" role="img" aria-label=""></canvas>
+        <svg class="ep-marks" aria-hidden="true"></svg>
+      </div>
+      <figcaption class="ep-tag"><b data-epoch-word>Then</b> <span data-epoch-date>April 2025</span></figcaption>
+    </figure>
+    <div class="ep-tools">
+      <button class="chip" type="button" aria-pressed="false" data-realpx="ep-s2">Real pixels</button>
+      <span class="ramp small" aria-hidden="true"></span><span class="tiny">Colour shows brightness, not real colour.</span>
+    </div>
+  </div>
+</section>
+
+<!-- S3 -->
+<section class="screen spread" data-route="/mission/measure" aria-labelledby="s3-h">
+  <div class="sheet">
+    <ol class="path" aria-label="Mission 1, Epsilon Indi B">
+      <li class="done"><span class="n">1</span><span>Spot it</span></li>
+      <li aria-current="step"><span class="n">2</span><span>Measure it</span></li>
+      <li><span class="n">3</span><span>How far?</span></li>
+      <li><span class="n">4</span><span>Your patch</span></li>
+    </ol>
+    <h1 id="s3-h">How fast does it move?</h1>
+    <p class="body">Zoomed in: your two marks, then and now, joined by the trail. The ruler in the eyepiece shows 10 arcseconds.</p>
+    <div class="sum">
+      <p class="fill">It moved <span class="blank on" data-count="6.5" data-dp="1">6.5</span> arcseconds</p>
+      <p class="fill">in <span class="blank on" data-count="17.1" data-dp="1">17.1</span> months, which is <span class="blank on" data-count="1.43" data-dp="2">1.43</span> years.</p>
+      <p class="fill big">6.5 ÷ 1.43 = <span class="blank on hero" data-count="4.58" data-dp="2">4.58</span> arcseconds a year</p>
+    </div>
+    <div class="versus">
+      <p><span class="vs-k">You</span><span class="vs-v">4.58</span></p>
+      <p><span class="vs-k">Star catalogue</span><span class="vs-v">4.68</span></p>
+      <p class="vs-note">2 percent apart. That is very close.</p>
+    </div>
+    <details class="why">
+      <summary>Why is mine a little different?</summary>
+      <p>The star does not only slide. It also wobbles a little, because we watch it from the Earth, and the Earth goes around the Sun. Five photos catch the slide and a bit of the wobble together. Measuring that wobble is the next step, and it tells us how far away the star is.</p>
+    </details>
+    <div class="actions">
+      <button class="chip" type="button" aria-pressed="false" data-diff>Subtract the photos</button>
+      <a class="btn btn-go" href="#/mission/distance">Next: how far is it?</a>
+    </div>
+  </div>
+  <div class="page-r">
+    <figure class="eyepiece" id="ep-s3" data-crop="69,60,32" data-crop-phone="66,60,26">
+      <div class="ep-disc">
+        <canvas class="ep-cv" role="img" aria-label=""></canvas>
+        <svg class="ep-marks" aria-hidden="true"></svg>
+      </div>
+      <figcaption class="ep-tag" data-s3-tag><b>Now</b> October 2026, with your marks</figcaption>
+    </figure>
+    <p class="tiny ep-note" data-diff-note hidden>After subtracting, the fixed stars vanish. The mover leaves a dark spot where it was (then) and a bright spot where it is (now).</p>
+  </div>
+</section>
+
+<!-- S4 -->
+<section class="screen spread" data-route="/mission/distance" aria-labelledby="s4-h">
+  <div class="sheet">
+    <ol class="path" aria-label="Mission 1, Epsilon Indi B">
+      <li class="done"><span class="n">1</span><span>Spot it</span></li>
+      <li class="done"><span class="n">2</span><span>Measure it</span></li>
+      <li aria-current="step"><span class="n">3</span><span>How far?</span></li>
+      <li><span class="n">4</span><span>Your patch</span></li>
+    </ol>
+    <h1 id="s4-h">How far away is it?</h1>
+    <p class="body">Hold a finger up and close one eye, then the other: the finger jumps against the wall. The Earth does the same thing for us as it goes around the Sun, so a nearby star seems to wobble. <button class="term" type="button" aria-expanded="false" aria-controls="g-parallax">Parallax</button> is the size of that wobble. The smaller the wobble, the farther the star.</p>
+    <p class="gloss" id="g-parallax" hidden><b>Parallax:</b> how much a nearby star seems to shift as the Earth moves around the Sun. Astronomers measure it in milliarcseconds (thousandths of an arcsecond).</p>
+    <div class="slider">
+      <label for="plx">Wobble size (parallax)</label>
+      <div class="slider-row"><input id="plx" type="range" min="0" max="600" step="2" value="160" aria-describedby="plx-fit"><output for="plx" id="plx-out">160 mas</output></div>
+      <p class="fit" id="plx-fit">Misfit: <b data-misfit>0</b> <span data-fit-word>Move the slider until the curve passes through the dots.</span></p>
+    </div>
+    <div class="sum" data-s4-result>
+      <p class="fill">Wobble <span class="blank on" data-plx-you>306</span> ± 28 milliarcseconds, so <span class="blank on hero" data-ly-you>10.7</span> light years away.</p>
+      <p class="fill">Speed across the sky <span class="blank on" data-v-you>72.5</span> km/s.</p>
+    </div>
+    <div class="versus">
+      <p><span class="vs-k">Distance</span><span class="vs-v"><span data-ly-you2>10.7</span> ly</span><span class="vs-t">catalogue 12.05 ly</span></p>
+      <p><span class="vs-k">Speed</span><span class="vs-v"><span data-v-you2>72.5</span> km/s</span><span class="vs-t">catalogue 82.0 km/s</span></p>
+      <p class="vs-note">12 percent off. Close, for five photos. At that speed you would cross from London to Bucharest in half a minute.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-go" href="#/mission/done">Get your patch</a>
+    </div>
+  </div>
+  <div class="page-r stack">
+    <figure class="diagram">
+      <svg viewBox="0 0 520 250" role="img" aria-labelledby="dg-t"><title id="dg-t">The Earth at two sides of its orbit around the Sun sees the nearby star in two slightly different directions against the far stars. The angle between them is the parallax.</title><g class="dg"></g></svg>
+      <figcaption class="tiny">Not to scale. The real angle is far smaller than drawn.</figcaption>
+    </figure>
+    <figure class="chart">
+      <svg id="plx-chart" viewBox="0 0 560 250" role="img" aria-labelledby="plx-chart-t"></svg>
+      <figcaption class="tiny">East to west wobble of Epsilon Indi B after taking out its straight slide, in arcseconds. Red dots: your five SPHEREx visits, with error bars. Blue line: the wobble your slider predicts.</figcaption>
+      <details class="why"><summary>Show the numbers</summary><table class="nums" data-plx-table></table></details>
+    </figure>
+  </div>
+</section>
+
+<!-- S5 -->
+<section class="screen done" data-route="/mission/done" aria-labelledby="s5-h">
+  <div class="done-grid">
+    <div class="patch-wrap">
+      <svg class="patch" id="patch" viewBox="0 0 400 400" role="img" aria-labelledby="patch-t"></svg>
+    </div>
+    <div class="done-copy">
+      <ol class="path" aria-label="Mission 1, Epsilon Indi B">
+        <li class="done"><span class="n">1</span><span>Spot it</span></li>
+        <li class="done"><span class="n">2</span><span>Measure it</span></li>
+        <li class="done"><span class="n">3</span><span>How far?</span></li>
+        <li aria-current="step"><span class="n">4</span><span>Your patch</span></li>
+      </ol>
+      <h1 id="s5-h">Mission 1 done.</h1>
+      <p class="body">You found Epsilon Indi B, a pair of brown dwarfs, and measured it with real NASA SPHEREx data.</p>
+      <dl class="form">
+        <div><dt>It moves</dt><dd><b>4.58</b> arcseconds a year <span>catalogue 4.68</span></dd></div>
+        <div><dt>It is</dt><dd><b>10.7</b> light years away <span>catalogue 12.05</span></dd></div>
+        <div><dt>It travels at</dt><dd><b>72.5</b> km/s <span>catalogue 82.0</span></dd></div>
+        <div><dt>Photos from</dt><dd>April 2025 to October 2026, 93 photos added up</dd></div>
+      </dl>
+      <div class="actions">
+        <button class="btn btn-go" type="button" data-copy>Copy link</button>
+        <p class="tiny" data-copy-note>Your result lives in the link. No account, no name, nothing stored.</p>
+      </div>
+    </div>
+  </div>
+  <div class="onward">
+    <h2>Next missions</h2>
+    <ul class="patches">
+      <li class="earned"><svg viewBox="0 0 100 100" aria-hidden="true" data-mini="epsindb"></svg><b>Epsilon Indi B</b><span>Done</span></li>
+      <li><svg viewBox="0 0 100 100" aria-hidden="true" data-mini="barnard"></svg><b>Barnard’s Star</b><span>The fastest-moving star in the sky</span></li>
+      <li><svg viewBox="0 0 100 100" aria-hidden="true" data-mini="wise0855"></svg><b>WISE 0855</b><span>The challenge’s own target, 134 arcseconds west since 2010</span></li>
+      <li><svg viewBox="0 0 100 100" aria-hidden="true" data-mini="rwaur"></svg><b>RW Aurigae</b><span>A star that changes brightness</span></li>
+      <li><svg viewBox="0 0 100 100" aria-hidden="true" data-mini="rdra"></svg><b>R Draconis</b><span>A star that changes brightness</span></li>
+    </ul>
+    <a class="link-quiet" href="#/explore">Explore any spot in the sky</a>
+  </div>
+</section>
+
+<!-- S6 -->
+<section class="screen explore" data-route="/explore" aria-labelledby="s6-h">
+  <div class="ex-head">
+    <h1 id="s6-h">Look at any spot in the sky</h1>
+    <form class="search" data-search>
+      <label for="q">Name or position (RA and Dec, in degrees or hours)</label>
+      <div class="search-row">
+        <input id="q" name="q" type="text" inputmode="text" autocomplete="off" spellcheck="false" value="WISE 0855-0714" aria-describedby="q-hint">
+        <button class="btn btn-ink" type="submit">Show</button>
+      </div>
+      <p class="tiny" id="q-hint">Try “Barnard’s Star” or “08 55 10.8 −07 14 42”. The position goes into the link, so you can share it.</p>
+    </form>
+  </div>
+  <div class="ex-grid">
+    <div class="ex-stage">
+      <figure class="eyepiece" id="ep-s6" data-crop="60,60,60">
+        <div class="ep-disc">
+          <canvas class="ep-cv" role="img" aria-label=""></canvas>
+          <svg class="ep-marks" aria-hidden="true"></svg>
+        </div>
+        <figcaption class="ep-tag"><b data-ex-visit>Visit 4 of 4</b> <span data-ex-date></span></figcaption>
+      </figure>
+      <div class="ruler-wrap">
+        <div class="ruler" data-ruler></div>
+        <input class="sr-range" type="range" min="0" max="3" step="1" value="3" id="ex-range" aria-label="Visit">
+      </div>
+      <div class="player">
+        <button class="btn-ctl" type="button" data-step-by="-1"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg>Earlier</button>
+        <button class="btn-ctl play" type="button" data-play aria-pressed="false"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M8 5v14l11-7z"/></svg><span data-play-label>Play</span></button>
+        <button class="btn-ctl" type="button" data-step-by="1">Later<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>
+      </div>
+    </div>
+    <div class="ex-side">
+      <p class="answer">This object has moved. In 2010 it was at the square; now it is <b data-ex-gap>130</b> arcseconds to the west.</p>
+      <dl class="form">
+        <div><dt>Visit</dt><dd data-ex-n>4 of 4</dd></div>
+        <div><dt>Dates</dt><dd data-ex-dates></dd></div>
+        <div><dt>Light</dt><dd><span data-ex-light></span> <button class="term" type="button" aria-expanded="true" aria-controls="g-ir">infrared</button></dd></div>
+        <div><dt>Photos added together</dt><dd data-ex-photos></dd></div>
+      </dl>
+      <p class="gloss" id="g-ir"><b>Infrared:</b> light just past red, too red for our eyes. Cold things like brown dwarfs glow in it. SPHEREx sees from 0.75 to 5 microns; our eyes stop at about 0.7.</p>
+      <fieldset class="marks-set">
+        <legend>Marks</legend>
+        <button class="chip" type="button" aria-pressed="true" data-mk="then2010"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12"/></svg>2010 position</button>
+        <button class="chip" type="button" aria-pressed="true" data-mk="now"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/></svg>Where it is now</button>
+        <button class="chip" type="button" aria-pressed="false" data-mk="track"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16 20 8"/></svg>Its path</button>
+      </fieldset>
+      <p class="loading"><span class="bar" aria-hidden="true"><span style="--p:.36"></span></span><span>Loading example: 34 of 95 photos, 21 MB</span></p>
+      <p class="tiny" data-share>Share this view: <a href="#/explore?ra=133.7951&amp;dec=-7.2451">this link opens the same spot</a></p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <p data-i18n="foot1">An independent student project for the 2026 NASA Space Apps Challenge; not made, reviewed or endorsed by NASA.</p>
+  <p data-i18n="foot2">Images: NASA/JPL-Caltech, SPHEREx, via NASA/IPAC IRSA.</p>
+</footer>
+
+<div class="toast-live sr" id="live" aria-live="polite"></div>
+<script type="module" src="app.js"></script>
+</body>
+</html>
