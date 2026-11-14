@@ -92,17 +92,17 @@ function Help() {
       <h3>Moving around</h3>
       <ul>
         <li>
-          <strong>Drag</strong> to turn the globe or the sky. The point you grab stays under your pointer.
+          <strong>Drag</strong> to pan around the sky. The point you grab stays under your pointer.
         </li>
         <li>
-          <strong>Scroll or pinch</strong> to zoom around the pointer. Zoom into the globe to fly inside the sky.
+          <strong>Scroll or pinch</strong> to zoom around the pointer. The field of view stays between 0.05° and 100°.
         </li>
         <li>
           <strong>Double-click</strong> to fly to a point. <strong>Click a pin</strong> for details.
         </li>
         <li>
-          Keys: arrows pan, <kbd>+</kbd>/<kbd>−</kbd> zoom, <kbd>S</kbd> globe/sky, <kbd>Enter</kbd> lock, <kbd>G</kbd> grid, <kbd>R</kbd> reset,{' '}
-          <kbd>Esc</kbd> close.
+          Keys: arrows pan, <kbd>+</kbd>/<kbd>−</kbd> zoom, <kbd>Enter</kbd> lock, <kbd>G</kbd> grid, <kbd>Home</kbd> (or <kbd>R</kbd>) reset,{' '}
+          <kbd>Esc</kbd> stop motion and close details or help.
         </li>
       </ul>
       <h3>Where the coordinates come from</h3>
@@ -111,10 +111,10 @@ function Help() {
         directly into right ascension and declination: RA = atan2(y, x), Dec = asin(z). NASA&apos;s images are already registered to the same
         frame, and each HiPS tile&apos;s file name is its HEALPix sky address, so every image lands exactly where it belongs.
       </p>
-      <h3>Why the globe looks mirrored</h3>
+      <h3>Panoramic sky</h3>
       <p>
-        From outside, a celestial globe shows the sky mirror-reversed. When you fly inside, the view flips to the true sky: north up, east to the
-        left.
+        You always look out from inside the sky, with north up and east to the left. Reset returns to the opening direction at a 60° field of
+        view. The coordinate grid starts hidden; press <kbd>G</kbd> to toggle it.
       </p>
       <h3>Precision</h3>
       <p>

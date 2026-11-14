@@ -6,7 +6,7 @@ import { SearchBox } from './SearchBox';
 import { LayerPanel } from './LayerPanel';
 import { Dock } from './Dock';
 import { SidePanel } from './SidePanel';
-import { FlashOverlay, HoverTooltip, Reticle, SkyLabels, StatusLine } from './Overlays';
+import { HoverTooltip, Reticle, SkyLabels, StatusLine } from './Overlays';
 import { Dialogs } from './Dialogs';
 
 function TopBar() {
@@ -45,7 +45,6 @@ export function Hud() {
       <CoordinateReadout />
       <Dock />
       <StatusLine />
-      <FlashOverlay />
       <PositionAnnouncer />
       <Dialogs />
     </div>

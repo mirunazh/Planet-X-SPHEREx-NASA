@@ -1,7 +1,7 @@
 'use client';
 
 /** Drives the camera from the view state and advances queued animations every frame. */
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useNav } from '@/lib/store';
@@ -38,46 +38,4 @@ export function Navigator() {
   });
 
   return null;
-}
-
-/** A faint limb glow so the globe reads as an object against black space (globe mode only). */
-export function GlobeRim() {
-  const mode = useNav((s) => s.mode);
-  const material = useMemo(
-    () =>
-      new THREE.ShaderMaterial({
-        uniforms: { uColor: { value: new THREE.Color('#5aa8ff') } },
-        vertexShader: /* glsl */ `
-          varying vec3 vN;
-          varying vec3 vV;
-          void main() {
-            vec4 mv = modelViewMatrix * vec4(position, 1.0);
-            vN = normalize(normalMatrix * normal);
-            vV = normalize(-mv.xyz);
-            gl_Position = projectionMatrix * mv;
-          }
-        `,
-        fragmentShader: /* glsl */ `
-          uniform vec3 uColor;
-          varying vec3 vN;
-          varying vec3 vV;
-          void main() {
-            float f = 1.0 - max(dot(vN, vV), 0.0);
-            gl_FragColor = vec4(uColor, pow(f, 4.0) * 0.5);
-          }
-        `,
-        transparent: true,
-        depthTest: false,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-      }),
-    [],
-  );
-  useEffect(() => () => material.dispose(), [material]);
-  if (mode !== 'globe') return null;
-  return (
-    <mesh renderOrder={50} frustumCulled={false} material={material}>
-      <sphereGeometry args={[1.002, 96, 64]} />
-    </mesh>
-  );
 }

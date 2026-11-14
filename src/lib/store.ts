@@ -66,9 +66,7 @@ export interface NavState {
   selected: Pin | null;
   locked: SkyTarget | null;
   origin: TargetOrigin;
-  flash: number;
   busy: boolean;
-  crossing: boolean;
   viewport: { width: number; height: number; dpr: number };
   allskyStatus: LoadStatus;
   /** HiPS order the renderer is drawing (null = whole-sky preview only). */
@@ -79,7 +77,7 @@ export interface NavState {
 }
 
 export interface NavActions {
-  setView: (v: Partial<Pick<NavState, 'mode' | 'center' | 'fov' | 'distance'>>) => void;
+  setView: (v: Partial<Pick<NavState, 'center' | 'fov'>>) => void;
   setSurvey: (id: SurveyId) => void;
   setFrame: (frame: number) => void;
   toggle: (key: 'showGrid' | 'showHosts' | 'showTargets' | 'rawPixels') => void;
@@ -92,9 +90,9 @@ export interface NavActions {
 }
 
 export const INITIAL_VIEW: Pick<NavState, 'mode' | 'center' | 'fov' | 'distance'> = {
-  mode: 'globe',
-  center: radecToVec(266.40499, -28.93617), // Galactic Centre: the Milky Way band crosses the globe
-  fov: 46,
+  mode: 'sky',
+  center: radecToVec(266.40499, -28.93617), // Galactic Centre: opening direction toward the Milky Way
+  fov: 60,
   distance: 3.2,
 };
 
@@ -104,7 +102,7 @@ export const useNav = create<NavState & NavActions>()((set) => ({
   frame: SURVEYS.spherex.defaultFrame,
   rawPixels: false,
   gain: 1,
-  showGrid: true,
+  showGrid: false,
   showHosts: true,
   showTargets: true,
   hosts: [],
@@ -116,9 +114,7 @@ export const useNav = create<NavState & NavActions>()((set) => ({
   selected: null,
   locked: null,
   origin: 'navigation',
-  flash: 0,
   busy: false,
-  crossing: false,
   viewport: { width: 1, height: 1, dpr: 1 },
   allskyStatus: 'idle',
   activeOrder: null,

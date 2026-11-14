@@ -1,6 +1,6 @@
 # Planet-X-SPHEREx-NASA
 
-**SPHEREx Sky Navigator**: a 3D navigator for the infrared sky in the style of Apple's Find My, built **only on NASA data**. Spin the whole sky like a globe, fly *through* the celestial sphere into the real sky, and zoom down to arcseconds. The app works out the exact ICRS coordinates under your view as you move, so you never type a coordinate unless you want to.
+**SPHEREx Sky Navigator**: a 3D navigator for the infrared sky in the style of Apple's Find My, built **only on NASA data**. Pan around the sky from inside the celestial sphere and zoom from a 100° field of view down to 0.05°. The app works out the exact ICRS coordinates under your view as you move, so you never type a coordinate unless you want to.
 
 Built for the NASA Space Apps Challenge 2026.
 
@@ -8,7 +8,7 @@ Built for the NASA Space Apps Challenge 2026.
 
 ## What it does
 
-- **Globe → sky crossing.** From outside, the celestial sphere is a globe, shown mirror-reversed like a classic celestial globe. Zoom in and the camera passes through the sphere wall into the true sky (north up, east left).
+- **Panoramic navigation.** Opens at a 60° field of view, north up and east left, with the grid hidden. Drag to pan; scroll, pinch or use +/− to zoom. Home (or R) resets the view; Esc stops motion. Legacy globe links retain their sky direction and open in the panorama.
 - **Coordinate deduction.** RA/Dec (ICRS), galactic l/b and field of view are computed live from the camera direction. The number of digits follows the real uncertainty: the larger of one screen pixel and one survey pixel.
 - **NASA surveys**, streamed as HiPS tiles from NASA/IPAC IRSA:
 

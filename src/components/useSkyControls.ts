@@ -10,8 +10,6 @@ import { useNav } from '@/lib/store';
 import {
   cancelAnimations,
   currentView,
-  enterSky,
-  exitToGlobe,
   flyTo,
   lockTarget,
   panByScreen,
@@ -68,7 +66,6 @@ export function useSkyControls(ref: RefObject<HTMLDivElement | null>): void {
 
     function onPointerDown(e: PointerEvent) {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
-      if (useNav.getState().crossing) return;
       el.setPointerCapture(e.pointerId);
       pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
       cancelAnimations();
@@ -112,12 +109,12 @@ export function useSkyControls(ref: RefObject<HTMLDivElement | null>): void {
           useNav.getState().setHover(null, null);
           useNav.setState({ origin: 'navigation' });
         }
-        if (!drag.moved || useNav.getState().crossing) return;
+        if (!drag.moved) return;
         const view = currentView();
         if (drag.anchor) {
           useNav.getState().setView({ center: solveAnchor(view, p.aspect, p.x, p.y, drag.anchor) });
         } else {
-          // Dragging in empty space around the globe: rotate by the pointer delta.
+          // Fallback if an anchor could not be determined: pan by the pointer delta.
           panByScreen((-(p.px - drag.lastX) / p.w) * 2, ((p.py - drag.lastY) / p.h) * 2);
         }
         drag.lastX = p.px;
@@ -189,7 +186,8 @@ export function useSkyControls(ref: RefObject<HTMLDivElement | null>): void {
 
     function onKey(e: KeyboardEvent) {
       const t = e.target as HTMLElement | null;
-      if (t && (['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(t.tagName) || t.isContentEditable)) return;
+      if (t && (['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName) || t.isContentEditable)) return;
+      if (t?.tagName === 'BUTTON' && !['Home', 'r', 'Escape'].includes(e.key)) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       const s = useNav.getState();
       switch (e.key) {
@@ -223,18 +221,21 @@ export function useSkyControls(ref: RefObject<HTMLDivElement | null>): void {
         case 'g':
           s.toggle('showGrid');
           break;
+        case 'Home':
         case 'r':
           resetView();
-          break;
-        case 's':
-          if (s.mode === 'globe') enterSky();
-          else exitToGlobe();
           break;
         default:
           return;
       }
       e.preventDefault();
     }
+
+    // Capture Escape even when an input or a modal consumes the key.
+    const onStopMotion = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') cancelAnimations();
+    };
+    window.addEventListener('keydown', onStopMotion, true);
 
     el.addEventListener('pointerdown', onPointerDown);
     el.addEventListener('pointermove', onPointerMove);
@@ -253,6 +254,7 @@ export function useSkyControls(ref: RefObject<HTMLDivElement | null>): void {
       el.removeEventListener('wheel', onWheel);
       el.removeEventListener('dblclick', onDoubleClick);
       window.removeEventListener('keydown', onKey);
+      window.removeEventListener('keydown', onStopMotion, true);
     };
   }, [ref]);
 }

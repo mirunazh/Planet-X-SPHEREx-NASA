@@ -6,12 +6,6 @@ import { radecToVec, vecToRadec } from '@/lib/sky/coords';
 import { cameraBasis, projectWithBasis } from '@/lib/sky/view';
 import { tileStore } from '../sky/TileStore';
 
-/** The burst of light when the camera passes through the celestial sphere. */
-export function FlashOverlay() {
-  const flash = useNav((s) => s.flash);
-  return <div className="flash" style={{ opacity: flash }} aria-hidden="true" />;
-}
-
 export function Reticle() {
   const mode = useNav((s) => s.mode);
   if (mode !== 'sky') return null;

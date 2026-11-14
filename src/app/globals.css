@@ -153,7 +153,6 @@ kbd {
 .hud > .labels,
 .hud > .reticle,
 .hud > .tooltip,
-.hud > .flash,
 .hud > .status {
   pointer-events: none;
 }
@@ -704,12 +703,6 @@ kbd {
 
 .tooltip span {
   color: var(--muted);
-}
-
-.flash {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(235, 248, 255, 0.95) 0%, rgba(127, 200, 255, 0.55) 35%, rgba(3, 5, 11, 0) 75%);
 }
 
 .status {

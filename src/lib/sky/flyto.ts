@@ -5,7 +5,7 @@
  * pan distance and the field of view as the zoom width.
  */
 import { type Vec3, DEG, RAD, angularDistance, slerp } from './coords';
-import { SKY_MAX_FOV } from './view';
+import { SKY_MAX_FOV, SKY_MIN_FOV } from './view';
 
 export interface FlyPath {
   duration: number;
@@ -50,7 +50,7 @@ export function flyPath(c0: Vec3, fov0: number, c1: Vec3, fov1: number): FlyPath
       const [u, w] = uw(tt * S);
       return {
         center: d1 < 1e-9 ? c1 : slerp(c0, c1, clamp(u, 0, 1)),
-        fov: clamp(w * RAD, Math.min(fov0, fov1) * 0.5, SKY_MAX_FOV),
+        fov: clamp(w * RAD, SKY_MIN_FOV, SKY_MAX_FOV),
       };
     },
   };

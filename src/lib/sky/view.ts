@@ -42,12 +42,12 @@ export interface View {
 }
 
 export const GLOBE_FOV = 40;
-/** Zooming the globe closer than this flies the camera into sky mode. */
+/** Legacy globe limits, retained for coordinate compatibility tests. */
 export const GLOBE_MIN_DISTANCE = 2.0;
 export const GLOBE_MAX_DISTANCE = 8;
-export const SKY_MIN_FOV = 0.01;
-/** Zooming the sky wider than this flies the camera back out to the globe. */
-export const SKY_MAX_FOV = 90;
+export const SKY_MIN_FOV = 0.05;
+/** Panoramic navigation clamps at this field of view. */
+export const SKY_MAX_FOV = 100;
 export const LOCK_MAX_FOV = 1;
 const MAX_ABS_DEC = 89.95;
 

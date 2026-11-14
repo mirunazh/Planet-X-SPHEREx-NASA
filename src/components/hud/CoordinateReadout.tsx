@@ -79,9 +79,7 @@ export function CoordinateReadout() {
         </span>
       </div>
       <p className="readout-mode">
-        {r.mode === 'globe'
-          ? 'Globe view: the celestial sphere seen from outside (mirror image). Zoom in to fly inside.'
-          : `Sky view: true orientation, north up, east left${r.frame ? ` · ${r.survey.shortName} λ ${r.frame.wavelengthUm.toFixed(3)} µm` : ` · ${r.survey.shortName}`}`}
+        {`Sky view: true orientation, north up, east left${r.frame ? ` · ${r.survey.shortName} λ ${r.frame.wavelengthUm.toFixed(3)} µm` : ` · ${r.survey.shortName}`}`}
       </p>
     </section>
   );
@@ -90,15 +88,14 @@ export function CoordinateReadout() {
 /** Announces the position to screen readers once the view settles (not every frame). */
 export function PositionAnnouncer() {
   const center = useNav((s) => s.center);
-  const mode = useNav((s) => s.mode);
   const [text, setText] = useState('');
   useEffect(() => {
     const t = setTimeout(() => {
       const { ra, dec } = vecToRadec(center);
-      setText(`${mode === 'globe' ? 'Globe' : 'Sky'} view centred on right ascension ${formatRA(ra, 60)}, declination ${formatDec(dec, 60)}`);
+      setText(`Sky view centred on right ascension ${formatRA(ra, 60)}, declination ${formatDec(dec, 60)}`);
     }, 900);
     return () => clearTimeout(t);
-  }, [center, mode]);
+  }, [center]);
   return (
     <div className="sr-only" aria-live="polite">
       {text}
