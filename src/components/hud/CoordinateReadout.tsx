@@ -11,6 +11,7 @@ import { radecToGalactic, vecToRadec } from '@/lib/sky/coords';
 import { formatAngle, formatDec, formatDegrees, formatRA, formatUncertainty } from '@/lib/sky/format';
 import { SPHEREX_FRAMES, SURVEYS } from '@/lib/sky/surveys';
 import { effectiveFov, pixelScaleDeg } from '@/lib/sky/view';
+import { HINT } from './hints';
 
 function useReadout() {
   const mode = useNav((s) => s.mode);
@@ -47,30 +48,26 @@ function useReadout() {
 
 export function CoordinateReadout() {
   const r = useReadout();
+  const detailHint = r.detail === 'preview' ? HINT.detailPreview : r.detail === 'magnified' ? HINT.detailMagnified : HINT.detailNative;
   return (
     <section className="readout panel" aria-label="Coordinates of the view centre">
       <div className="readout-main">
-        <span className="coord">
-          <abbr title="Right ascension (ICRS)">RA</abbr>
+        <span className="coord" data-hint={HINT.ra}>
+          <span className="coord-label">RA</span>
           <output>{formatRA(r.ra, r.uncertainty)}</output>
         </span>
-        <span className="coord">
-          <abbr title="Declination (ICRS)">Dec</abbr>
+        <span className="coord" data-hint={HINT.dec}>
+          <span className="coord-label">Dec</span>
           <output>{formatDec(r.dec, r.uncertainty)}</output>
         </span>
       </div>
       <div className="readout-sub">
-        <span title="Galactic longitude and latitude">
+        <span data-hint={HINT.galactic}>
           l {formatDegrees(r.l, r.uncertainty)}° · b {formatDegrees(r.b, r.uncertainty)}°
         </span>
-        <span title="Vertical field of view">FOV {formatAngle(r.fov)}</span>
-        <span title="Positional uncertainty: the larger of one screen pixel and one survey pixel">
-          {formatUncertainty(r.uncertainty)}
-        </span>
-        <span
-          className={`chip ${r.detail === 'magnified' ? 'chip-warn' : ''}`}
-          title={`${r.survey.shortName} native pixel: ${r.survey.pixelScaleArcsec}″`}
-        >
+        <span data-hint={HINT.fov}>FOV {formatAngle(r.fov)}</span>
+        <span data-hint={HINT.uncertainty}>{formatUncertainty(r.uncertainty)}</span>
+        <span className={`chip ${r.detail === 'magnified' ? 'chip-warn' : ''}`} data-hint={detailHint}>
           {r.detail === 'preview'
             ? 'Whole-sky preview'
             : r.detail === 'magnified'
@@ -78,7 +75,7 @@ export function CoordinateReadout() {
               : 'Native resolution'}
         </span>
       </div>
-      <p className="readout-mode">
+      <p className="readout-mode" data-hint={r.mode === 'globe' ? HINT.modeGlobe : HINT.modeSky}>
         {r.mode === 'globe'
           ? 'Globe view: the celestial sphere seen from outside (mirror image). Zoom in to fly inside.'
           : `Sky view: true orientation, north up, east left${r.frame ? ` · ${r.survey.shortName} λ ${r.frame.wavelengthUm.toFixed(3)} µm` : ` · ${r.survey.shortName}`}`}

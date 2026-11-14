@@ -60,12 +60,12 @@ export const SPHEREX_FRAMES: SpherexFrame[] = SPHEREX_WAVELENGTHS_UM.map((wavele
 }));
 
 export const SPHEREX_PRESETS: { frame: number; label: string; hint: string }[] = [
-  { frame: 0, label: '0.75 µm', hint: 'Shortest SPHEREx wavelength' },
-  { frame: 22, label: '1.25 µm', hint: 'Close to the 2MASS J band' },
-  { frame: 46, label: '2.19 µm', hint: 'Close to the 2MASS Ks band' },
-  { frame: 62, label: '3.29 µm', hint: 'PAH emission and methane absorption' },
-  { frame: 80, label: '4.26 µm', hint: 'CO₂ ice absorption band' },
-  { frame: 90, label: '4.60 µm', hint: 'Close to the WISE W2 band' },
+  { frame: 0, label: '0.75 µm', hint: '0.75 µm: the shortest SPHEREx wavelength, mostly starlight.' },
+  { frame: 22, label: '1.25 µm', hint: '1.25 µm: close to the 2MASS J band.' },
+  { frame: 46, label: '2.19 µm', hint: '2.19 µm: close to 2MASS Ks. Sees through dust to the stars of the Milky Way.' },
+  { frame: 62, label: '3.29 µm', hint: '3.29 µm: glow of carbon-rich PAH molecules in galaxies; methane absorption in cold brown dwarfs.' },
+  { frame: 80, label: '4.26 µm', hint: '4.26 µm: absorption by CO₂ ice in cold interstellar clouds.' },
+  { frame: 90, label: '4.60 µm', hint: '4.60 µm: close to WISE W2. Warm dust and cool brown dwarfs.' },
 ];
 
 const SPHEREX_ACK =

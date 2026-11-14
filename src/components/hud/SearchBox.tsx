@@ -11,6 +11,7 @@ import { searchPins } from '@/lib/pins';
 import { parseCoordinates } from '@/lib/sky/parse';
 import { radecToVec } from '@/lib/sky/coords';
 import { formatDec, formatRA } from '@/lib/sky/format';
+import { HINT } from './hints';
 
 interface ResolveResponse {
   ok: boolean;
@@ -88,6 +89,8 @@ export function SearchBox() {
         autoComplete="off"
         spellCheck={false}
         maxLength={64}
+        data-hint={HINT.search}
+        data-hint-nofocus=""
         placeholder="M31, Teegarden's Star, 10.68 41.27, 00 42 44 +41 16 09"
         value={query}
         onChange={(e) => {

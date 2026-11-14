@@ -24,6 +24,7 @@ Built for the NASA Space Apps Challenge 2026.
 - **Search.** Type coordinates in any common notation, a pin name, or any galaxy name (resolved by NED through a server-side route).
 - **Lock target.** Below a 1° field of view, lock the centre to produce a reproducible `SkyTarget` with position, uncertainty, HEALPix order-14 index, layer and wavelength. This is the hand-off to the image-comparison pipeline. Copy it as JSON or as a deep link.
 - **Deep links.** Every view is a URL, e.g. `/?ra=10.68479&dec=41.26907&mode=sky&fov=0.5&survey=spherex&f=46`.
+- **Self-explaining interface.** Hover over any element (or focus it with the keyboard) for a short explanation. The same texts appear in the Field guide under **How it works**, which also serves touch screens.
 
 ## How the coordinates are generated
 

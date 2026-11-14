@@ -14,6 +14,7 @@ import { type Vec3, DEG, RAD, add, cross, eqToGal, galToEq, normalize, radecToVe
 import { effectiveFov, pickSky, visibleRadiusDeg } from '@/lib/sky/view';
 import { currentView, flyTo, viewportAspect } from '@/lib/navigation';
 import { loadAllsky } from '../sky/allsky';
+import { HINT } from './hints';
 
 const W = 256;
 const H = 128;
@@ -202,7 +203,7 @@ export function MiniMap() {
   }, []);
 
   return (
-    <div className="minimap">
+    <div className="minimap" data-hint={HINT.minimap}>
       <canvas
         ref={canvasRef}
         width={W}

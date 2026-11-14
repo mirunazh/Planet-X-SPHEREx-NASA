@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useNav } from '@/lib/store';
 import { SPHEREX_FRAMES, SPHEREX_PRESETS, SURVEYS, SURVEY_ORDER, nearestUsableFrame } from '@/lib/sky/surveys';
+import { HINT, SURVEY_HINT } from './hints';
 
 export function LayerPanel() {
   const surveyId = useNav((s) => s.surveyId);
@@ -33,7 +34,7 @@ export function LayerPanel() {
     <section className={`panel layers ${collapsed ? 'collapsed' : ''}`} aria-label="Sky layers">
       <header className="panel-head">
         <h2>Sky layer</h2>
-        <button className="icon-btn" aria-expanded={!collapsed} onClick={() => setCollapsed((c) => !c)}>
+        <button className="icon-btn" aria-expanded={!collapsed} onClick={() => setCollapsed((c) => !c)} data-hint={HINT.layersToggle}>
           {collapsed ? 'Show' : 'Hide'}
         </button>
       </header>
@@ -47,20 +48,20 @@ export function LayerPanel() {
                 aria-checked={id === surveyId}
                 className={id === surveyId ? 'on' : ''}
                 onClick={() => useNav.getState().setSurvey(id)}
-                title={SURVEYS[id].name}
+                data-hint={SURVEY_HINT[id]}
               >
                 <span>{SURVEYS[id].shortName}</span>
                 <small>{SURVEYS[id].epoch.split(' ')[0].slice(0, 9)}</small>
               </button>
             ))}
           </div>
-          <p className="muted small">
+          <p className="muted small" data-hint={HINT.surveyInfo}>
             {survey.mission} · {survey.wavelength} · {survey.epoch} · native pixel {survey.pixelScaleArcsec}″
           </p>
 
           {survey.isCube && (
             <div className="wavelength">
-              <label htmlFor="frame-slider">
+              <label htmlFor="frame-slider" data-hint={HINT.wavelength}>
                 Wavelength <strong>{shown.wavelengthUm.toFixed(3)} µm</strong>{' '}
                 <small>
                   band {shown.band} · channel {shown.channel}
@@ -75,13 +76,14 @@ export function LayerPanel() {
                 value={pending}
                 aria-valuetext={`${shown.wavelengthUm.toFixed(3)} micrometres`}
                 onChange={(e) => setPending(Number(e.target.value))}
+                data-hint={HINT.wavelength}
               />
               <div className="presets">
                 {SPHEREX_PRESETS.map((p) => (
                   <button
                     key={p.frame}
                     className={p.frame === frame ? 'on' : ''}
-                    title={p.hint}
+                    data-hint={p.hint}
                     onClick={() => {
                       setPending(p.frame);
                       useNav.getState().setFrame(p.frame);
@@ -95,7 +97,7 @@ export function LayerPanel() {
           )}
 
           <div className="wavelength">
-            <label htmlFor="gain-slider">
+            <label htmlFor="gain-slider" data-hint={HINT.gain}>
               Display brightness <strong>×{gain.toFixed(1)}</strong> <small>display only, data unchanged</small>
             </label>
             <input
@@ -106,22 +108,23 @@ export function LayerPanel() {
               step={0.1}
               value={gain}
               onChange={(e) => useNav.setState({ gain: Number(e.target.value) })}
+              data-hint={HINT.gain}
             />
           </div>
 
           <fieldset className="toggles">
             <legend className="sr-only">Overlays</legend>
-            <label>
+            <label data-hint={HINT.grid}>
               <input type="checkbox" checked={showGrid} onChange={() => toggle('showGrid')} /> Grid, ecliptic and galactic plane
             </label>
-            <label>
+            <label data-hint={HINT.targets}>
               <input type="checkbox" checked={showTargets} onChange={() => toggle('showTargets')} /> Featured targets
             </label>
-            <label>
+            <label data-hint={HINT.hosts}>
               <input type="checkbox" checked={showHosts} onChange={() => toggle('showHosts')} /> Exoplanet host stars
               {hostCount > 0 && <span className="muted"> ({hostCount.toLocaleString('en-US')})</span>}
             </label>
-            <label title="Nearest-neighbour magnification shows the survey's true pixels">
+            <label data-hint={HINT.raw}>
               <input type="checkbox" checked={rawPixels} onChange={() => toggle('rawPixels')} /> Show raw pixels
             </label>
           </fieldset>

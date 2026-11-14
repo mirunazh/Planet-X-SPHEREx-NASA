@@ -3,6 +3,7 @@
 import { type ReactNode, useEffect, useRef } from 'react';
 import { useNav } from '@/lib/store';
 import { PLATFORM_CREDITS, SURVEYS, SURVEY_ORDER } from '@/lib/sky/surveys';
+import { FIELD_GUIDE } from './hints';
 
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -86,9 +87,32 @@ function Credits() {
   );
 }
 
+function FieldGuide() {
+  return (
+    <>
+      <h3>Field guide</h3>
+      <p className="muted small">On a computer, hover over any element for the same short explanation.</p>
+      {FIELD_GUIDE.map((section) => (
+        <section key={section.title} className="guide-section">
+          <h4>{section.title}</h4>
+          <dl className="guide">
+            {section.items.map(([term, text]) => (
+              <div key={term} className="guide-row">
+                <dt>{term}</dt>
+                <dd>{text}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ))}
+    </>
+  );
+}
+
 function Help() {
   return (
     <>
+      <FieldGuide />
       <h3>Moving around</h3>
       <ul>
         <li>
@@ -136,7 +160,7 @@ export function Dialogs() {
     );
   if (panel === 'help')
     return (
-      <Modal title="How it works" onClose={close}>
+      <Modal title="How it works and field guide" onClose={close}>
         <Help />
       </Modal>
     );

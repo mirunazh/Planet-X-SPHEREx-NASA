@@ -4,14 +4,16 @@
 import { useState } from 'react';
 import { type Pin, useNav } from '@/lib/store';
 import { flyTo } from '@/lib/navigation';
-import { formatDec, formatDegrees, formatRA, formatUncertainty, formatAngle } from '@/lib/sky/format';
+import { formatAngle, formatDec, formatDegrees, formatRA, formatUncertainty } from '@/lib/sky/format';
 import type { SkyTarget } from '@/lib/sky/target';
+import { HINT } from './hints';
 
-function CopyButton({ label, text }: { label: string; text: () => string }) {
+function CopyButton({ label, hint, text }: { label: string; hint: string; text: () => string }) {
   const [done, setDone] = useState(false);
   return (
     <button
       className="btn ghost"
+      data-hint={hint}
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(text());
@@ -33,29 +35,31 @@ function PinCard({ pin }: { pin: Pin }) {
     <section className="side panel" aria-label={`Details: ${pin.name}`}>
       <header className="panel-head">
         <div>
-          <p className="eyebrow">{pin.kind === 'host' ? 'Exoplanet host star' : pin.targetKind?.replace('-', ' ')}</p>
+          <p className="eyebrow" data-hint={HINT.kind}>
+            {pin.kind === 'host' ? 'Exoplanet host star' : pin.targetKind?.replace('-', ' ')}
+          </p>
           <h2>{pin.name}</h2>
         </div>
-        <button className="icon-btn" onClick={close} aria-label="Close details">
+        <button className="icon-btn" onClick={close} aria-label="Close details" data-hint={HINT.close}>
           ×
         </button>
       </header>
       {pin.description && <p>{pin.description}</p>}
       <dl className="facts">
-        <dt>RA / Dec</dt>
+        <dt data-hint={HINT.position}>RA / Dec</dt>
         <dd className="mono">
           {formatRA(pin.ra, 1)} {formatDec(pin.dec, 1)}
         </dd>
         {pin.kind === 'host' && (
           <>
-            <dt>Planets</dt>
+            <dt data-hint={HINT.planets}>Planets</dt>
             <dd>
               {pin.planetCount ?? pin.planets?.length}: {pin.planets?.slice(0, 6).join(', ')}
               {(pin.planets?.length ?? 0) > 6 ? '…' : ''}
             </dd>
             {pin.distPc != null && (
               <>
-                <dt>Distance</dt>
+                <dt data-hint={HINT.distance}>Distance</dt>
                 <dd>
                   {pin.distPc.toLocaleString('en-US')} pc ({(pin.distPc * 3.26156).toLocaleString('en-US', { maximumFractionDigits: 1 })} light-years)
                 </dd>
@@ -63,13 +67,13 @@ function PinCard({ pin }: { pin: Pin }) {
             )}
             {pin.kmag != null && (
               <>
-                <dt>Ks magnitude</dt>
+                <dt data-hint={HINT.kmag}>Ks magnitude</dt>
                 <dd>{pin.kmag}</dd>
               </>
             )}
             {pin.firstDiscovery != null && (
               <>
-                <dt>First discovery</dt>
+                <dt data-hint={HINT.discovery}>First discovery</dt>
                 <dd>
                   {pin.firstDiscovery}
                   {pin.facilities?.length ? `, ${pin.facilities.slice(0, 2).join('; ')}` : ''}
@@ -78,7 +82,7 @@ function PinCard({ pin }: { pin: Pin }) {
             )}
           </>
         )}
-        <dt>Source</dt>
+        <dt data-hint={HINT.source}>Source</dt>
         <dd>
           {pin.source?.url ? (
             <a href={pin.source.url} target="_blank" rel="noreferrer">
@@ -91,10 +95,10 @@ function PinCard({ pin }: { pin: Pin }) {
         </dd>
       </dl>
       <div className="row">
-        <button className="btn primary" onClick={() => flyTo(pin.vec, pin.fov, 'pin')}>
+        <button className="btn primary" onClick={() => flyTo(pin.vec, pin.fov, 'pin')} data-hint={HINT.flyHere}>
           Fly here
         </button>
-        <button className="btn ghost" onClick={close}>
+        <button className="btn ghost" onClick={close} data-hint={HINT.close}>
           Close
         </button>
       </div>
@@ -108,44 +112,46 @@ function LockedCard({ target }: { target: SkyTarget }) {
     <section className="side panel locked" aria-label="Locked target">
       <header className="panel-head">
         <div>
-          <p className="eyebrow">Target locked · ICRS</p>
+          <p className="eyebrow" data-hint={HINT.locked}>
+            Target locked · ICRS
+          </p>
           <h2 className="mono">
             {formatRA(target.ra, u)} {formatDec(target.dec, u)}
           </h2>
         </div>
-        <button className="icon-btn" onClick={() => useNav.setState({ locked: null })} aria-label="Release target">
+        <button className="icon-btn" onClick={() => useNav.setState({ locked: null })} aria-label="Release target" data-hint={HINT.release}>
           ×
         </button>
       </header>
       <dl className="facts">
-        <dt>Decimal</dt>
+        <dt data-hint={HINT.decimal}>Decimal</dt>
         <dd className="mono">
           {formatDegrees(target.ra, u)}°, {formatDegrees(target.dec, u)}°
         </dd>
-        <dt>Galactic</dt>
+        <dt data-hint={HINT.galactic}>Galactic</dt>
         <dd className="mono">
           l {formatDegrees(target.galactic.l, u)}°, b {formatDegrees(target.galactic.b, u)}°
         </dd>
-        <dt>Uncertainty</dt>
+        <dt data-hint={HINT.uncertainty}>Uncertainty</dt>
         <dd>{formatUncertainty(u)}</dd>
-        <dt>Field of view</dt>
+        <dt data-hint={HINT.fov}>Field of view</dt>
         <dd>{formatAngle(target.fovDeg)}</dd>
-        <dt>HEALPix</dt>
+        <dt data-hint={HINT.healpix}>HEALPix</dt>
         <dd className="mono">
           order {target.healpix.order}, nested {target.healpix.ipix}
         </dd>
-        <dt>Layer</dt>
+        <dt data-hint={HINT.layer}>Layer</dt>
         <dd>
           {target.layer.survey}
           {target.layer.wavelengthUm ? ` at ${target.layer.wavelengthUm} µm` : ''}
         </dd>
-        <dt>Origin</dt>
+        <dt data-hint={HINT.origin}>Origin</dt>
         <dd>{target.origin}</dd>
       </dl>
       <p className="muted small">Ready for the image pipeline: this target selects the cutouts compared across SPHEREx, NEOWISE, WISE and 2MASS.</p>
       <div className="row">
-        <CopyButton label="Copy JSON" text={() => JSON.stringify(target, null, 2)} />
-        <CopyButton label="Copy link" text={() => window.location.href} />
+        <CopyButton label="Copy JSON" hint={HINT.copyJson} text={() => JSON.stringify(target, null, 2)} />
+        <CopyButton label="Copy link" hint={HINT.copyLink} text={() => window.location.href} />
       </div>
     </section>
   );

@@ -154,8 +154,62 @@ kbd {
 .hud > .reticle,
 .hud > .tooltip,
 .hud > .flash,
-.hud > .status {
+.hud > .status,
+.hud > .hint {
   pointer-events: none;
+}
+
+/* Hover / focus explanations (HintLayer) */
+
+.hint {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 50;
+  max-width: 280px;
+  padding: 8px 11px;
+  border-radius: 10px;
+  background: var(--panel-solid);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  font-size: 12.5px;
+  line-height: 1.45;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.12s ease;
+}
+
+.hint.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.readout [data-hint],
+.facts dt[data-hint],
+.eyebrow[data-hint],
+.brand[data-hint],
+p[data-hint],
+.wavelength label[data-hint] {
+  cursor: help;
+}
+
+.facts dt[data-hint] {
+  text-decoration: underline dotted rgba(154, 168, 198, 0.55);
+  text-underline-offset: 3px;
+}
+
+/* Disabled buttons swallow hover events, so their hint sits on a wrapper. */
+.lock-wrap {
+  display: block;
+}
+
+.lock-wrap .btn:disabled {
+  pointer-events: none;
+}
+
+.lock-wrap:has(.btn:disabled) {
+  cursor: not-allowed;
 }
 
 .panel {
@@ -421,8 +475,7 @@ kbd {
   gap: 8px;
 }
 
-.coord abbr {
-  text-decoration: none;
+.coord-label {
   font-size: 11px;
   letter-spacing: 0.08em;
   color: var(--muted);
@@ -777,6 +830,43 @@ kbd {
 .credit {
   border-top: 1px solid var(--border);
   padding-top: 6px;
+}
+
+.guide-section h4 {
+  margin: 14px 0 6px;
+  color: var(--text);
+}
+
+.guide {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.guide-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 30%) 1fr;
+  gap: 12px;
+  padding: 5px 0;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.guide-row dt {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.guide-row dd {
+  margin: 0;
+  color: #ccd5ea;
+}
+
+@media (max-width: 520px) {
+  .guide-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
 }
 
 /* ---------- Responsive ---------- */
