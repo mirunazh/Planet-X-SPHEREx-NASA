@@ -1,0 +1,17 @@
+{
+  "name": "spherex-index",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Static SPHEREx Level 2 image index reader: which images cover a sky position, from static files only.",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "test": "vitest run",
+    "test:archive": "vitest run test/archive.test.ts --silent=false",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "vitest": "4.1.12"
+  }
+}
