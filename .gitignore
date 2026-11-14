@@ -26,3 +26,9 @@ npm-debug.log*
 
 # local tool configuration
 /.claude/
+
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+.playwright-mcp/
