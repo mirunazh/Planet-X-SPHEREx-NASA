@@ -1,0 +1,17 @@
+epsindb D2: 93/93 frames loaded
+pass 0: n=19 60789.9-60799.7 wl 1.107-1.651 cen-pred E +0.14+-0.04 N -0.38+-0.05 (scatter 0.18,0.21) stack cen-pred E +0.24 N -0.43 SNR 578
+pass 1: n=13 60832.7-60833.5 wl 1.107-1.638 cen-pred E +0.28+-0.03 N -0.56+-0.07 (scatter 0.11,0.25) stack cen-pred E +0.19 N -0.30 SNR 487
+pass 2: n=30 60949.7-60987.4 wl 1.109-1.618 cen-pred E -0.04+-0.04 N -0.75+-0.05 (scatter 0.23,0.26) stack cen-pred E +0.03 N -0.79 SNR 399
+pass 3: n=7 61154.9-61160.6 wl 1.107-1.541 cen-pred E +0.33+-0.05 N -0.35+-0.07 (scatter 0.14,0.19) stack cen-pred E +0.41 N -0.21 SNR 316
+pass 4: n=24 61311.1-61315.5 wl 1.095-1.637 cen-pred E -0.10+-0.05 N -0.73+-0.05 (scatter 0.23,0.25) stack cen-pred E -0.06 N -0.72 SNR 443
+motion pass 0->1: measured E +0.47 N -0.47, predicted E +0.33 N -0.29
+motion pass 1->2: measured E +0.72 N -1.11, predicted E +1.03 N -0.92
+motion pass 2->3: measured E +2.81 N -0.87, predicted E +2.44 N -1.27
+motion pass 3->4: measured E +1.03 N -1.50, predicted E +1.46 N -1.12
+motion pass 0->4: measured E +5.02 N -3.95, predicted E +5.26 N -3.60
+refstar 331.12982,-56.77476 p0:(-0.69,-0.21) p1:(-0.66,-0.08) p2:(-0.91,-0.30) p3:(-0.61,-0.19) p4:(-0.95,-0.43)
+refstar 331.06135,-56.79976 p0:(+0.40,-1.32) p1:(+0.54,-1.18) p2:(+0.18,-1.41) p3:(+0.39,-1.45) p4:(+0.20,-1.41)
+refstar 331.12222,-56.78726 p0:(+0.74,-0.38) p1:(+0.61,-0.01) p2:(+0.32,-0.26) p3:(+0.57,-0.09) p4:(+0.41,-0.12)
+Ignoring fixed x limits to fulfill fixed data aspect with adjustable data limits.
+Ignoring fixed y limits to fulfill fixed data aspect with adjustable data limits.
+wrote docs/research/experiments/exp09_epsindb.json

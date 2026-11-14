@@ -1,0 +1,22 @@
+{
+ "n": 93,
+ "n_A_on_detector": 88,
+ "n_A_in_band": 0,
+ "A_minus_B_rows_range": [
+  -45.79794196675766,
+  46.63260212347693
+ ],
+ "A_minus_B_cols_range": [
+  -70.7234016977294,
+  70.65708690668635
+ ],
+ "n_B_nan_within_5px": 0,
+ "B_flux_fit": {
+  "slope": 33.946484112955375,
+  "intercept": -19.78821954133387,
+  "robust_resid_sigma": 11.756024860561984,
+  "frac_scatter": 0.548235834472878
+ },
+ "n_B_flux_outliers_5sigma": 0,
+ "outliers": []
+}

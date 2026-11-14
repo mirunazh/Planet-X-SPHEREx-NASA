@@ -1,0 +1,13 @@
+parallax factors vs det08 full propagation: max |diff| = 1.14e-06 (factor units, AU)
+synthetic recovery OK
+reproduces exp09 per-exposure centroids: max difference 0.00e+00"
+reference stars: 3 kept of 86 clusters: (331.17189,-56.79333 pk 5.2 n 93), (331.02076,-56.81403 pk 3.1 n 83), (331.12938,-56.77485 pk 17.7 n 91)
+DIFF: n=93 (dropped 0, clipped 0); plx 330.4 mas formal 31.6 boot 28.5 jack 69.6 -> 4.7 sigma; pm 4048, -2393 mas/yr; chi2 372.2/182 -> 232.3/181; d 3.03+-0.64 pc; v 67.5+-14.2 km/s
+   LOO: -p0: 324; -p1: 327; -p2: 400; -p3: 302; -p4: 313
+   pass means: plx 329.6 +- 41.0 (jack 68.8) chi2 148.8/6 -> 10.7/5
+   pm fixed: plx 306.2 formal 28.1 boot 23.1 jack 15.1; chi2 389.2/184 -> 235.9/183
+ABS: n=91 (dropped 0, clipped 2); plx 457.1 mas formal 24.9 boot 23.8 jack 118.8 -> 3.8 sigma; pm 4082, -2410 mas/yr; chi2 683.2/178 -> 235.3/177; d 2.19+-0.57 pc; v 49.2+-12.8 km/s
+   LOO: -p0: 458; -p1: 462; -p2: 548; -p3: 367; -p4: 422
+   pass means: plx 458.6 +- 29.6 (jack 109.5) chi2 457.8/6 -> 9.3/5
+   pm fixed: plx 437.7 formal 24.9 boot 20.6 jack 50.6; chi2 684.6/180 -> 251.6/179
+product JSON rebuilds the model: chi2 232.329 (fit 232.329)

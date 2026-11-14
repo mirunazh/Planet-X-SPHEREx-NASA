@@ -1,0 +1,380 @@
+[
+ {
+  "file": "level2_2025W19_1B_0116_1D6_spx_l2b-v27-2026-197.fits",
+  "det": 6,
+  "cutout_shape": [
+   88,
+   88
+  ],
+  "parent_origin": [
+   316,
+   106
+  ],
+  "pixels_identical": true,
+  "n_finite": 7737,
+  "max_abs_diff": 0.0,
+  "target_px_s3": [
+   360.16247653540654,
+   149.00342146583688
+  ],
+  "target_px_cutout_plus_origin": [
+   360.16247653540654,
+   149.00342146583688
+  ],
+  "dpix": 1.4210854715202004e-14,
+  "wl_reader": 4.967377954559458,
+  "bw_reader": 0.03718681003229353,
+  "wl_astropy_cutout": 4.967377954559457,
+  "bw_astropy_cutout": 0.03718681003229353,
+  "wave_table_identical": true,
+  "data_off": 25920,
+  "t_total": 15.172533083998132,
+  "requests": [
+   {
+    "tag": "A",
+    "range": "0-34559",
+    "t": 5.016604042000836,
+    "bytes": 34560,
+    "code": "206",
+    "exit": 0,
+    "attempt": 0,
+    "ttfb": 3.852886
+   },
+   {
+    "tag": "B",
+    "range": "890880-1608959",
+    "t": 9.041406792006455,
+    "bytes": 718080,
+    "code": "206",
+    "exit": 0,
+    "attempt": 0,
+    "ttfb": 1.326991
+   },
+   {
+    "tag": "C",
+    "range": "-5760",
+    "t": 1.0974276250053663,
+    "bytes": 5760,
+    "code": "206",
+    "exit": 0,
+    "attempt": 0,
+    "ttfb": 1.07507
+   }
+  ]
+ },
+ {
+  "file": "level2_2025W50_2A_0254_1D6_spx_l2b-v27-2026-210.fits",
+  "det": 6,
+  "cutout_shape": [
+   88,
+   88
+  ],
+  "parent_origin": [
+   1265,
+   956
+  ],
+  "pixels_identical": true,
+  "n_finite": 7743,
+  "max_abs_diff": 0.0,
+  "target_px_s3": [
+   1308.29133683553,
+   999.6940030447354
+  ],
+  "target_px_cutout_plus_origin": [
+   1308.2913368355303,
+   999.6940030447354
+  ],
+  "dpix": 2.2737367544323206e-13,
+  "wl_reader": 4.701850221262981,
+  "bw_reader": 0.03677647191880859,
+  "wl_astropy_cutout": 4.701850221262982,
+  "bw_astropy_cutout": 0.0367764719188086,
+  "wave_table_identical": true,
+  "data_off": 25920,
+  "t_total": 3.5061915419937577,
+  "requests": [
+   {
+    "tag": "A",
+    "range": "0-34559",
+    "t": 1.3130716670129914,
+    "bytes": 34560,
+    "code": "206",
+    "exit": 0,
+    "attempt": 0,
+    "ttfb": 1.123791
+   },
+   {
+    "tag": "B",
+    "range": "7826880-8544959",
+    "t": 1.471394666004926,
+    "bytes": 718080,
+    "code": "206",
+    "exit": 0,
+    "attempt": 0,
+    "ttfb": 0.677758
+   },
+   {
+    "tag": "C",
+    "range": "-5760",
+    "t": 0.7042308329982916,
+    "bytes": 5760,
+    "code": "206",
+    "exit": 0,
+    "attempt": 0,
+    "ttfb": 0.547752
+   }
+  ]
+ },
+ {
+  "file": "level2_2025W19_1B_0181_1D5_spx_l2b-v27-2026-197.fits",
+  "det": 5,
+  "cutout_shape": [
+   88,
+   88
+  ],
+  "parent_origin": [
+   665,
+   367
+  ],
+  "pixels_identical": true,
+  "n_finite": 7739,
+  "max_abs_diff": 0.0,
+  "target_px_s3": [
+   709.4159945630863,
+   410.6024793888168
+  ],
+  "target_px_cutout_plus_origin": [
+   709.4159945630863,
+   410.6024793888168
+  ],
+  "dpix": 0.0,
+  "wl_reader": 4.295073269980591,
+  "bw_reader": 0.037562547352456274,
+  "wl_astropy_cutout": 4.295073269980591,
+  "bw_astropy_cutout": 0.037562547352456274,
+  "wave_table_identical": true,
+  "data_off": 25920,
+  "t_total": 2.654720250007813,
+  "requests": [
+   {
+    "tag": "A",
+    "range": "0-34559",
+    "t": 0.6692672909994144,
+    "bytes": 34560,
+    "code": "206",
+    "exit": 0,
+    "attempt": 0,
+    "ttfb": 0.507599
+   },
+   {
+    "tag": "B",
+    "range": "3020640-3738719",
+    "t": 1.3546388329996262,
+    "bytes": 718080,
+    "code": "206",
+    "exit": 0,
+    "attempt": 0,
+    "ttfb": 0.462977
+   },
+   {
+    "tag": "C",
+    "range": "-5760",
+    "t": 0.615320334007265,
+    "bytes": 5760,
+    "code": "206",
+    "exit": 0,
+    "attempt": 0,
+    "ttfb": 0.587712
+   }
+  ]
+ },
+ {
+  "file": "level2_2025W45_2A_0308_4D5_spx_l2b-v27-2026-247.fits",
+  "det": 5,
+  "cutout_shape": [
+   88,
+   88
+  ],
+  "parent_origin": [
+   1648,
+   29
+  ],
+  "pixels_identical": true,
+  "n_finite": 7744,
+  "max_abs_diff": 0.0,
+  "target_px_s3": [
+   1691.603609367426,
+   72.37617864582676
+  ],
+  "target_px_cutout_plus_origin": [
+   1691.6036093674263,
+   72.37617864582674
+  ],
+  "dpix": 2.274846706538671e-13,
+  "wl_reader": 4.408114961039193,
+  "bw_reader": 0.03845656339148162,
+  "wl_astropy_cutout": 4.408114961039193,
+  "bw_astropy_cutout": 0.038456563391481624,
+  "wave_table_identical": true,
+  "data_off": 25920,
+  "t_total": 10.31036375000258,
+  "requests": [
+   {
+    "tag": "A",
+    "range": "0-34559",
+    "t": 2.1150461669894867,
+    "bytes": 34560,
+    "code": "206",
+    "exit": 0,
+    "attempt": 0,
+    "ttfb": 1.574502
+   },
+   {
+    "tag": "B",
+    "range": "262560-980639",
+    "t": 7.3031247920007445,
+    "bytes": 718080,
+    "code": "206",
+    "exit": 0,
+    "attempt": 0,
+    "ttfb": 1.559027
+   },
+   {
+    "tag": "C",
+    "range": "-5760",
+    "t": 0.8745884169911733,
+    "bytes": 5760,
+    "code": "206",
+    "exit": 0,
+    "attempt": 0,
+    "ttfb": 0.852047
+   }
+  ]
+ },
+ {
+  "file": "level2_2025W19_1B_0241_1D4_spx_l2b-v27-2026-197.fits",
+  "det": 4,
+  "cutout_shape": [
+   88,
+   88
+  ],
+  "parent_origin": [
+   1016,
+   512
+  ],
+  "pixels_identical": true,
+  "n_finite": 7739,
+  "max_abs_diff": 0.0,
+  "target_px_s3": [
+   1060.3124862219156,
+   555.7433923329065
+  ],
+  "target_px_cutout_plus_origin": [
+   1060.3124862219156,
+   555.7433923329065
+  ],
+  "dpix": 0.0,
+  "wl_reader": 3.35803587777158,
+  "bw_reader": 0.0947505034292284,
+  "wl_astropy_cutout": 3.3580358777715795,
+  "bw_astropy_cutout": 0.0947505034292284,
+  "wave_table_identical": true,
+  "data_off": 25920,
+  "t_total": 2.508668165988638,
+  "requests": [
+   {
+    "tag": "A",
+    "range": "0-34559",
+    "t": 0.7298874580010306,
+    "bytes": 34560,
+    "code": "206",
+    "exit": 0,
+    "attempt": 0,
+    "ttfb": 0.563256
+   },
+   {
+    "tag": "B",
+    "range": "4203840-4921919",
+    "t": 1.2300016669905744,
+    "bytes": 718080,
+    "code": "206",
+    "exit": 0,
+    "attempt": 0,
+    "ttfb": 0.477808
+   },
+   {
+    "tag": "C",
+    "range": "-5760",
+    "t": 0.5324885419977363,
+    "bytes": 5760,
+    "code": "206",
+    "exit": 0,
+    "attempt": 0,
+    "ttfb": 0.500076
+   }
+  ]
+ },
+ {
+  "file": "level2_2025W45_1A_0110_2D4_spx_l2b-v27-2026-247.fits",
+  "det": 4,
+  "cutout_shape": [
+   88,
+   88
+  ],
+  "parent_origin": [
+   1599,
+   1571
+  ],
+  "pixels_identical": true,
+  "n_finite": 7743,
+  "max_abs_diff": 0.0,
+  "target_px_s3": [
+   1642.784700446986,
+   1614.0999866791233
+  ],
+  "target_px_cutout_plus_origin": [
+   1642.784700446986,
+   1614.099986679123
+  ],
+  "dpix": 2.2737367544323206e-13,
+  "wl_reader": 2.632082573668095,
+  "bw_reader": 0.07510690521566554,
+  "wl_astropy_cutout": 2.6320825736680953,
+  "bw_astropy_cutout": 0.07510690521566554,
+  "wave_table_identical": true,
+  "data_off": 25920,
+  "t_total": 2.7986439999949653,
+  "requests": [
+   {
+    "tag": "A",
+    "range": "0-34559",
+    "t": 0.8858490830025403,
+    "bytes": 34560,
+    "code": "206",
+    "exit": 0,
+    "attempt": 0,
+    "ttfb": 0.690286
+   },
+   {
+    "tag": "B",
+    "range": "12845280-13563359",
+    "t": 1.2821860830008518,
+    "bytes": 718080,
+    "code": "206",
+    "exit": 0,
+    "attempt": 0,
+    "ttfb": 0.557448
+   },
+   {
+    "tag": "C",
+    "range": "-5760",
+    "t": 0.6128628340084106,
+    "bytes": 5760,
+    "code": "206",
+    "exit": 0,
+    "attempt": 0,
+    "ttfb": 0.589034
+   }
+  ]
+ }
+]

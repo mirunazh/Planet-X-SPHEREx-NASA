@@ -1,0 +1,80 @@
+barnard pass0 D2     n=18 mjd=60913.7 wl=1.101-1.629 SNR mean=nan med=nan cen offset=(-1.3,-0.9)"
+barnard pass1 D2     n=18 mjd=61116.2 wl=1.118-1.629 SNR mean=nan med=nan cen offset=(-0.0,-1.4)"
+barnard pass2 D2     n=22 mjd=61273.1 wl=1.088-1.661 SNR mean=nan med=nan cen offset=(-0.5,-1.9)"
+barnard pass3 D2     n= 1 mjd=61305.6 wl=1.512-1.512 SNR mean=nan med=nan cen offset=(-8.3,+0.6)"
+    (centroid started at grid centre: (+0.7,+5.2)")
+  motion D2 pass0->1: measured (+0.7,+5.2)" predicted (-0.6,+5.6)"
+    (centroid started at grid centre: (+0.8,+4.1)")
+  motion D2 pass1->2: measured (+0.8,+4.1)" predicted (+1.4,+4.6)"
+    (centroid started at grid centre: (-8.8,-1.1)")
+  motion D2 pass2->3: measured (-7.6,+3.3)" predicted (+0.1,+0.8)"
+  refstar D2 pass0: shift vs pass0 (+0.0,+0.0)"
+  refstar D2 pass1: shift vs pass0 (-0.4,+0.0)"
+  refstar D2 pass2: shift vs pass0 (+0.0,-0.1)"
+  refstar D2 pass3: shift vs pass0 (+0.0,+0.4)"
+  diff D2 pass2-pass0: SNR at last pos +nan, at first pos +nan
+w0855 pass0 D4     n= 4 mjd=60801.5 wl=3.358-3.638 SNR mean=1.6 med=1.6 cen offset=(+10.7,+3.5)"
+w0855 pass0 D5     n= 8 mjd=60801.3 wl=4.039-4.406 SNR mean=6.8 med=8.5 cen offset=(+2.8,+2.0)"
+w0855 pass0 D5+D6  n=11 mjd=60801.1 wl=4.039-5.003 SNR mean=7.7 med=9.1 cen offset=(+2.5,+1.8)"
+w0855 pass0 D6     n= 3 mjd=60800.7 wl=4.860-5.003 SNR mean=2.1 med=2.5 cen offset=(+0.4,+1.7)"
+w0855 pass1 D4     n=18 mjd=60980.7 wl=2.439-3.831 SNR mean=5.1 med=5.4 cen offset=(+6.6,+3.7)"
+w0855 pass1 D5     n=19 mjd=60986.8 wl=3.822-4.408 SNR mean=8.7 med=8.8 cen offset=(+2.4,+1.9)"
+w0855 pass1 D5+D6  n=37 mjd=60989.1 wl=3.822-4.982 SNR mean=9.3 med=11.2 cen offset=(+1.8,+1.4)"
+w0855 pass1 D6     n=18 mjd=60991.5 wl=4.418-4.982 SNR mean=11.0 med=13.1 cen offset=(+1.1,+0.8)"
+w0855 pass2 D5     n= 6 mjd=61021.7 wl=4.047-4.225 SNR mean=9.6 med=7.8 cen offset=(+1.4,+1.3)"
+w0855 pass2 D5+D6  n= 9 mjd=61021.7 wl=4.047-4.736 SNR mean=9.2 med=10.2 cen offset=(+1.1,+1.1)"
+w0855 pass2 D6     n= 3 mjd=61021.6 wl=4.634-4.736 SNR mean=7.9 med=5.5 cen offset=(-0.3,+0.4)"
+w0855 pass3 D4     n=14 mjd=61163.7 wl=2.427-3.735 SNR mean=7.6 med=8.6 cen offset=(+1.9,+3.2)"
+w0855 pass3 D5     n=15 mjd=61165.8 wl=3.835-4.369 SNR mean=9.9 med=10.1 cen offset=(+0.7,+1.6)"
+w0855 pass3 D5+D6  n=36 mjd=61161.2 wl=3.835-4.967 SNR mean=12.0 med=15.2 cen offset=(+0.4,+1.5)"
+w0855 pass3 D6     n=21 mjd=61157.9 wl=4.424-4.967 SNR mean=9.7 med=10.6 cen offset=(-0.1,+1.1)"
+    (centroid started at grid centre: (-1.0,+0.2)")
+  motion D4 pass0->1: measured (-1.0,+0.2)" predicted (+3.1,+0.1)"
+    (centroid started at grid centre: (+0.2,+0.1)")
+  motion D4 pass1->3: measured (+0.2,+0.1)" predicted (+4.9,+0.6)"
+    (centroid started at grid centre: (+2.8,+0.0)")
+  motion D5 pass0->1: measured (+2.8,+0.0)" predicted (+3.3,+0.1)"
+    (centroid started at grid centre: (-0.1,-0.6)")
+  motion D5 pass1->2: measured (-0.1,-0.6)" predicted (+0.9,-0.0)"
+    (centroid started at grid centre: (+3.3,+1.0)")
+  motion D5 pass2->3: measured (+3.3,+1.0)" predicted (+4.0,+0.6)"
+    (centroid started at grid centre: (+2.6,-0.3)")
+  motion D5+D6 pass0->1: measured (+2.6,-0.3)" predicted (+3.3,+0.1)"
+    (centroid started at grid centre: (+0.1,-0.3)")
+  motion D5+D6 pass1->2: measured (+0.1,-0.3)" predicted (+0.8,-0.0)"
+    (centroid started at grid centre: (+3.2,+0.9)")
+  motion D5+D6 pass2->3: measured (+3.2,+0.9)" predicted (+3.9,+0.6)"
+    (centroid started at grid centre: (+4.2,-0.8)")
+  motion D6 pass0->1: measured (+4.2,-0.8)" predicted (+3.4,+0.1)"
+    (centroid started at grid centre: (-0.7,-0.4)")
+  motion D6 pass1->2: measured (-0.7,-0.4)" predicted (+0.8,-0.0)"
+    (centroid started at grid centre: (+4.0,+1.2)")
+  motion D6 pass2->3: measured (+4.0,+1.2)" predicted (+3.8,+0.5)"
+  refstar D4 pass0: shift vs pass0 (+0.0,+0.0)"
+  refstar D4 pass1: shift vs pass0 (-0.3,-0.0)"
+  refstar D4 pass3: shift vs pass0 (-0.1,-0.1)"
+  refstar D5 pass0: shift vs pass0 (+0.0,+0.0)"
+  refstar D5 pass1: shift vs pass0 (-0.3,+0.1)"
+  refstar D5 pass2: shift vs pass0 (-0.4,+0.1)"
+  refstar D5 pass3: shift vs pass0 (-0.1,-0.0)"
+  refstar D5+D6 pass0: shift vs pass0 (+0.0,+0.0)"
+  refstar D5+D6 pass1: shift vs pass0 (-0.3,+0.0)"
+  refstar D5+D6 pass2: shift vs pass0 (-0.4,-0.0)"
+  refstar D5+D6 pass3: shift vs pass0 (-0.0,-0.1)"
+  refstar D6 pass0: shift vs pass0 (+0.0,+0.0)"
+  refstar D6 pass1: shift vs pass0 (-0.2,-0.7)"
+  refstar D6 pass2: shift vs pass0 (-0.1,-0.8)"
+  refstar D6 pass3: shift vs pass0 (+0.1,-0.6)"
+  diff D4 pass3-pass0: SNR at last pos +3.1, at first pos +0.7
+  diff D5 pass3-pass0: SNR at last pos +3.5, at first pos -6.6
+  diff D5+D6 pass3-pass0: SNR at last pos +5.2, at first pos -5.1
+  diff D6 pass3-pass0: SNR at last pos +3.5, at first pos +0.7
+  comoving stack D6: n=45 SNR mean=14.3 median=13.9 control=-1.9 centroid offset=(+0.2,+0.9)"
+  fixed stack D6: n=45 SNR mean=11.4 median=13.0 control=-1.9 centroid offset=(+1.2,+1.1)"
+  comoving stack D5: n=48 SNR mean=11.5 median=13.5 control=-0.2 centroid offset=(+0.9,+1.4)"
+  fixed stack D5: n=48 SNR mean=9.9 median=10.3 control=-0.7 centroid offset=(+2.6,+2.0)"
+  comoving stack D4: n=36 SNR mean=6.6 median=6.1 control=0.1 centroid offset=(+5.0,+3.4)"
+  fixed stack D4: n=36 SNR mean=5.2 median=5.9 control=-0.0 centroid offset=(+5.4,+3.8)"
+  comoving stack D5+D6: n=93 SNR mean=14.0 median=14.7 control=-0.7 centroid offset=(+0.7,+1.2)"
+  fixed stack D5+D6: n=93 SNR mean=11.7 median=12.4 control=-1.0 centroid offset=(+2.0,+1.8)"
+wrote docs/research/experiments/det08_results_nomask.json

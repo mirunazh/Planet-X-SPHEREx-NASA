@@ -1,0 +1,5 @@
+barnard: centre 269.44637,4.76912  n=61
+w0855: centre 133.76008,-7.24232  n=129
+190 files, 2 failed, 761 MB, wall 40 s, per-request median 15.2 s
+('<scratch>/w8/data/barnard/D2/level2_2026W35_1A_0038_1D2_spx_l2b-v27-2026-243.fits', "FAILED RuntimeError('curl exit 56')", 18.263487100601196)
+('<scratch>/w8/data/barnard/D2/level2_2026W35_2A_0126_1D2_spx_l2b-v27-2026-246.fits', "FAILED RuntimeError('curl exit 56')", 17.406091928482056)

@@ -1,0 +1,6 @@
+rdra D6: 50/50 frames loaded
+R Dra: r_core(95%) = 24.05 px -> wing annulus 26.1-29.1 px, bkg 32.1-36.1
+R Dra: 2 field stars, median fluxes 3.7, 2.4
+R Dra: n_ok 49 on 37 days; fit P=246: full amp 1.557 mag, resid 1.335; best P 216 d (resid 1.323); raw rms 1.395; within-day rms 1.319
+docs/research/experiments/exp09_targets.py:553: RuntimeWarning: invalid value encountered in log10
+  ax[1].plot(mj, -2.5 * np.log10(np.array([p["field_norm"] for p in P])), "x", ms=3, color="C2", label="field-star norm")

@@ -1,0 +1,7 @@
+level2_2025W19_1B_0116_1D6_spx_l2b-v27-2026-197.fits: D6 88x88 origin 316,106 identical=True dpix=1.42e-14 wl 4.96738 vs astropy 4.96738, bw 0.03719 vs 0.03719, wave table identical=True data_off=25920 t=15.2s
+level2_2025W50_2A_0254_1D6_spx_l2b-v27-2026-210.fits: D6 88x88 origin 1265,956 identical=True dpix=2.27e-13 wl 4.70185 vs astropy 4.70185, bw 0.03678 vs 0.03678, wave table identical=True data_off=25920 t=3.5s
+level2_2025W19_1B_0181_1D5_spx_l2b-v27-2026-197.fits: D5 88x88 origin 665,367 identical=True dpix=0.00e+00 wl 4.29507 vs astropy 4.29507, bw 0.03756 vs 0.03756, wave table identical=True data_off=25920 t=2.7s
+level2_2025W45_2A_0308_4D5_spx_l2b-v27-2026-247.fits: D5 88x88 origin 1648,29 identical=True dpix=2.27e-13 wl 4.40811 vs astropy 4.40811, bw 0.03846 vs 0.03846, wave table identical=True data_off=25920 t=10.3s
+level2_2025W19_1B_0241_1D4_spx_l2b-v27-2026-197.fits: D4 88x88 origin 1016,512 identical=True dpix=0.00e+00 wl 3.35804 vs astropy 3.35804, bw 0.09475 vs 0.09475, wave table identical=True data_off=25920 t=2.5s
+level2_2025W45_1A_0110_2D4_spx_l2b-v27-2026-247.fits: D4 88x88 origin 1599,1571 identical=True dpix=2.27e-13 wl 2.63208 vs astropy 2.63208, bw 0.07511 vs 0.07511, wave table identical=True data_off=25920 t=2.8s
+VALIDATION PASSED

@@ -1,0 +1,5 @@
+rwaur D2: 55/55 frames loaded
+RW Aur: r_core(95%) = 0.00 px -> wing annulus 2.0-5.0 px, bkg 8.0-12.0
+RW Aur: 5 field stars, median fluxes 153.1, 41.4, 18.5, 5.3, 3.1
+RW Aur pass 1/pass 0: {'n_bins': 17, 'median': 1.3997469982507973, 'mean': 1.3865176530275118, 'std': 0.22382269620037165, 'sem': 0.054284977520274405, 'dmag': -0.3651238620651466}
+RW Aur pass 2/pass 0: {'n_bins': 16, 'median': 1.4044150274638783, 'mean': 1.3798305983048558, 'std': 0.16566554355370552, 'sem': 0.04141638588842638, 'dmag': -0.368738669595294}

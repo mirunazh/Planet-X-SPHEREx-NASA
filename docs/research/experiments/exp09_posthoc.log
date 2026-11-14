@@ -1,0 +1,14 @@
+rwaur D2: 55/55 frames loaded
+RW Aur field norm per pass: {0: {'median_all5': 0.9994909844786513, 'median_bright3': 0.9986089654506549}, 1: {'median_all5': 0.9971359288525004, 'median_bright3': 0.9979584963300931}, 2: {'median_all5': 1.0162905222447236, 'median_bright3': 0.9985482294136729}}
+RW Aur wing_norm5: {'p1/p0': (1.4, 0.224, 0.054, -0.365), 'p2/p0': (1.404, 0.166, 0.041, -0.369)}
+RW Aur wing_norm_bright3: {'p1/p0': (1.38, 0.207, 0.052, -0.35), 'p2/p0': (1.37, 0.134, 0.033, -0.342)}
+RW Aur wing_raw: {'p1/p0': (1.381, 0.214, 0.052, -0.351), 'p2/p0': (1.38, 0.15, 0.037, -0.35)}
+RW Aur core_r2p5_norm_bright3: {'p1/p0': (1.423, 0.203, 0.051, -0.383), 'p2/p0': (1.426, 0.234, 0.058, -0.386)}
+control star wing/others: {'p1/p0': (0.988, 0.095, 0.024), 'p2/p0': (1.002, 0.101, 0.025)} raw: {'p1/p0': 0.983, 'p2/p0': 0.984}
+RW Aur peak per pass: {0: 133.04235738515854, 1: 195.30347234010696, 2: 223.38839131593704}
+rdra D6: 50/50 frames loaded
+R Dra ring core: per-exposure r_core pct [1.0, 2.0, 2.0, 2.0] -> annulus 4.0-7.0 px
+R Dra raw {'n': 50, 'n_days': 38, 'raw_rms': 0.318, 'p246_full_amp': 0.75, 'p246_resid': 0.272, 'best_period': 250.0, 'best_resid': 0.272, 'within_day_rms': 0.281, 'n_within_day': 23}
+R Dra field_normalised {'n': 49, 'n_days': 37, 'raw_rms': 0.933, 'p246_full_amp': 0.3, 'p246_resid': 0.93, 'best_period': 108.0, 'best_resid': 0.923, 'within_day_rms': 1.086, 'n_within_day': 23}
+R Dra outer {'annulus': [7.0, 10.0], 'n': 50, 'n_days': 38, 'raw_rms': 0.356, 'p246_full_amp': 1.056, 'p246_resid': 0.228, 'best_period': 234.0, 'best_resid': 0.225, 'within_day_rms': 0.197, 'n_within_day': 23}
+wrote docs/research/experiments/exp09_posthoc.json

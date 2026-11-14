@@ -1,0 +1,16 @@
+| mode | frames ok / tried | wall (s) | frames/s | per frame total s (median / p90 / max) | A s | B s | C s | bytes per frame | retried requests | failures |
+|---|---|---|---|---|---|---|---|---|---|---|
+| sequential | 20 / 20 | 54.6 | 0.37 | 2.45 / 2.90 / 7.01 | 0.67 / 0.80 / 0.85 | 1.16 / 1.40 / 5.47 | 0.58 / 0.76 / 0.83 | 538,080 | 0 | 0 |
+  sequential: time to first byte median 0.53 s; total MB 10.8; B bytes [497760]
+| parallel x8 | 40 / 40 | 24.6 | 1.63 | 3.48 / 6.21 / 8.82 | 0.74 / 0.87 / 1.30 | 1.96 / 4.85 / 7.41 | 0.61 / 0.84 / 1.02 | 538,080 | 0 | 0 |
+  parallel: time to first byte median 0.57 s; total MB 21.5; B bytes [497760]
+
+| file | det | cutout | parent origin (x, y) | pixels identical | finite px | target px S3 - cutout | wl reader | wl astropy | bw reader | bw astropy | IMAGE data offset |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 2025W19_1B_0116_1D6_spx_l2 | D6 | 88x88 | 316, 106 | True | 7737 | 1.4e-14 px | 4.967378 | 4.967378 | 0.037187 | 0.037187 | 25,920 |
+| 2025W50_2A_0254_1D6_spx_l2 | D6 | 88x88 | 1265, 956 | True | 7743 | 2.3e-13 px | 4.701850 | 4.701850 | 0.036776 | 0.036776 | 25,920 |
+| 2025W19_1B_0181_1D5_spx_l2 | D5 | 88x88 | 665, 367 | True | 7739 | 0.0e+00 px | 4.295073 | 4.295073 | 0.037563 | 0.037563 | 25,920 |
+| 2025W45_2A_0308_4D5_spx_l2 | D5 | 88x88 | 1648, 29 | True | 7744 | 2.3e-13 px | 4.408115 | 4.408115 | 0.038457 | 0.038457 | 25,920 |
+| 2025W19_1B_0241_1D4_spx_l2 | D4 | 88x88 | 1016, 512 | True | 7739 | 0.0e+00 px | 3.358036 | 3.358036 | 0.094751 | 0.094751 | 25,920 |
+| 2025W45_1A_0110_2D4_spx_l2 | D4 | 88x88 | 1599, 1571 | True | 7743 | 2.3e-13 px | 2.632083 | 2.632083 | 0.075107 | 0.075107 | 25,920 |
+max |wl diff| um: 8.881784197001252e-16  max |bw diff|: 6.938893903907228e-18
