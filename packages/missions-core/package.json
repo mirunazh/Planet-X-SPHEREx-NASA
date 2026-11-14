@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "description": "Pure logic for the SPHEREx measuring missions: grid, centroid, motion, parallax, photometry, scoring, shareable reports, mission scripts and glossary.",
+  "exports": { ".": "./src/index.ts" },
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit"

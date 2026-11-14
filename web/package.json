@@ -19,9 +19,11 @@
     "@astryxdesign/core": "0.7.16",
     "@astryxdesign/theme-neutral": "0.7.16",
     "@stylexjs/stylex": "0.19.2",
+    "missions-core": "file:../packages/missions-core",
     "next": "16.4.6",
     "react": "19.3.1",
     "react-dom": "19.3.1",
+    "spherex-core": "file:../packages/spherex-core",
     "zustand": "5.1.0"
   },
   "devDependencies": {
