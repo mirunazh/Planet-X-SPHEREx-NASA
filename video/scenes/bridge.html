@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>bridge: 1930 to SPHEREx</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .rx { position: absolute; left: 1460px; top: 330px; width: 350px; font: 400 24px/1.6 var(--mono); color: var(--text-2); }
+  .rx div { white-space: nowrap; overflow: hidden; }
+  .rx div:first-child { color: var(--text); font-weight: 500; }
+</style>
+</head>
+<body>
+<canvas class="full" width="1920" height="1080"></canvas>
+<div class="rx"></div>
+<script type="module">
+  import { caption, tag, register, el, ramp, lerp, clamp, easeOut, easeInOut, loadStack, stretch } from './lib.js';
+  import { makePlates, drawPlateView, DOT_MID } from './plate.js';
+  const MISSION = '/assets/missions/epsindb/';
+  const g = document.querySelector('canvas').getContext('2d');
+  const P = makePlates();
+  const off = Object.assign(document.createElement('canvas'), { width: 1920, height: 1080 });
+  const og = off.getContext('2d');
+  const img = Object.assign(document.createElement('canvas'), { width: 121, height: 121 });
+  const label = tag('Illustration');
+  const rx = document.querySelector('.rx');
+  const cap = caption();
+  let pass, S = 7.5, px0, py0;
+
+  const ready = (async () => {
+    const m = await (await fetch(MISSION + 'manifest.json')).json();
+    const grp = m.groups.find((x) => x.id === 'd2'); pass = grp.passes[0];
+    const data = await loadStack(MISSION + pass.stack);
+    const ig = img.getContext('2d'), im = ig.createImageData(121, 121);
+    const lo = [8, 11, 18], hi = [232, 236, 246]; // --bg to --text, the manifest's own asinh stretch
+    for (let i = 0; i < data.length; i++) { const k = stretch(data[i], grp.display); for (let c = 0; c < 3; c++) im.data[i * 4 + c] = lerp(lo[c], hi[c], k); im.data[i * 4 + 3] = 255; }
+    ig.putImageData(im, 0, 0);
+    // put the target pixel exactly where the plate's moving dot sat (screen centre)
+    px0 = 960 - (pass.measured.x + 0.5) * S; py0 = 540 - (pass.measured.y + 0.5) * S;
+    for (const line of [m.name, `SPHEREx detector ${pass.detectors.join(', ')}`, grp.label.match(/[\d.]+ to [\d.]+/)[0] + ' \u00b5m', pass.label, `${pass.nExposures} exposures stacked`])
+      el('div', { 'data-text': 'receipt', text: line }, rx);
+  })();
+
+  register((t, frame) => {
+    const T_INV = 0.22, fi = Math.round((t - T_INV) * 60);
+    const fade = easeInOut(ramp(t, 0.3, 0.95));
+    const v = { cx: DOT_MID.x, cy: DOT_MID.y, s: lerp(0.98, 1.25, easeInOut(ramp(t, T_INV, 0.95))) };
+    drawPlateView(og, P, P.B, v, frame, { circle: t < T_INV ? 1 : 0, grain: 0.2, vignette: t < T_INV });
+    g.fillStyle = '#080B12'; g.fillRect(0, 0, 1920, 1080);
+    // SPHEREx frame settles in
+    const z = lerp(1.06, 1, easeOut(ramp(t, 0.3, 1.1))), w = 121 * S * z;
+    const x = 960 - (960 - px0) * z, y = 540 - (540 - py0) * z;
+    g.globalAlpha = fade; g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+    g.drawImage(img, x, y, w, w);
+    g.strokeStyle = '#3A4666'; g.lineWidth = 1; g.globalAlpha = ramp(t, 0.8, 1.0); g.strokeRect(x - 0.5, y - 0.5, w + 1, w + 1);
+    // the negative turns positive (mechanical flick), then dissolves away
+    g.globalAlpha = 1 - fade; g.filter = t >= T_INV ? 'invert(1)' : 'none'; g.drawImage(off, 0, 0); g.filter = 'none';
+    if (t >= T_INV) { g.globalAlpha = 1 - fade; g.drawImage(P.vignette, 0, 0); g.globalAlpha = 1; const d = [0.62, 0.34, 0.12][fi] ?? 0; if (d) { g.fillStyle = `rgba(8,11,18,${d})`; g.fillRect(0, 0, 1920, 1080); } }
+    g.globalAlpha = 1;
+    // ring locks on Epsilon Indi B
+    const kr = easeOut(ramp(t, 1.0, 1.25));
+    if (kr > 0) { g.beginPath(); g.arc(960, 540, lerp(70, 30, kr), 0, 7); g.strokeStyle = `rgba(255,106,61,${kr})`; g.lineWidth = 3; g.stroke(); }
+    const real = t >= 0.6;
+    label.lastChild.textContent = real ? 'SPHEREx, real data' : 'Illustration';
+    label.firstChild.style.color = real ? 'var(--accent)' : 'currentColor';
+    [...rx.children].forEach((d, i) => { const k = easeOut(ramp(t, 0.95 + i * 0.06, 1.2 + i * 0.06)); d.style.opacity = k; d.style.transform = `translateX(${(1 - k) * 10}px)`; });
+    cap(t);
+  }, ready);
+</script>
+</body></html>

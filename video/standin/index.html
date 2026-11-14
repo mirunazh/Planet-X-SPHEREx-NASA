@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Stand-in app</title>
+<style>
+  @font-face { font-family: 'Inter'; src: url('../assets/fonts/InterVariable.woff2') format('woff2'); font-weight: 100 900; }
+  @font-face { font-family: 'JetBrains Mono'; src: url('../assets/fonts/JetBrainsMono-Regular.woff2') format('woff2'); }
+  html, body { margin: 0; height: 100%; background: #080B12; color: #E8ECF6; font: 400 18px/1.4 'Inter', sans-serif; }
+  header { display: flex; gap: 16px; align-items: center; padding: 28px 48px; border-bottom: 1px solid #1E2740; }
+  header b { font-weight: 600; margin-right: 24px; }
+  input { width: 380px; padding: 12px 14px; font: 400 20px 'JetBrains Mono', monospace; color: #E8ECF6; background: #0E1422; border: 1px solid #3A4666; border-radius: 8px; outline: none; }
+  input:focus { border-color: #FF6A3D; }
+  button { padding: 12px 22px; font: 600 18px 'Inter'; color: #10121A; background: #A3AEC9; border: 0; border-radius: 8px; transition: background-color 400ms ease, transform 400ms ease; }
+  button.on { background: #FF6A3D; transform: scale(1.04); }
+  main { display: flex; gap: 48px; padding: 40px 48px; }
+  #sky { width: 726px; height: 726px; border: 1px solid #3A4666; image-rendering: auto; }
+  aside { font: 400 20px/1.7 'JetBrains Mono', monospace; color: #A3AEC9; }
+  aside .v { color: #E8ECF6; }
+  #status { opacity: 0; transition: opacity 600ms ease; color: #FF8A63; }
+  #status.on { opacity: 1; }
+</style></head>
+<body>
+<header><b>Stand-in app</b><input id="coords" placeholder="RA Dec (degrees)" autocomplete="off"><button id="go">Show</button><span id="status">5 SPHEREx passes loaded</span></header>
+<main>
+  <canvas id="sky" width="726" height="726"></canvas>
+  <aside><div>Target <span class="v" id="name">none</span></div><div>Pass <span class="v" id="pass">-</span></div><div>Date <span class="v" id="date">-</span></div><div>Clock <span class="v" id="clock">-</span></div></aside>
+</main>
+<script>
+  // Plays the real Epsilon Indi B stacks on requestAnimationFrame; a timer reveals the status.
+  const M = '/assets/missions/epsindb/', g = document.getElementById('sky').getContext('2d');
+  let frames = [], passes = [], playing = false, t0 = 0;
+  const $ = (id) => document.getElementById(id);
+  fetch(M + 'manifest.json').then((r) => r.json()).then(async (m) => {
+    const grp = m.groups[0], d = grp.display; passes = grp.passes;
+    for (const p of passes) {
+      const v = new Float32Array(await (await fetch(M + p.stack)).arrayBuffer());
+      const c = document.createElement('canvas'); c.width = c.height = 121; const cg = c.getContext('2d'), im = cg.createImageData(121, 121);
+      for (let i = 0; i < v.length; i++) { const t = Math.min(1, Math.max(0, (v[i] - d.vmin) / (d.vmax - d.vmin))); const k = Number.isFinite(v[i]) ? Math.asinh(t / d.soft) / Math.asinh(1 / d.soft) : 0; im.data.set([8 + 224 * k, 11 + 225 * k, 18 + 228 * k, 255], i * 4); }
+      cg.putImageData(im, 0, 0); frames.push(c);
+    }
+    document.body.dataset.ready = '1';
+    requestAnimationFrame(loop);
+  });
+  function loop(ts) {
+    const i = playing ? Math.floor((ts - t0) / 400) % frames.length : 0;
+    g.imageSmoothingQuality = 'high'; g.drawImage(frames[i], 0, 0, 726, 726);
+    if (playing) { const p = passes[i]; g.beginPath(); g.arc((p.measured.x + 0.5) * 6, (p.measured.y + 0.5) * 6, 26, 0, 7); g.strokeStyle = '#FF6A3D'; g.lineWidth = 3; g.stroke(); $('pass').textContent = `${i + 1} of ${frames.length}`; $('date').textContent = p.label; }
+    $('clock').textContent = (ts / 1000).toFixed(3) + ' s';
+    requestAnimationFrame(loop);
+  }
+  $('go').addEventListener('click', () => {
+    $('go').classList.add('on'); $('name').textContent = 'Epsilon Indi B';
+    playing = true; t0 = performance.now();
+    setTimeout(() => $('status').classList.add('on'), 300);
+  });
+</script>
+</body></html>

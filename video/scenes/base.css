@@ -1,0 +1,26 @@
+@font-face { font-family: 'Inter'; src: url('../assets/fonts/InterVariable.woff2') format('woff2'); font-weight: 100 900; font-display: block; }
+@font-face { font-family: 'JetBrains Mono'; src: url('../assets/fonts/JetBrainsMono-Regular.woff2') format('woff2'); font-weight: 400; font-display: block; }
+@font-face { font-family: 'JetBrains Mono'; src: url('../assets/fonts/JetBrainsMono-Medium.woff2') format('woff2'); font-weight: 500; font-display: block; }
+@font-face { font-family: 'JetBrains Mono'; src: url('../assets/fonts/JetBrainsMono-SemiBold.woff2') format('woff2'); font-weight: 600; font-display: block; }
+
+:root {
+  --bg: #080B12; --surface: #0E1422; --muted: #161D30; --line: #3A4666;
+  --text: #E8ECF6; --text-2: #A3AEC9; --accent: #FF6A3D; --accent-text: #FF8A63;
+  --sans: 'Inter', system-ui, sans-serif; --mono: 'JetBrains Mono', ui-monospace, monospace;
+  --serif: 'Iowan Old Style', 'Baskerville', Georgia, serif; /* 1930 only, macOS system faces */
+  --cap-fg: var(--text); --cap-bg: rgba(8, 11, 18, 0.86);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); color: var(--text); }
+body { font-family: var(--sans); -webkit-font-smoothing: antialiased; font-feature-settings: 'tnum' 1; }
+canvas.full { position: absolute; inset: 0; width: 1920px; height: 1080px; }
+
+/* Caption: one line, bottom third, inside the 5 percent title-safe area (y <= 1026). */
+.cap-wrap { position: absolute; left: 0; right: 0; bottom: 110px; display: flex; justify-content: center; pointer-events: none; }
+.cap { font: 600 54px/1.15 var(--sans); letter-spacing: -0.012em; color: var(--cap-fg); background: var(--cap-bg);
+  padding: 15px 30px 17px; border-radius: 12px; white-space: nowrap; max-width: 1600px; overflow: hidden; }
+
+/* Honest label: Illustration / SPHEREx, real data / Placeholder. Top-left, inside title-safe. */
+.tag { position: absolute; top: 76px; left: 112px; font: 500 24px/1 var(--sans); letter-spacing: 0.005em; padding: 10px 15px 11px;
+  border-radius: 8px; background: rgba(8, 11, 18, 0.84); color: var(--text); white-space: nowrap; overflow: hidden; }
+.tag i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 10px; vertical-align: 2px; background: currentColor; }

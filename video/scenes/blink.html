@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>shot 1: blink</title>
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="era1930.css">
+</head>
+<body>
+<canvas class="full" width="1920" height="1080"></canvas>
+<script type="module">
+  import { caption, tag, register, el, ramp, lerp, easeOut, easeInOut } from './lib.js';
+  import { makePlates, drawPlateView, DOT_MID } from './plate.js';
+  const g = document.querySelector('canvas').getContext('2d');
+  const P = makePlates();
+  tag('Illustration');
+  const plateTag = el('div', { class: 'tag plate', 'data-text': 'plate' });
+  const cap = caption();
+  const SW = 0.5; // blink comparator: plates swap every half second (shutter clack in audio.mjs)
+  register((t, frame) => {
+    const k = Math.floor(t / SW + 1e-9), dt = t - k * SW, fi = Math.round(dt * 60);
+    const dim = [0.62, 0.34, 0.12][fi] ?? 0; // mechanical flick on each swap
+    const shake = 5 * Math.exp(-dt / 0.06) * Math.sin(dt * 70);
+    const e = easeInOut(ramp(t, 0, 3));
+    const v = { cx: lerp(1200, DOT_MID.x, e), cy: lerp(760, DOT_MID.y, e), s: lerp(0.84, 0.98, e), dx: shake * 0.3, dy: shake };
+    drawPlateView(g, P, k % 2 ? P.B : P.A, v, frame, { dim, circle: easeOut(ramp(t, 1.62, 2.05)) });
+    plateTag.textContent = k % 2 ? 'Plate B' : 'Plate A';
+    cap(t);
+  });
+</script>
+</body></html>

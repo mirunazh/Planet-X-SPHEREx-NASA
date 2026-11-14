@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>shot 2: Tombaugh</title>
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="era1930.css">
+<style>
+  .col { position: absolute; left: 1150px; top: 330px; width: 660px; }
+  .who { font: 500 40px/1.4 var(--mono); color: #EDE5D3; white-space: pre; height: 56px; overflow: hidden; }
+  .name { margin-top: 30px; font: italic 400 150px/1.5 var(--serif); color: #F1EBDD; letter-spacing: -0.01em; width: max-content; padding: 0 28px 0 4px; }
+</style>
+</head>
+<body>
+<canvas class="full" width="1920" height="1080"></canvas>
+<div class="col"><div class="who" data-text="who"></div><div class="name" data-text="pluto">Pluto</div></div>
+<script type="module">
+  import { caption, tag, register, ramp, lerp, easeOut, easeInOut } from './lib.js';
+  import { makePlates, drawPlateView, toScreen, DOT_MID, PW, PH } from './plate.js';
+  const g = document.querySelector('canvas').getContext('2d');
+  const P = makePlates();
+  const who = document.querySelector('.who'), name = document.querySelector('.name');
+  const TEXT = 'Clyde Tombaugh, 1930', CPS = 26, T_TYPE = 0.55, T_NAME = 1.95; // ticks in audio.mjs use the same numbers
+  tag('Illustration');
+  const cap = caption();
+  register((t, frame) => {
+    const e = easeInOut(ramp(t, 0, 1.3));
+    const v = { cx: lerp(DOT_MID.x, PW / 2, e), cy: lerp(DOT_MID.y, PH / 2, e), s: lerp(0.98, 0.37, e), dx: lerp(0, -330, e), dy: lerp(0, -40, e) };
+    drawPlateView(g, P, P.B, v, frame, { grain: lerp(0.2, 0.1, e), circle: 1, shadow: true });
+    // typed index line
+    const n = Math.max(0, Math.min(TEXT.length, Math.floor((t - T_TYPE) * CPS + 1e-9) + 1));
+    who.textContent = t < T_TYPE ? '' : TEXT.slice(0, n);
+    // the dot gets its name: leader line from the circle, then the word
+    const k = easeOut(ramp(t, T_NAME - 0.25, T_NAME + 0.2));
+    if (k > 0) {
+      const c = toScreen(v, DOT_MID), r = name.getBoundingClientRect();
+      const x0 = c.x + 26, y0 = c.y, x1 = r.left - 18, y1 = r.top + r.height * 0.55;
+      g.beginPath(); g.moveTo(x0, y0); g.lineTo(lerp(x0, x1, k), lerp(y0, y1, k));
+      g.strokeStyle = 'rgba(196,58,40,0.95)'; g.lineWidth = 3; g.lineCap = 'round'; g.stroke();
+    }
+    const kn = easeOut(ramp(t, T_NAME, T_NAME + 0.3));
+    name.style.opacity = kn; name.style.transform = `translateX(${(1 - kn) * 16}px)`;
+    cap(t);
+  });
+</script>
+</body></html>

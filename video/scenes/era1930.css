@@ -1,0 +1,5 @@
+/* 1930 look: warm darkroom black, pale glass, warm caption pill. */
+:root { --cap-bg: rgba(14, 11, 8, 0.86); --cap-fg: #F1EBDD; }
+html, body { background: #0B0907; }
+.tag { background: rgba(14, 11, 8, 0.84); color: #F1EBDD; }
+.tag.plate { left: auto; right: 112px; font: 500 24px/1 var(--mono); }

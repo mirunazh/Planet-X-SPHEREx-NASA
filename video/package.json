@@ -1,0 +1,12 @@
+{
+  "name": "demo-video",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "render": "node render.mjs",
+    "capture": "node capture.mjs"
+  },
+  "dependencies": {
+    "playwright": "1.63.0"
+  }
+}

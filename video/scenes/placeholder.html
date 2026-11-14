@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>placeholder</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .card { position: absolute; left: 112px; right: 112px; top: 150px; height: 660px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; }
+  .num { position: absolute; left: 72px; top: 64px; font: 500 30px/1.4 var(--mono); color: var(--text-2); }
+  .time { position: absolute; right: 72px; top: 64px; font: 500 30px/1.4 var(--mono); color: var(--text-2); }
+  .note { position: absolute; left: 72px; right: 72px; top: 250px; font: 500 46px/1.25 var(--sans); color: var(--text); max-width: 1400px; }
+  .bar { position: absolute; left: 72px; right: 72px; bottom: 72px; height: 6px; background: var(--muted); border-radius: 3px; }
+  .bar b { position: absolute; top: 0; bottom: 0; background: var(--accent); border-radius: 3px; }
+  .bar u { position: absolute; top: -6px; width: 2px; height: 18px; background: var(--text); }
+</style></head>
+<body>
+<div class="card">
+  <div class="num" data-text="num"></div><div class="time" data-text="time"></div>
+  <div class="note" data-text="note"></div>
+  <div class="bar"><b></b><u></u></div>
+</div>
+<script type="module">
+  import { shot, caption, tag, register } from './lib.js';
+  const total = 30, $ = (s) => document.querySelector(s);
+  const f = (x) => x.toFixed(2).padStart(5, '0');
+  $(".num").textContent = `Shot ${shot.id.slice(1)}`;
+  $('.time').textContent = `${f(shot.start)} to ${f(shot.start + shot.dur)} s`;
+  $('.note').textContent = shot.note;
+  $('.bar b').style.left = `${(shot.start / total) * 100}%`;
+  $('.bar b').style.width = `${(shot.dur / total) * 100}%`;
+  tag('Placeholder');
+  const cap = caption();
+  register((t) => { cap(t); $('.bar u').style.left = `${((shot.start + t) / total) * 100}%`; });
+</script>
+</body></html>

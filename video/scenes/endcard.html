@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>shot 9: end card</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .title { position: absolute; left: 0; right: 0; top: 348px; text-align: center; }
+  .title h1 { display: inline-block; margin: 0; font: 650 116px/1.3 var(--sans); letter-spacing: -0.03em; color: var(--text); white-space: nowrap; position: relative; padding: 12px 40px; }
+  .title .dot { display: inline-block; color: var(--accent); }
+  .ring { position: absolute; width: 56px; height: 56px; border: 3px solid var(--accent); border-radius: 50%; opacity: 0; }
+  .url { position: absolute; left: 0; right: 0; top: 548px; text-align: center; }
+  .url span { display: inline-block; font: 500 46px/1.4 var(--mono); color: var(--accent-text); white-space: nowrap; }
+  .credits { position: absolute; left: 0; right: 0; top: 880px; text-align: center; font: 400 26px/1.5 var(--sans); color: var(--text-2); }
+  .credits div { display: block; width: max-content; margin: 0 auto; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="title"><h1 data-text="caption"><span class="words"></span><span class="dot">.</span></h1></div>
+<div class="ring"></div>
+<div class="url"><span data-text="url"></span></div>
+<div class="credits"><div data-text="credit-data">Data: NASA SPHEREx, NASA/IPAC IRSA</div><div data-text="credit-music"></div></div>
+<script type="module">
+  import { shot, vars, register, ramp, lerp, easeOut } from './lib.js';
+  const $ = (s) => document.querySelector(s);
+  $('.words').textContent = shot.caption.replace(/\.$/, ''); // the full stop is the moving dot
+  $('.url span').textContent = vars.url;
+  $('.credits div:last-child').textContent = vars.musicCredit;
+  const h1 = $('h1'), dot = $('.dot'), ring = $('.ring'), JUMP = 0.55, LOCK = 0.9; // clack + tick in audio.mjs
+  register((t) => {
+    const k = easeOut(ramp(t, 0, 0.35));
+    h1.style.opacity = k; h1.style.transform = `translateY(${(1 - k) * 14}px)`;
+    const j = t >= JUMP ? 1 : 0;
+    dot.style.transform = `translate(${j * 30}px, ${j * -9}px)`;
+    const d = dot.getBoundingClientRect(), kr = easeOut(ramp(t, LOCK, LOCK + 0.25));
+    ring.style.left = `${d.left + d.width / 2 - 28 + 1}px`; ring.style.top = `${d.top + d.height * 0.76 - 28}px`;
+    ring.style.opacity = kr; ring.style.transform = `scale(${lerp(1.8, 1, kr)})`;
+    const ku = easeOut(ramp(t, 0.7, 1.0));
+    $('.url span').style.opacity = ku; $('.url span').style.transform = `translateY(${(1 - ku) * 8}px)`;
+    $('.credits').style.opacity = easeOut(ramp(t, 1.0, 1.3));
+  });
+</script>
+</body></html>
