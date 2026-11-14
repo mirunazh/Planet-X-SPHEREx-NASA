@@ -168,6 +168,36 @@ C, ecranul 1 și ecranul 2:
 
 Cum le pornești: fiecare folder are `NOTES.md`. B și C sunt pagini statice; un server simplu ajunge, de exemplu `python3 -m http.server 3302` din rădăcina depozitului, apoi `http://localhost:3302/design/b-dial/`. Dacă `NOTES.md` din folder spune altfel, urmează ce scrie acolo.
 
+### 3.5 Runda 2 de design (adăugat la 20:15)
+
+Șeful de echipă a respins și machetele B și C („arată napa"; a cerut ceva impecabil, prietenos cu studenții, în format educativ). S-a pornit o rundă nouă, de la zero, pe baza skill-urilor de design salvate ale echipei. Brief-ul complet, cu motivele pentru care runda 1 a eșuat, este în `design/BRIEF-redesign.md`. Schimbările principale: fotografia reală este mărită fin și colorată după căldură (cu un comutator „pixeli reali"), primul ecran este chiar clipitul (ții apăsat și cerul trece între „atunci" și „acum"), iar produsul este o lecție în patru pași cu o insignă la final, plus un ecran de explorare pentru orice coordonată.
+
+| Direcție | Idee | Stare la 20:15 |
+|---|---|---|
+| **D „Observatory"** (`design/d-observatory/`) | Cerul este pagina: fotografia umple ecranul pe negru, interfața plutește deasupra; literă lată și grea (Archivo), Geist pentru text | Toate cele șase ecrane, pe calculator și telefon; axe fără probleme. De reparat: stelele prea pufoase, panoul taie conținutul jos la ecranele 4 și 5; căutarea din ecranul 6 arată doar WISE 0855 |
+| **E „Workbook"** (`design/e-workbook/`) | Caiet de lucru care prinde viață: pagină albă, roșu și albastru puternice, cerul într-un ocular rotund, propoziții cu spații goale care se completează cu măsurătorile elevului | Toate cele șase ecrane există; rundele de critică erau în curs la oprire (vezi `NOTES.md` din folder) |
+| **A „Plate"** (refăcută) | Placă fotografică în negativ pe hârtie crem | Ecranele 1, 2 și 3; ecranele 4 și 5 nu există |
+
+Toate machetele se văd într-o singură pagină: pornește `python3 -m http.server 3302 --bind 127.0.0.1` din rădăcina depozitului și deschide `http://127.0.0.1:3302/design/index.html`.
+
+D, primul ecran și insigna de la final:
+
+![D Observatory, ecranul 1](../design/d-observatory/shots/s1-desktop.png)
+
+![D Observatory, ecranul 5](../design/d-observatory/shots/s5-desktop.png)
+
+E, primul ecran și un pas de lecție:
+
+![E Workbook, ecranul 1](../design/e-workbook/shots/s1-desktop.png)
+
+![E Workbook, ecranul 2](../design/e-workbook/shots/s2-desktop.png)
+
+A, primul ecran:
+
+![A Plate, ecranul 1](../design/a-plate/shots/s1-desktop.png)
+
+**Părerea coordonatorului:** aspectul din D, cu mecanica de lecție din E (propozițiile cu spații goale și feedbackul mare). Șeful de echipă nu a ales încă. Recomandarea din 3.4 (B) nu mai este valabilă.
+
 ## 4. Ce mai e nevoie, în ordine
 
 Ordinea ține cont de ce contează la jurizare: mai întâi produsul minim care răspunde provocării, publicat și filmat; apoi partea educațională; apoi finisajele.
