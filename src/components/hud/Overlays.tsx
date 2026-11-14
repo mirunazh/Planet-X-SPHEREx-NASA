@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useNav } from '@/lib/store';
+import { loadPins } from '@/lib/pins';
 import { radecToVec, vecToRadec } from '@/lib/sky/coords';
 import { cameraBasis, projectWithBasis } from '@/lib/sky/view';
 import { tileStore } from '../sky/TileStore';
@@ -100,7 +101,7 @@ export function StatusLine() {
   const messages: { text: string; tone: 'info' | 'warn' }[] = [];
   if (tiles.pending > 0) messages.push({ text: `Streaming ${tiles.pending} sky tile${tiles.pending === 1 ? '' : 's'} from IRSA…`, tone: 'info' });
   if (tiles.failed > 0) messages.push({ text: `${tiles.failed} tile${tiles.failed === 1 ? '' : 's'} unavailable, showing the coarser layer`, tone: 'warn' });
-  if (data === 'error') messages.push({ text: 'Pins unavailable: run "npm run data" to build the NASA data snapshot.', tone: 'warn' });
+  if (data === 'error') messages.push({ text: 'Could not load places. Check your connection and retry.', tone: 'warn' });
   if (!messages.length) return null;
   return (
     <div className="status" role="status" aria-live="polite">
@@ -109,6 +110,8 @@ export function StatusLine() {
           {m.text}
         </span>
       ))}
+      {tiles.failed > 0 && prefix && <button className="btn" onClick={() => tileStore.retryFailed(prefix)}>Retry details</button>}
+      {data === 'error' && <button className="btn" onClick={() => void loadPins()}>Retry places</button>}
     </div>
   );
 }

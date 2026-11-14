@@ -72,6 +72,8 @@ export interface NavState {
   locked: SkyTarget | null;
   origin: TargetOrigin;
   busy: boolean;
+  /** Explicit movement/reset/stop intents invalidate pending name lookups. */
+  navigationRevision: number;
   viewport: { width: number; height: number; dpr: number };
   allskyStatus: LoadStatus;
   /** HiPS order the renderer is drawing (null = whole-sky preview only). */
@@ -123,6 +125,7 @@ export const useNav = create<NavState & NavActions>()((set) => ({
   locked: null,
   origin: 'navigation',
   busy: false,
+  navigationRevision: 0,
   viewport: { width: 1, height: 1, dpr: 1 },
   allskyStatus: 'idle',
   activeOrder: null,

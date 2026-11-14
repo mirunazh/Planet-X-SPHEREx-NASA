@@ -20,6 +20,7 @@ const hooks = vi.hoisted(() => ({
   pins: vi.fn(),
   tiles: new Map<string, import('@/components/sky/TileStore').TileEntry>(),
   requestTile: vi.fn(),
+  upload: vi.fn(),
 }));
 
 vi.mock('react', async (importOriginal) => ({
@@ -51,7 +52,7 @@ vi.mock('@/lib/store', async (importOriginal) => {
   return { ...actual, useNav: Object.assign((selector: (state: ReturnType<typeof actual.useNav.getState>) => unknown) => selector(actual.useNav.getState()), actual.useNav) };
 });
 vi.mock('@react-three/fiber', () => ({ useFrame: (frame: (state: RootState) => void) => { hooks.frame = frame; } }));
-vi.mock('@/components/sky/allsky', () => ({ loadAllsky: hooks.load, pinAllsky: hooks.pins, allskyCache: { clear: vi.fn() } }));
+vi.mock('@/components/sky/allsky', () => ({ loadAllsky: hooks.load, pinAllsky: hooks.pins, allskyCache: { clear: vi.fn(), prefetch: vi.fn() } }));
 vi.mock('@/components/sky/geometry', () => ({
   buildTileGeometry: () => new THREE.BufferGeometry(),
   getAllskyGeometry: () => new THREE.BufferGeometry(),
@@ -87,9 +88,11 @@ function render() {
   return element.props.object as THREE.Group;
 }
 
-function draw() {
-  now += 100;
-  hooks.frame!({ size: { width: 1600, height: 900 }, viewport: { dpr: 1 } } as RootState);
+function draw(frames = 4, width = 1600, height = 900) {
+  for (let i = 0; i < frames; i++) {
+    now += 100;
+    hooks.frame!({ size: { width, height }, viewport: { dpr: 1 }, gl: { initTexture: hooks.upload } } as unknown as RootState);
+  }
 }
 
 function unmount() {
@@ -109,6 +112,7 @@ beforeEach(() => {
   useNav.setState({ ...useNav.getInitialState(), anim: [], fov: 1 });
   hooks.slots = []; hooks.effects = []; hooks.tiles.clear();
   hooks.load.mockReset(); hooks.pins.mockClear(); hooks.requestTile.mockReset();
+  hooks.upload.mockClear(); vi.mocked(allskyCache.prefetch).mockClear();
   loads = new Map();
   hooks.load.mockImplementation((url) => {
     const load = deferred(); loads.set(url, load); return load.promise;
@@ -123,9 +127,76 @@ beforeEach(() => {
   vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
-afterEach(() => { unmount(); vi.restoreAllMocks(); });
+afterEach(() => { unmount(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 describe('HiPS band swaps', () => {
+  it('gives the preview its own frame and uploads at most two centre-first detail textures per desktop frame', async () => {
+    const group = render();
+    loads.get(url(46))!.resolve(asset(url(46)));
+    await flush(); draw(1);
+    expect(group.children).toHaveLength(1);
+    expect(hooks.upload).toHaveBeenCalledTimes(1);
+    const expected = [...hooks.tiles.values()].sort((a, b) => a.priority - b.priority);
+    draw(1);
+    expect(group.children).toHaveLength(3);
+    expect(hooks.upload.mock.calls.slice(1).map(([texture]) => texture.name)).toEqual(expected.slice(0, 2).map((e) => e.key));
+    for (let i = 0; i < 5; i++) {
+      const before = hooks.upload.mock.calls.length;
+      draw(1);
+      expect(hooks.upload.mock.calls.length - before).toBeLessThanOrEqual(2);
+    }
+  });
+
+  it('limits compact-screen uploads and batches raw-pixel filter changes', async () => {
+    const group = render();
+    loads.get(url(46))!.resolve(asset(url(46)));
+    await flush(); draw(1, 390, 844);
+    expect(group.children).toHaveLength(1);
+    for (let i = 0; i < 6; i++) {
+      const before = hooks.upload.mock.calls.length;
+      draw(1, 390, 844);
+      expect(hooks.upload.mock.calls.length - before).toBeLessThanOrEqual(1);
+    }
+    useNav.getState().toggle('rawPixels'); render();
+    for (let i = 0; i < 8; i++) {
+      const before = hooks.upload.mock.calls.length;
+      draw(1, 390, 844);
+      expect(hooks.upload.mock.calls.length - before).toBeLessThanOrEqual(1);
+    }
+    for (const child of group.children as THREE.Mesh[]) {
+      expect((child.material as THREE.MeshBasicMaterial).map!.magFilter).toBe(THREE.NearestFilter);
+    }
+  });
+
+  it('preloads only after settling, limits halo requests, and never renders speculative tiles', async () => {
+    const group = render();
+    loads.get(url(46))!.resolve(asset(url(46)));
+    await flush(); draw(4);
+    expect(hooks.requestTile.mock.calls.some((args) => args[5] === true)).toBe(false);
+    expect(vi.mocked(allskyCache.prefetch).mock.calls.some(([url]) => url !== null)).toBe(false);
+    draw(6);
+    const speculative = hooks.requestTile.mock.calls.filter((args) => args[5] === true);
+    expect(speculative.length).toBeGreaterThan(0);
+    expect(new Set(speculative.map(([key]) => key)).size).toBeLessThanOrEqual(6);
+    const visible = new Set(maps(group));
+    expect(speculative.every(([key]) => !visible.has(key))).toBe(true);
+    expect(allskyCache.prefetch).toHaveBeenCalledWith(url(47), url(46));
+    useNav.setState({ fov: 0.5 }); draw(1);
+    expect(vi.mocked(allskyCache.prefetch).mock.lastCall).toEqual([null]);
+  });
+
+  it('does not prefetch when data saving is enabled or a new band is loading', async () => {
+    vi.stubGlobal('navigator', { connection: { saveData: true } });
+    render();
+    loads.get(url(46))!.resolve(asset(url(46)));
+    await flush(); draw(12);
+    expect(hooks.requestTile.mock.calls.some((args) => args[5] === true)).toBe(false);
+    expect(vi.mocked(allskyCache.prefetch).mock.calls.every(([url]) => url === null)).toBe(true);
+    vi.stubGlobal('navigator', { connection: { saveData: false } });
+    useNav.getState().setFrame(90); render(); draw(12);
+    expect(hooks.requestTile.mock.calls.some((args) => args[5] === true)).toBe(false);
+    expect(vi.mocked(allskyCache.prefetch).mock.calls.every(([url]) => url === null)).toBe(true);
+  });
   it('survives StrictMode effect replay with the same refs and request controller', async () => {
     const group = render();
     const initial = loads.get(url(46))!;
@@ -159,7 +230,7 @@ describe('HiPS band swaps', () => {
     useNav.getState().setFrame(90); render();
     loads.get(url(90))!.resolve(asset(url(90)));
     await flush(); draw();
-    const renderedKeys = [...hooks.tiles.keys()].filter((key) => key.startsWith('spherex|90|'));
+    const renderedKeys = maps(group).filter((key) => key.startsWith('spherex|90|'));
     expect(vi.mocked(tileStore.retain).mock.lastCall?.[1]).toEqual(new Set(renderedKeys));
     const clears = vi.mocked(tileStore.clear).mock.calls.length;
     const previews = vi.mocked(allskyCache.clear).mock.calls.length;

@@ -2,7 +2,7 @@
  * Navigation actions: panoramic zoom, pan, fly-to, inertia and
  * target lock. Animations are queued steps run once per frame by <Navigator>.
  */
-import { type AnimStep, INITIAL_VIEW, useNav } from './store';
+import { type AnimStep, type Pin, INITIAL_VIEW, useNav } from './store';
 import { type FlyPath, flyPath } from './sky/flyto';
 import {
   type Vec3,
@@ -47,7 +47,7 @@ export function viewportAspect(): number {
 export function cancelAnimations(): void {
   const s = useNav.getState();
   s.anim.length = 0;
-  useNav.setState({ busy: false });
+  useNav.setState({ busy: false, navigationRevision: s.navigationRevision + 1 });
 }
 
 function enqueue(steps: AnimStep[]): void {
@@ -102,6 +102,12 @@ export function flyTo(target: Vec3, fovTarget: number, origin: TargetOrigin = 'n
   cancelAnimations();
   useNav.setState({ origin, locked: null });
   enqueue([skyFlight(goal, fovGoal)]);
+}
+
+/** Featured places and search suggestions share the same navigation/details flow. */
+export function visitPin(pin: Pin): void {
+  flyTo(pin.vec, pin.fov, 'pin');
+  useNav.setState({ selected: pin });
 }
 
 export function resetView(): void {

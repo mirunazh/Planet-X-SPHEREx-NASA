@@ -6,10 +6,12 @@ import { HipsLayer } from './sky/HipsLayer';
 import { GridLayer } from './sky/GridLayer';
 import { PinsLayer } from './sky/PinsLayer';
 import { Navigator } from './sky/Navigator';
+import { RenderQuality } from './sky/RenderQuality';
 import { useSkyControls } from './useSkyControls';
 import { Hud } from './hud/Hud';
 import { applyUrlState, startUrlSync } from '@/lib/urlState';
 import { loadPins } from '@/lib/pins';
+import { startConnectionRecovery } from '@/lib/connectionRecovery';
 import { INITIAL_VIEW, useNav } from '@/lib/store';
 
 function NoWebGL() {
@@ -33,7 +35,9 @@ export default function SkyExplorer() {
     void loadPins();
     // Development-only handle for debugging and end-to-end tests.
     if (process.env.NODE_ENV !== 'production') (window as unknown as { __nav?: typeof useNav }).__nav = useNav;
-    return startUrlSync();
+    const stopUrlSync = startUrlSync();
+    const stopRecovery = startConnectionRecovery();
+    return () => { stopUrlSync(); stopRecovery(); };
   }, []);
 
   return (
@@ -47,12 +51,13 @@ export default function SkyExplorer() {
       >
         <Canvas
           flat
-          dpr={[1, 2]}
+          dpr={[1, 1.5]}
           gl={{ antialias: true, powerPreference: 'high-performance' }}
           camera={{ fov: INITIAL_VIEW.fov, near: 0.001, far: 50, position: [0, 0, 0] }}
           fallback={<NoWebGL />}
         >
           <color attach="background" args={['#03050b']} />
+          <RenderQuality />
           <Navigator />
           <HipsLayer />
           <GridLayer />

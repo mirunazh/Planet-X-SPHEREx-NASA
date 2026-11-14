@@ -3,6 +3,7 @@
  */
 import * as THREE from 'three';
 import { ALLSKY_MEMORY_BUDGET, abortError, textureBytes } from './textureMemory';
+import { downloadImage } from './imageDownload';
 
 export interface AllskyAsset {
   url: string;
@@ -21,6 +22,7 @@ interface PreviewEntry {
   controller?: AbortController;
   asset?: AllskyAsset;
   bytes: number;
+  speculative: boolean;
 }
 
 export class AllskyCache {
@@ -29,11 +31,13 @@ export class AllskyCache {
   private bytes = 0;
   private inflight = 0;
   private clock = 0;
+  private prefetchUrl: string | null = null;
 
   constructor(private readonly budget = ALLSKY_MEMORY_BUDGET) {}
 
   pin(urls: string[]): void {
     this.pinned = new Set(urls);
+    this.prefetchUrl = null;
     for (const e of this.entries.values()) {
       if (!e.asset && !this.pinned.has(e.url)) this.remove(e);
     }
@@ -41,15 +45,36 @@ export class AllskyCache {
   }
 
   load(url: string): Promise<AllskyAsset> {
+    return this.enqueue(url, false);
+  }
+
+  /** One adjacent preview, only when it fits beside the resident images.
+   * Failed/skipped background work never affects the visible layer's status.
+   */
+  prefetch(url: string | null, referenceUrl?: string): void {
+    if (url === this.prefetchUrl) return;
+    this.prefetchUrl = url;
+    for (const e of this.entries.values()) {
+      if (e.speculative && !e.asset && e.url !== url && !this.pinned.has(e.url)) this.remove(e);
+    }
+    if (!url || this.entries.has(url)) return;
+    const reference = referenceUrl ? this.entries.get(referenceUrl) : undefined;
+    if (!reference?.asset || this.bytes + reference.bytes > this.budget) return;
+    if ([...this.entries.values()].some((e) => !e.asset && !e.speculative)) return;
+    void this.enqueue(url, true).catch(() => {});
+  }
+
+  private enqueue(url: string, speculative: boolean): Promise<AllskyAsset> {
     const hit = this.entries.get(url);
     if (hit) {
       hit.lastUsed = ++this.clock;
+      if (!speculative) hit.speculative = false;
       return hit.promise;
     }
     let resolve!: PreviewEntry['resolve'];
     let reject!: PreviewEntry['reject'];
     const promise = new Promise<AllskyAsset>((yes, no) => { resolve = yes; reject = no; });
-    this.entries.set(url, { url, promise, resolve, reject, bytes: 0, lastUsed: ++this.clock });
+    this.entries.set(url, { url, promise, resolve, reject, speculative, bytes: 0, lastUsed: ++this.clock });
     this.pump();
     return promise;
   }
@@ -67,7 +92,8 @@ export class AllskyCache {
     }
   }
 
-  private makeRoom(bytes: number): boolean {
+  private makeRoom(bytes: number, speculative: boolean): boolean {
+    if (speculative) return this.bytes + bytes <= this.budget;
     let available = this.budget - this.bytes;
     const candidates = [...this.entries.values()]
       .filter((e) => e.asset && !this.pinned.has(e.url))
@@ -83,9 +109,9 @@ export class AllskyCache {
 
   private pump(): void {
     if (this.inflight) return;
-    // Latest requested preview first. There is no speculative preloading here.
+    // Foreground first; one slot bounds preview download/decode work.
     const next = [...this.entries.values()].filter((e) => !e.asset && !e.controller)
-      .sort((a, b) => b.lastUsed - a.lastUsed)[0];
+      .sort((a, b) => Number(a.speculative) - Number(b.speculative) || b.lastUsed - a.lastUsed)[0];
     if (next) void this.download(next);
   }
 
@@ -96,15 +122,13 @@ export class AllskyCache {
     const current = () => !controller.signal.aborted && this.entries.get(e.url) === e;
     let bitmap: ImageBitmap | undefined;
     try {
-      const res = await fetch(e.url, { mode: 'cors', signal: controller.signal });
+      const blob = await downloadImage(e.url, controller.signal);
       if (!current()) return;
-      if (!res.ok) throw new Error(`HTTP ${res.status} loading ${e.url}`);
-      const blob = await res.blob();
-      if (!current()) return;
+      if (!blob) throw new Error('Sky preview is missing');
       bitmap = await createImageBitmap(blob);
       if (!current()) return;
       const bytes = textureBytes(bitmap.width, bitmap.height, false);
-      if (!this.makeRoom(bytes)) throw new Error('Sky preview exceeds the available image memory budget');
+      if (!this.makeRoom(bytes, e.speculative)) throw new Error('Sky preview exceeds the available image memory budget');
       const texture = new THREE.Texture(bitmap);
       texture.flipY = false;
       texture.colorSpace = THREE.SRGBColorSpace;
@@ -132,6 +156,7 @@ export class AllskyCache {
   /** Release all resident images and abort pending work when the viewer leaves. */
   clear(): void {
     this.pinned.clear();
+    this.prefetchUrl = null;
     for (const e of this.entries.values()) this.remove(e);
   }
 

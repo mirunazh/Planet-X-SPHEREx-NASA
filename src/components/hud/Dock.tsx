@@ -31,9 +31,9 @@ export function Dock() {
         className="btn primary lock"
         disabled={!lockable}
         onClick={lockTarget}
-        title={lockable ? 'Lock these coordinates (Enter)' : zoomedIn ? 'Load the selected sky layer before locking' : `Zoom in below ${LOCK_MAX_FOV}° to lock`}
+        title={lockable ? 'Lock these coordinates (Enter)' : zoomedIn ? 'Load the selected sky layer before locking' : `Zoom to ${LOCK_MAX_FOV}° or closer to lock`}
       >
-        {lockable ? 'Lock target' : zoomedIn ? 'Load selected layer to lock' : `Zoom below ${LOCK_MAX_FOV}° to lock`}
+        {lockable ? 'Lock target' : zoomedIn ? 'Waiting for sky layer' : `Zoom to ${LOCK_MAX_FOV}° to lock`}
       </button>
     </section>
   );

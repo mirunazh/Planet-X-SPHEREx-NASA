@@ -1,36 +1,17 @@
 'use client';
 
 /** Details for a selected pin, or the locked SkyTarget handed to the image pipeline. */
-import { useState } from 'react';
 import { type Pin, useNav } from '@/lib/store';
-import { flyTo } from '@/lib/navigation';
+import { visitPin } from '@/lib/navigation';
+import { buildTargetUrl } from '@/lib/urlState';
+import { CopyButton } from './CopyButton';
 import { formatDec, formatDegrees, formatRA, formatUncertainty, formatAngle } from '@/lib/sky/format';
 import type { SkyTarget } from '@/lib/sky/target';
-
-function CopyButton({ label, text }: { label: string; text: () => string }) {
-  const [done, setDone] = useState(false);
-  return (
-    <button
-      className="btn ghost"
-      onClick={async () => {
-        try {
-          await navigator.clipboard.writeText(text());
-          setDone(true);
-          setTimeout(() => setDone(false), 1500);
-        } catch {
-          setDone(false);
-        }
-      }}
-    >
-      {done ? 'Copied' : label}
-    </button>
-  );
-}
 
 function PinCard({ pin }: { pin: Pin }) {
   const close = () => useNav.setState({ selected: null });
   return (
-    <section className="side panel" aria-label={`Details: ${pin.name}`}>
+    <section className="side panel" id="details-panel" aria-label={`Details: ${pin.name}`}>
       <header className="panel-head">
         <div>
           <p className="eyebrow">{pin.kind === 'host' ? 'Exoplanet host star' : pin.targetKind?.replace('-', ' ')}</p>
@@ -78,20 +59,21 @@ function PinCard({ pin }: { pin: Pin }) {
             )}
           </>
         )}
-        <dt>Source</dt>
+        <dt>Position source</dt>
         <dd>
           {pin.source?.url ? (
             <a href={pin.source.url} target="_blank" rel="noreferrer">
               {pin.source.service}
             </a>
           ) : (
-            pin.source?.service
+            pin.source?.service ?? 'Featured target snapshot'
           )}
           {pin.source?.resolvedName ? ` (${pin.source.resolvedName})` : ''}
         </dd>
       </dl>
+      {pin.source?.retrievedAt && <p className="small muted">Position snapshot: {new Date(pin.source.retrievedAt).toLocaleDateString('en-GB', { timeZone: 'UTC' })}.</p>}
       <div className="row">
-        <button className="btn primary" onClick={() => flyTo(pin.vec, pin.fov, 'pin')}>
+        <button className="btn primary" onClick={() => visitPin(pin)}>
           Fly here
         </button>
         <button className="btn ghost" onClick={close}>
@@ -105,7 +87,7 @@ function PinCard({ pin }: { pin: Pin }) {
 function LockedCard({ target }: { target: SkyTarget }) {
   const u = target.uncertaintyArcsec;
   return (
-    <section className="side panel locked" aria-label="Locked target">
+    <section className="side panel locked" id="details-panel" aria-label="Locked target">
       <header className="panel-head">
         <div>
           <p className="eyebrow">Target locked · ICRS</p>
@@ -142,10 +124,10 @@ function LockedCard({ target }: { target: SkyTarget }) {
         <dt>Origin</dt>
         <dd>{target.origin}</dd>
       </dl>
-      <p className="muted small">Ready for the image pipeline: this target selects the cutouts compared across SPHEREx, NEOWISE, WISE and 2MASS.</p>
+      <p className="muted small">Copy the target for analysis, or reopen its position and sky layer with a link.</p>
       <div className="row">
         <CopyButton label="Copy JSON" text={() => JSON.stringify(target, null, 2)} />
-        <CopyButton label="Copy link" text={() => window.location.href} />
+        <CopyButton label="Copy target link" text={() => buildTargetUrl(target, window.location.href)} />
       </div>
     </section>
   );

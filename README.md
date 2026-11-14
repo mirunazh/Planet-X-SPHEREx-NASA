@@ -50,9 +50,11 @@ Other scripts:
 ```bash
 npm test             # unit tests (coordinate maths, formatting, parsing, HiPS addressing, fly-to)
 npm run typecheck
+npm run benchmark    # CPU geometry and visible-cell query/sort timings (not GPU/FPS)
 npm run data         # rebuild public/data/*.json from NASA services (with provenance)
 npm run verify:hips  # re-run the tile-orientation check against NASA data
 npm run build && npm start
+npm run test:production # exercise the latest build locally; NED responses simulated
 ```
 
 Docker (production, Next.js standalone output):
@@ -78,8 +80,10 @@ docs/               plan and image-source rationale for the presentation
 Design notes:
 - **Tiles load straight from IRSA in the browser.** IRSA serves them with CORS `*`, and they are never mirrored.
   - The whole-sky preview takes one request.
-  - Full-resolution tiles stream for the patch in view, at the HEALPix order matching the screen pixel, within a 72-tile budget.
+  - Full-resolution tiles stream for the patch in view, at the HEALPix order matching the screen pixel, within a 64-tile desktop / 40-tile compact-screen plan.
   - Coarser tiles fill in while finer ones load.
+  - Decoded images and texture pixels use estimated resident budgets of 128 MiB for detail and 64 MiB for previews; these do not include total browser/GPU memory. Visible images are protected, and background preloading is limited.
+  - Transfers time out after 30 seconds. Failed details can be retried without losing resident images; reconnecting retries failed detail, preview and place loads.
 - **Production security headers:** CSP limited to self and IRSA, `nosniff`, a strict referrer policy and frame denial.
 
 ## Data and credits
@@ -98,3 +102,5 @@ The full acknowledgement texts are in the app under **Data & credits**. The rati
 - SPHEREx HiPS tiles stop at 12.9″ pixels. Deeper zoom magnifies them, and the readout says so. Switch to 2MASS for 0.8″ detail.
 - The PNG tiles use a fixed asinh display stretch (0–40 MJy/sr). They are for display, not photometry.
 - The SPHEREx cube's blank channels (frames 50 and 51) are skipped by the wavelength slider.
+
+The final verification record and remaining browser/live-data checks are in [docs/stage-6-review.md](docs/stage-6-review.md). For production testing, orientation checks, an exact demonstration sequence and performance recording, use [docs/demo-checklist.md](docs/demo-checklist.md).

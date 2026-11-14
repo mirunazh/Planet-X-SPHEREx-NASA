@@ -188,8 +188,10 @@ export function useSkyControls(ref: RefObject<HTMLDivElement | null>): void {
       const t = e.target as HTMLElement | null;
       if (t && (['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName) || t.isContentEditable)) return;
       if (t?.tagName === 'BUTTON' && !['Home', 'r', 'Escape'].includes(e.key)) return;
+      if (t && ['A', 'SUMMARY'].includes(t.tagName) && e.key !== 'Escape') return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       const s = useNav.getState();
+      if (s.panel !== 'none' && e.key !== 'Escape') return;
       switch (e.key) {
         case 'ArrowLeft':
           panByScreen(-0.15, 0);

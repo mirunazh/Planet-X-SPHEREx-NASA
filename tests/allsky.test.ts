@@ -142,3 +142,85 @@ describe('preview memory and request lifecycle', () => {
     expect(cache.memoryStats()).toMatchObject({ bytes: 0, entries: 0, inflight: 0 });
   });
 });
+
+describe('adjacent-band preview preloading', () => {
+  it('loads one neighboring band without changing foreground and reuses it on selection', async () => {
+    setup();
+    const cache = new AllskyCache(previewBytes * 3);
+    cache.pin(['visible']);
+    const visible = await cache.load('visible');
+    cache.prefetch('neighbor', 'visible'); await flush();
+    expect(fetch).toHaveBeenCalledTimes(2);
+    cache.prefetch('neighbor', 'visible'); await flush();
+    expect(fetch).toHaveBeenCalledTimes(2);
+    cache.pin(['visible', 'neighbor']);
+    const next = await cache.load('neighbor');
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(next.url).toBe('neighbor');
+    expect(visible.bitmap.close).not.toHaveBeenCalled();
+    cache.clear();
+  });
+
+  it('cancels a background preview when a different foreground layer is requested', async () => {
+    setup();
+    const cache = new AllskyCache(previewBytes * 3);
+    cache.pin(['visible']); await cache.load('visible');
+    const background = deferred<ReturnType<typeof response>>();
+    vi.mocked(fetch).mockImplementationOnce(() => background.promise as Promise<Response>);
+    cache.prefetch('neighbor', 'visible');
+    const signal = vi.mocked(fetch).mock.calls[1][1]!.signal!;
+    cache.pin(['visible', 'requested']);
+    const requested = cache.load('requested');
+    expect(signal.aborted).toBe(true);
+    expect(fetch).toHaveBeenCalledTimes(2);
+    background.resolve(response());
+    await requested;
+    expect(vi.mocked(fetch).mock.lastCall?.[0]).toBe('requested');
+    expect(createImageBitmap).toHaveBeenCalledTimes(2);
+    cache.clear();
+  });
+
+  it('promotes the exact in-flight background preview without abort or a second request', async () => {
+    setup();
+    const cache = new AllskyCache(previewBytes * 3);
+    cache.pin(['visible']); await cache.load('visible');
+    const background = deferred<ReturnType<typeof response>>();
+    vi.mocked(fetch).mockImplementationOnce(() => background.promise as Promise<Response>);
+    cache.prefetch('neighbor', 'visible');
+    cache.pin(['visible', 'neighbor']);
+    const selected = cache.load('neighbor');
+    expect(vi.mocked(fetch).mock.calls[1][1]!.signal!.aborted).toBe(false);
+    background.resolve(response()); await selected;
+    expect(fetch).toHaveBeenCalledTimes(2);
+    cache.clear();
+  });
+
+  it('skips prefetch when resident images leave insufficient space and does not evict visited bands', async () => {
+    setup();
+    const cache = new AllskyCache(previewBytes * 2);
+    cache.pin(['visible']);
+    const visited = await cache.load('visited');
+    await cache.load('visible');
+    cache.prefetch('neighbor', 'visible'); await flush();
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(visited.bitmap.close).not.toHaveBeenCalled();
+    expect(cache.memoryStats().bytes).toBe(previewBytes * 2);
+    cache.clear();
+  });
+
+  it('silently releases an unexpectedly large background decode without displacing the displayed image', async () => {
+    setup();
+    const cache = new AllskyCache(previewBytes * 2);
+    cache.pin(['visible']); const visible = await cache.load('visible');
+    const oversized = image(64);
+    vi.mocked(createImageBitmap).mockResolvedValueOnce(oversized as unknown as ImageBitmap);
+    cache.prefetch('neighbor', 'visible'); await flush();
+    expect(oversized.close).toHaveBeenCalledOnce();
+    expect(visible.bitmap.close).not.toHaveBeenCalled();
+    expect(cache.memoryStats().bytes).toBe(previewBytes);
+    const calls = vi.mocked(fetch).mock.calls.length;
+    cache.prefetch('neighbor', 'visible'); await flush();
+    expect(fetch).toHaveBeenCalledTimes(calls);
+    cache.clear();
+  });
+});

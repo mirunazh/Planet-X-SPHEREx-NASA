@@ -84,9 +84,17 @@ export async function GET(req: NextRequest) {
     const pos = json.Preferred?.Position;
     let body: ResolveBody;
     let status: number;
-    if (json.ResultCode === 3 && typeof pos?.RA === 'number' && typeof pos?.Dec === 'number') {
-      body = { ok: true, name: json.Preferred?.Name ?? name, ra: pos.RA, dec: pos.Dec, objectType: json.Preferred?.ObjType?.Value ?? null, source: 'NED' };
+    if (json.ResultCode === 3 && typeof pos?.RA === 'number' && typeof pos?.Dec === 'number' &&
+      Number.isFinite(pos.RA) && Number.isFinite(pos.Dec) && pos.RA >= 0 && pos.RA < 360 && Math.abs(pos.Dec) <= 90) {
+      const preferredName = json.Preferred?.Name;
+      const objectType = json.Preferred?.ObjType?.Value;
+      body = {
+        ok: true, name: typeof preferredName === 'string' && preferredName.trim() ? preferredName.trim() : name,
+        ra: pos.RA, dec: pos.Dec, objectType: typeof objectType === 'string' ? objectType : null, source: 'NED',
+      };
       status = 200;
+    } else if (json.ResultCode === 3) {
+      return reply({ ok: false, message: 'NED returned an invalid position. Please try again.' }, 502);
     } else if (json.ResultCode === 1) {
       body = { ok: false, message: 'That name is ambiguous in NED. Please be more specific.' };
       status = 404;

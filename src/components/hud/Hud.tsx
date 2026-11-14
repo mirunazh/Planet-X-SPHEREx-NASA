@@ -1,52 +1,78 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useNav } from '@/lib/store';
+import { buildViewUrl } from '@/lib/urlState';
 import { CoordinateReadout, PositionAnnouncer } from './CoordinateReadout';
 import { SearchBox } from './SearchBox';
 import { LayerPanel } from './LayerPanel';
+import { LayerStatus } from './LayerStatus';
+import { DemoPlaces } from './DemoPlaces';
+import { CopyButton } from './CopyButton';
 import { Dock } from './Dock';
 import { SidePanel } from './SidePanel';
 import { HoverTooltip, Reticle, SkyLabels, StatusLine } from './Overlays';
 import { Dialogs } from './Dialogs';
 
-function TopBar() {
+type MobilePanel = 'layers' | 'places' | 'details';
+
+function TopBar({ onNavigate }: { onNavigate: () => void }) {
   const setPanel = useNav((s) => s.setPanel);
   return (
     <header className="topbar">
       <div className="brand panel">
         <span className="brand-mark" aria-hidden="true" />
-        <div>
-          <h1>SPHEREx Sky Navigator</h1>
-          <p>Infrared sky · NASA data only</p>
-        </div>
+        <div><h1>SPHEREx Sky Navigator</h1><p>Explore the infrared sky</p></div>
       </div>
-      <SearchBox />
-      <nav className="top-actions" aria-label="Information">
-        <button className="btn ghost panel" onClick={() => setPanel('help')}>
-          How it works
-        </button>
-        <button className="btn ghost panel" onClick={() => setPanel('credits')}>
-          Data &amp; credits
-        </button>
+      <SearchBox onNavigate={onNavigate} />
+      <nav className="top-actions" aria-label="Information and sharing">
+        <CopyButton label="Share view" text={() => buildViewUrl(useNav.getState(), window.location.href)} />
+        <button className="btn ghost" onClick={() => setPanel('help')}>Help</button>
+        <button className="btn ghost" onClick={() => setPanel('credits')}>Sources</button>
       </nav>
     </header>
   );
 }
 
 export function Hud() {
+  const [mobilePanel, setMobilePanel] = useState<MobilePanel | null>(null);
+  const selected = useNav((s) => s.selected);
+  const locked = useNav((s) => s.locked);
+  useEffect(() => {
+    if (selected || locked) setMobilePanel('details');
+    else setMobilePanel((current) => current === 'details' ? null : current);
+  }, [selected, locked]);
+  const showDetails = () => setMobilePanel('details');
+  const closePanel = () => {
+    setMobilePanel(null);
+    document.getElementById(`toggle-${mobilePanel}`)?.focus();
+  };
   return (
-    <div className="hud">
-      <SkyLabels />
-      <Reticle />
-      <HoverTooltip />
-      <TopBar />
-      <SidePanel />
-      <LayerPanel />
-      <CoordinateReadout />
-      <Dock />
-      <StatusLine />
-      <PositionAnnouncer />
-      <Dialogs />
+    <div className={`hud mobile-${mobilePanel ?? 'none'}`}>
+      <SkyLabels /><Reticle /><HoverTooltip />
+      <TopBar onNavigate={showDetails} />
+      <aside className="hud-rail left-rail" aria-label="Layers and featured places">
+        <LayerPanel /><DemoPlaces onVisit={showDetails} />
+      </aside>
+      <aside className="hud-rail right-rail" aria-label="Target and navigation">
+        <SidePanel /><Dock />
+      </aside>
+      {mobilePanel && <div className="mobile-panel-close"><button className="btn" onClick={closePanel}>Back to sky</button></div>}
+      <div className="view-summary">
+        <CoordinateReadout />
+        <div className="mobile-layer-status panel"><LayerStatus /></div>
+      </div>
+      <nav className="mobile-controls panel" aria-label="Sky panels">
+        {(['layers', 'places', 'details'] as const).map((panel) => (
+          <button key={panel} id={`toggle-${panel}`} className="btn ghost" aria-expanded={mobilePanel === panel}
+            aria-controls={panel === 'details' && !selected && !locked ? undefined : `${panel}-panel`}
+            disabled={panel === 'details' && !selected && !locked}
+            onClick={() => setMobilePanel((current) => current === panel ? null : panel)}>
+            {panel === 'layers' ? 'Layers' : panel === 'places' ? 'Places' : 'Details'}
+          </button>
+        ))}
+      </nav>
+      <StatusLine /><PositionAnnouncer /><Dialogs />
     </div>
   );
 }

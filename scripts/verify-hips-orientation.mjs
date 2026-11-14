@@ -4,7 +4,7 @@
 // are located in SPHEREx DR1 and 2MASS HiPS tiles served by IRSA under each of
 // the 8 possible pixel orientations. The correct orientation is the one that puts
 // every star on a bright pixel. The same test is repeated on the low-resolution
-// Allsky image used for the first paint of the globe.
+// Allsky image used for the first paint of the panorama.
 //
 // Run: npm run verify:hips
 
@@ -47,7 +47,7 @@ const radecToVec = (ra, dec) => [
 
 async function tap(query) {
   const url = `${TAP}?LANG=ADQL&FORMAT=csv&QUERY=${encodeURIComponent(query)}`;
-  const res = await fetch(url);
+  const res = await fetch(url, { signal: AbortSignal.timeout(30_000) });
   if (!res.ok) throw new Error(`TAP HTTP ${res.status}`);
   const lines = (await res.text()).trim().split(/\r?\n/).slice(1);
   return lines.filter(Boolean).map((l) => l.split(','));
@@ -56,7 +56,7 @@ async function tap(query) {
 const imageCache = new Map();
 async function fetchImage(url, ext) {
   if (imageCache.has(url)) return imageCache.get(url);
-  const res = await fetch(url);
+  const res = await fetch(url, { signal: AbortSignal.timeout(30_000) });
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
   const buf = Buffer.from(await res.arrayBuffer());
   let img;
@@ -175,7 +175,7 @@ async function main() {
   if (!allskyOk) failures++;
 
   // Cube frame naming: frame 0 has no suffix.
-  const probe = async (u) => (await fetch(u, { method: 'HEAD' })).status;
+  const probe = async (u) => (await fetch(u, { method: 'HEAD', signal: AbortSignal.timeout(30_000) })).status;
   const base = `${HIPS}/SPHEREx/spherex_allsky_cube/Norder3/Dir0`;
   const [plain, zero, one] = await Promise.all([probe(`${base}/Npix0.png`), probe(`${base}/Npix0_0.png`), probe(`${base}/Npix0_1.png`)]);
   const namingOk = plain === 200 && zero === 404 && one === 200;

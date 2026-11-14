@@ -72,3 +72,37 @@ describe('panoramic deep links', () => {
     }
   });
 });
+
+describe('shareable demonstration views', () => {
+  it.each(['spherex', 'twomass', 'allwise'] as const)('round trips position, zoom and the selected %s layer without waiting for address-bar sync', async (surveyId) => {
+    const { buildViewUrl } = await import('@/lib/urlState');
+    useNav.setState({ center: radecToVec(12.34567, -56.78901), fov: 0.05, surveyId, frame: 90 });
+    const shared = new URL(buildViewUrl(useNav.getState(), 'https://example.com/explore?old=value#outdated'));
+    expect(shared.pathname).toBe('/explore'); expect(shared.hash).toBe(''); expect(shared.searchParams.get('old')).toBeNull();
+    expect(shared.searchParams.get('f')).toBe(surveyId === 'spherex' ? '90' : null);
+    useNav.setState({ ...useNav.getInitialState(), anim: [] }); location(shared.search); applyUrlState();
+    const restored = useNav.getState();
+    expect(angularDistance(restored.center, radecToVec(12.34567, -56.78901))).toBeLessThan(0.00001);
+    expect(restored.fov).toBe(0.05); expect(restored.surveyId).toBe(surveyId);
+    if (surveyId === 'spherex') expect(restored.frame).toBe(90);
+  });
+
+  it('normalizes rounded RA at the 360-degree boundary', async () => {
+    const { buildViewUrl } = await import('@/lib/urlState');
+    const url = new URL(buildViewUrl({ ...useNav.getState(), center: radecToVec(359.9999999, 20) }, 'https://example.com/'));
+    expect(url.searchParams.get('ra')).toBe('0.00000');
+    location(url.search); applyUrlState();
+    expect(angularDistance(useNav.getState().center, radecToVec(0, 20))).toBeLessThan(0.00001);
+  });
+
+  it('shares locked target coordinates and layer even after the current view moves elsewhere', async () => {
+    const { buildTargetUrl } = await import('@/lib/urlState');
+    const { buildSkyTarget } = await import('@/lib/sky/target');
+    const target = buildSkyTarget({ center: radecToVec(10.68, 41.27), fovDeg: 0.5, uncertaintyArcsec: 13, survey: 'spherex', hipsUrl: 'https://irsa.ipac.caltech.edu/', frames: [46], origin: 'pin' });
+    useNav.setState({ center: radecToVec(200, -20), fov: 10, surveyId: 'allwise' });
+    const url = new URL(buildTargetUrl(target, 'https://example.com/explore'));
+    location(url.search); applyUrlState();
+    expect(angularDistance(useNav.getState().center, radecToVec(target.ra, target.dec))).toBeLessThan(0.00001);
+    expect(useNav.getState()).toMatchObject({ surveyId: 'spherex', frame: 46, fov: 0.5, locked: null });
+  });
+});

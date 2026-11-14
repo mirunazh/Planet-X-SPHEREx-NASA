@@ -5,7 +5,9 @@
 import { INITIAL_VIEW, useNav } from './store';
 import { radecToVec, vecToRadec } from './sky/coords';
 import { SKY_MAX_FOV, SKY_MIN_FOV, clampCenter } from './sky/view';
-import { SURVEYS, isSurveyId, nearestUsableFrame } from './sky/surveys';
+import { SURVEYS, isSurveyId, nearestUsableFrame, type SurveyId } from './sky/surveys';
+import type { Vec3 } from './sky/coords';
+import type { SkyTarget } from './sky/target';
 
 const finite = (v: string | null) => (v !== null && v.trim() !== '' && Number.isFinite(Number(v)) ? Number(v) : null);
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
@@ -34,17 +36,38 @@ export function applyUrlState(): void {
   useNav.setState(patch);
 }
 
-function writeUrl(): void {
-  const s = useNav.getState();
+type ShareView = { center: Vec3; fov: number; surveyId: SurveyId; frame: number };
+
+/** Serialize current state synchronously, independently of the address-bar debounce. */
+export function viewQuery(s: ShareView): string {
   const { ra, dec } = vecToRadec(s.center);
   const p = new URLSearchParams();
-  p.set('ra', ra.toFixed(5));
+  p.set('ra', (Number(ra.toFixed(5)) % 360).toFixed(5));
   p.set('dec', dec.toFixed(5));
   p.set('mode', 'sky');
   p.set('fov', Number(s.fov.toPrecision(4)).toString());
   p.set('survey', s.surveyId);
-  if (SURVEYS[s.surveyId].isCube) p.set('f', String(s.frame));
-  window.history.replaceState(window.history.state, '', `${window.location.pathname}?${p.toString()}`);
+  if (SURVEYS[s.surveyId].isCube) p.set('f', String(nearestUsableFrame(s.frame)));
+  return p.toString();
+}
+
+export function buildViewUrl(s: ShareView, baseUrl: string): string {
+  const url = new URL(baseUrl);
+  url.search = viewQuery(s);
+  url.hash = '';
+  return url.toString();
+}
+
+export function buildTargetUrl(target: SkyTarget, baseUrl: string): string {
+  if (!isSurveyId(target.layer.survey)) throw new Error('Unknown target survey');
+  return buildViewUrl({
+    center: radecToVec(target.ra, target.dec), fov: target.fovDeg,
+    surveyId: target.layer.survey, frame: target.layer.frames?.[0] ?? 0,
+  }, baseUrl);
+}
+
+function writeUrl(): void {
+  window.history.replaceState(window.history.state, '', `${window.location.pathname}?${viewQuery(useNav.getState())}`);
 }
 
 /** Mirrors the view into the URL, debounced so it settles after motion stops. */

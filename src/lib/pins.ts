@@ -108,10 +108,10 @@ export function searchPins(query: string, targets: Pin[], hosts: Pin[], limit = 
     if (n.startsWith(q)) return 1;
     if (n.split(/[\s()]+/).some((w) => w.startsWith(q))) return 2;
     if (n.includes(q)) return 3;
-    return 9;
+    return Infinity;
   };
   return [...targets.map((p) => ({ p, s: score(p) - 0.5 })), ...hosts.map((p) => ({ p, s: score(p) }))]
-    .filter((x) => x.s < 9)
+    .filter((x) => Number.isFinite(x.s))
     .sort((a, b) => a.s - b.s || a.p.name.localeCompare(b.p.name))
     .slice(0, limit)
     .map((x) => x.p);

@@ -9,6 +9,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "benchmark": "vitest bench --run",
+    "test:production": "node scripts/test-production.mjs",
     "data": "node scripts/fetch-nasa-data.mjs",
     "verify:hips": "node scripts/verify-hips-orientation.mjs"
   },

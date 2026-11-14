@@ -81,6 +81,20 @@ describe('panoramic controls', () => {
     expect(useNav.getState().anim).toHaveLength(0);
   });
 
+  it.each(['A', 'SUMMARY'])('preserves native keyboard activation for %s', (tagName) => {
+    expect(key('Enter', tagName).defaultPrevented).toBe(false);
+    expect(key('Home', tagName).defaultPrevented).toBe(false);
+  });
+
+  it('keeps navigation shortcuts from moving the sky behind an open dialog', () => {
+    useNav.setState({ panel: 'help' });
+    const view = currentView();
+    for (const value of ['ArrowLeft', '+', 'Home', 'r', 'g']) key(value);
+    expect(currentView()).toEqual(view);
+    expect(useNav.getState().anim).toHaveLength(0);
+    expect(useNav.getState().showGrid).toBe(false);
+  });
+
   it.each(['DIV', 'BUTTON', 'INPUT'])('stops a flight with Escape when a %s has focus', (tagName) => {
     flyTo(radecToVec(10, 40), 0.05);
     runAnimations(0);
