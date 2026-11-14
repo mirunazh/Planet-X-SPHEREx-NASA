@@ -1,0 +1,213 @@
+{
+  "provenance": {
+    "note": "Featured targets. Each entry records the NASA service (or IAU definition) its position comes from.",
+    "retrievedAt": "2026-11-14T11:34:07.013Z"
+  },
+  "targets": [
+    {
+      "id": "galactic-centre",
+      "name": "Galactic Centre",
+      "kind": "reference",
+      "ra": 266.40499,
+      "dec": -28.93617,
+      "fov": 10,
+      "description": "Origin of galactic coordinates (l = 0°, b = 0°), Hipparcos definition.",
+      "source": {
+        "service": "IAU definition (computed)",
+        "retrievedAt": "2026-11-14T11:34:07.013Z",
+        "note": "Galactic frame, ESA Hipparcos catalogue Vol. 1 §1.5.3"
+      }
+    },
+    {
+      "id": "north-ecliptic-pole",
+      "name": "North Ecliptic Pole",
+      "kind": "reference",
+      "ra": 270,
+      "dec": 66.560721,
+      "fov": 30,
+      "description": "SPHEREx scans the sky around the ecliptic poles; its northern deep field sits here.",
+      "source": {
+        "service": "IAU definition (computed)",
+        "retrievedAt": "2026-11-14T11:34:07.013Z",
+        "note": "Mean obliquity at J2000.0, IAU 2006 (84381.406″)"
+      }
+    },
+    {
+      "id": "south-ecliptic-pole",
+      "name": "South Ecliptic Pole",
+      "kind": "reference",
+      "ra": 90,
+      "dec": -66.560721,
+      "fov": 30,
+      "description": "The southern counterpart; the SPHEREx deep field is offset from it.",
+      "source": {
+        "service": "IAU definition (computed)",
+        "retrievedAt": "2026-11-14T11:34:07.013Z",
+        "note": "Mean obliquity at J2000.0, IAU 2006 (84381.406″)"
+      }
+    },
+    {
+      "id": "spherex-deep-south",
+      "name": "SPHEREx Deep Field (south)",
+      "kind": "deep-field",
+      "ra": 80.1482,
+      "dec": -61.8089,
+      "fov": 20,
+      "description": "Observed by SPHEREx on every orbit; centre of the 115679 DR1 deep-field images.",
+      "source": {
+        "service": "IRSA TAP, spherex.obscore (spherex_dr1_deep)",
+        "url": "https://irsa.ipac.caltech.edu/TAP/sync",
+        "query": "SELECT CASE WHEN s_dec > 0 THEN 'north' ELSE 'south' END AS field, COUNT(*) AS n, AVG(s_ra) AS ra, AVG(s_dec) AS dec FROM spherex.obscore WHERE obs_collection = 'spherex_dr1_deep' GROUP BY CASE WHEN s_dec > 0 THEN 'north' ELSE 'south' END",
+        "retrievedAt": "2026-11-14T11:34:07.013Z"
+      }
+    },
+    {
+      "id": "spherex-deep-north",
+      "name": "SPHEREx Deep Field (north)",
+      "kind": "deep-field",
+      "ra": 270.4888,
+      "dec": 66.3134,
+      "fov": 20,
+      "description": "Observed by SPHEREx on every orbit; centre of the 118002 DR1 deep-field images.",
+      "source": {
+        "service": "IRSA TAP, spherex.obscore (spherex_dr1_deep)",
+        "url": "https://irsa.ipac.caltech.edu/TAP/sync",
+        "query": "SELECT CASE WHEN s_dec > 0 THEN 'north' ELSE 'south' END AS field, COUNT(*) AS n, AVG(s_ra) AS ra, AVG(s_dec) AS dec FROM spherex.obscore WHERE obs_collection = 'spherex_dr1_deep' GROUP BY CASE WHEN s_dec > 0 THEN 'north' ELSE 'south' END",
+        "retrievedAt": "2026-11-14T11:34:07.013Z"
+      }
+    },
+    {
+      "id": "m31",
+      "name": "Andromeda Galaxy (M31)",
+      "kind": "galaxy",
+      "ra": 10.6847929,
+      "dec": 41.269065,
+      "fov": 4,
+      "description": "The nearest large spiral galaxy.",
+      "source": {
+        "service": "NED (NASA/IPAC Extragalactic Database)",
+        "url": "https://ned.ipac.caltech.edu/srs/ObjectLookup?name=M31",
+        "resolvedName": "Messier 031",
+        "retrievedAt": "2026-11-14T11:34:07.013Z"
+      }
+    },
+    {
+      "id": "m33",
+      "name": "Triangulum Galaxy (M33)",
+      "kind": "galaxy",
+      "ra": 23.4620417,
+      "dec": 30.6602222,
+      "fov": 1.5,
+      "description": "A nearby face-on spiral in the Local Group.",
+      "source": {
+        "service": "NED (NASA/IPAC Extragalactic Database)",
+        "url": "https://ned.ipac.caltech.edu/srs/ObjectLookup?name=M33",
+        "resolvedName": "Messier 033",
+        "retrievedAt": "2026-11-14T11:34:07.013Z"
+      }
+    },
+    {
+      "id": "m101",
+      "name": "Pinwheel Galaxy (M101)",
+      "kind": "galaxy",
+      "ra": 210.8022671,
+      "dec": 54.34895,
+      "fov": 0.6,
+      "description": "Used in the IRSA SPHEREx tutorials to map 3.3 µm PAH emission.",
+      "source": {
+        "service": "NED (NASA/IPAC Extragalactic Database)",
+        "url": "https://ned.ipac.caltech.edu/srs/ObjectLookup?name=M101",
+        "resolvedName": "Messier 101",
+        "retrievedAt": "2026-11-14T11:34:07.013Z"
+      }
+    },
+    {
+      "id": "m81",
+      "name": "Bode's Galaxy (M81)",
+      "kind": "galaxy",
+      "ra": 148.888221,
+      "dec": 69.0652946,
+      "fov": 0.8,
+      "description": "Bright spiral galaxy in Ursa Major.",
+      "source": {
+        "service": "NED (NASA/IPAC Extragalactic Database)",
+        "url": "https://ned.ipac.caltech.edu/srs/ObjectLookup?name=M81",
+        "resolvedName": "SN 1993J HOST",
+        "retrievedAt": "2026-11-14T11:34:07.013Z"
+      }
+    },
+    {
+      "id": "m51",
+      "name": "Whirlpool Galaxy (M51)",
+      "kind": "galaxy",
+      "ra": 202.4841667,
+      "dec": 47.2305556,
+      "fov": 0.4,
+      "description": "Interacting spiral galaxy pair.",
+      "source": {
+        "service": "NED (NASA/IPAC Extragalactic Database)",
+        "url": "https://ned.ipac.caltech.edu/srs/ObjectLookup?name=M51",
+        "resolvedName": "Messier 051",
+        "retrievedAt": "2026-11-14T11:34:07.013Z"
+      }
+    },
+    {
+      "id": "lmc",
+      "name": "Large Magellanic Cloud",
+      "kind": "galaxy",
+      "ra": 80.8941667,
+      "dec": -69.7561111,
+      "fov": 12,
+      "description": "Satellite galaxy of the Milky Way, next to the SPHEREx southern deep field.",
+      "source": {
+        "service": "NED (NASA/IPAC Extragalactic Database)",
+        "url": "https://ned.ipac.caltech.edu/srs/ObjectLookup?name=LMC",
+        "resolvedName": "Large Magellanic Cloud",
+        "retrievedAt": "2026-11-14T11:34:07.013Z"
+      }
+    },
+    {
+      "id": "smc",
+      "name": "Small Magellanic Cloud",
+      "kind": "galaxy",
+      "ra": 13.1866667,
+      "dec": -72.8286111,
+      "fov": 5,
+      "description": "Satellite galaxy of the Milky Way.",
+      "source": {
+        "service": "NED (NASA/IPAC Extragalactic Database)",
+        "url": "https://ned.ipac.caltech.edu/srs/ObjectLookup?name=SMC",
+        "resolvedName": "Small Magellanic Cloud",
+        "retrievedAt": "2026-11-14T11:34:07.013Z"
+      }
+    },
+    {
+      "id": "teegardens-star",
+      "name": "Teegarden's Star",
+      "kind": "star",
+      "ra": 43.269145,
+      "dec": 16.864902,
+      "fov": 0.3,
+      "description": "Nearby red dwarf with planets, moving ~5″ per year. Our calibration target across 2MASS, WISE and SPHEREx.",
+      "source": {
+        "service": "NASA Exoplanet Archive (pscomppars)",
+        "url": "https://exoplanetarchive.ipac.caltech.edu/TAP/sync",
+        "retrievedAt": "2026-11-14T11:34:07.013Z"
+      }
+    },
+    {
+      "id": "barnards-star",
+      "name": "Barnard's star",
+      "kind": "star",
+      "ra": 269.448614,
+      "dec": 4.737981,
+      "fov": 0.3,
+      "description": "The fastest-moving star in the sky (~10″ per year).",
+      "source": {
+        "service": "NASA Exoplanet Archive (pscomppars)",
+        "url": "https://exoplanetarchive.ipac.caltech.edu/TAP/sync",
+        "retrievedAt": "2026-11-14T11:34:07.013Z"
+      }
+    }
+  ]
+}
