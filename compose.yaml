@@ -1,0 +1,33 @@
+services:
+  web:
+    build: .
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      COMPARISON_SERVICE_URL: http://comparison:8000
+    depends_on:
+      comparison:
+        condition: service_healthy
+    restart: unless-stopped
+  comparison:
+    build: ./services/comparison
+    init: true
+    expose:
+      - "8000"
+    # Also serves a locally running `npm run dev` through its default proxy URL.
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      COMPARISON_DB: /data/inventory.sqlite3
+      METADATA_CACHE_BYTES: 268435456
+      # Temporary archive diagnosis: 0 disables the corresponding time limit.
+      IRSA_REQUEST_TIMEOUT_SECONDS: 0
+      SEARCH_EXECUTION_TIMEOUT_SECONDS: 0
+      SEARCH_QUEUE_TIMEOUT_SECONDS: 0
+    volumes:
+      - comparison-metadata:/data
+    mem_limit: 512m
+    restart: unless-stopped
+
+volumes:
+  comparison-metadata:

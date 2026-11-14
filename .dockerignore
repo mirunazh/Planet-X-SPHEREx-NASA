@@ -8,3 +8,9 @@ npm-debug.log*
 scripts/.cache
 Dockerfile
 .dockerignore
+services
+__pycache__
+.venv
+
+.codex
+.comparison-data

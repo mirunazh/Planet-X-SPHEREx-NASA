@@ -818,6 +818,59 @@ summary { cursor: pointer; min-height: 32px; }
 .mobile-controls, .mobile-panel-close, .mobile-layer-status { display: none; }
 
 /* ---------- Responsive ---------- */
+.comparison-crop { position: fixed; left: 50%; top: 50%; translate: -50% -50%; border: 1px solid var(--accent); pointer-events: none; }
+.crop-selector { position: fixed; z-index: 45; top: 100px; left: 50%; translate: -50% 0; padding: 16px; width: min(360px, calc(100vw - 24px)); pointer-events: auto; }
+.crop-selector h2 { margin: 0; font-size: 17px; }
+.crop-selector label { display: flex; justify-content: space-between; }
+.crop-selector input { width: 100%; min-height: 40px; accent-color: var(--accent); }
+.crop-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+.comparison-page { height: 100dvh; overflow: auto; padding: 24px; }
+.comparison-header { display: flex; justify-content: space-between; gap: 24px; align-items: center; margin-bottom: 24px; }
+.comparison-header h1 { font-size: 26px; margin: 12px 0 6px; }
+.comparison-header p { margin: 0; }
+.comparison-layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 24px; align-items: start; }
+.comparison-filters { padding: 16px; position: sticky; top: 0; }
+.comparison-filters summary { font-weight: 600; }
+.comparison-filters form { display: grid; gap: 14px; margin-top: 12px; }
+.comparison-filters label { display: grid; gap: 5px; font-size: 12px; min-width: 0; }
+.comparison-filters input, .comparison-filters select { width: 100%; min-width: 0; min-height: 40px; border: 1px solid var(--border-strong); border-radius: 6px; padding: 8px; color: var(--text); background: var(--bg); font: inherit; }
+.filter-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.comparison-results { min-width: 0; }
+.comparison-workspace { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.comparison-slot { padding: 20px; min-height: 200px; overflow-wrap: anywhere; }
+.comparison-slot h2 { font-size: 17px; margin: 0 0 16px; }
+.inventory-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin: 28px 0 16px; }
+.inventory-heading h2 { margin: 0; font-size: 18px; }
+.inventory-heading h2 span { font-size: 13px; font-weight: 400; }
+.mission-status { border-top: 1px solid var(--border); padding: 12px 0; overflow-wrap: anywhere; }
+.mission-status > strong, .mission-status > span { display: block; }
+.mission-status > span { font-size: 12px; margin-top: 4px; }
+.comparison-error { color: var(--danger); }
+.comparison-warning { color: var(--warn); }
+.inventory-list { margin: 20px 0; padding: 0; list-style: none; }
+.inventory-product { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(180px, 1.4fr) auto; gap: 20px; padding: 20px 0; border-top: 1px solid var(--border-strong); }
+.inventory-product p { margin: 5px 0; }
+.product-kind { display: inline-block; font-size: 11px; color: var(--muted); margin-left: 10px; }
+.product-provenance { min-width: 0; overflow-wrap: anywhere; }
+.product-title { max-width: 65ch; }
+.product-actions { display: flex; flex-direction: column; gap: 8px; }
+.product-actions .btn[aria-pressed='true'] { color: var(--accent); border-color: var(--accent); }
+.inventory-pages { display: flex; flex-wrap: wrap; gap: 12px; padding-bottom: 24px; }
+.inventory-empty { padding: 28px 0; color: var(--muted); max-width: 65ch; }
+@media (max-width: 760px) {
+  .comparison-page { padding: 16px; }
+  .comparison-header { align-items: start; flex-direction: column; gap: 12px; }
+  .comparison-layout { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .comparison-filters { position: static; }
+  .comparison-workspace { gap: 10px; }
+  .comparison-slot { min-height: 180px; padding: 12px; }
+  .comparison-slot p { font-size: 12px; }
+  .inventory-product { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .product-actions { flex-direction: row; }
+  .product-actions .btn { flex: 1; }
+  .comparison-filters input, .comparison-filters select { font-size: 16px; }
+  .crop-selector { top: 125px; }
+}
 @media (max-width: 1200px) {
   :root { --gap: 12px; }
   .hud { grid-template-columns: 270px minmax(0, 1fr) 250px; }
@@ -891,4 +944,33 @@ summary { cursor: pointer; min-height: 32px; }
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+.collection-details { padding: 12px 0; border-top: 1px solid var(--border); }
+.collection-details summary { cursor: pointer; font-size: 13px; color: var(--muted); }
+.collection-details ul { padding-inline-start: 20px; }
+.collection-details li { margin-block: 12px; overflow-wrap: anywhere; font-size: 13px; }
+.collection-details p { margin-block: 5px; }
+.inventory-update { padding-block: 12px; color: var(--warn); }
+.slideshow { scroll-margin-top: 20px; }
+.slideshow-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.slideshow-heading h2 { font-size: 20px; margin: 0; }
+.slideshow-stage { position: relative; display: grid; place-items: center; min-height: 320px; height: min(58vh, 620px); background: #000; border: 1px solid var(--border-strong); border-radius: 12px; overflow: hidden; }
+.slideshow-stage:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.slideshow-image { width: 100%; height: 100%; min-height: 0; object-fit: contain; }
+.slideshow-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; padding: 24px; text-align: center; background: #000; }
+.slideshow-placeholder p { margin: 0; max-width: 52ch; }
+.slideshow-controls { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; padding-block: 16px; }
+.slideshow-navigation { display: flex; flex-wrap: wrap; gap: 8px; }
+.slideshow-speed { display: flex; align-items: center; gap: 8px; }
+.slideshow-speed select { min-height: 40px; padding: 6px 10px; color: var(--text); background: var(--bg); border: 1px solid var(--border-strong); border-radius: 6px; font: inherit; }
+.slideshow-caption p { margin-block: 5px; overflow-wrap: anywhere; }
+.slideshow-hint { max-width: 75ch; line-height: 1.6; }
+.saved-comparison { margin-top: 24px; }
+.saved-comparison summary { cursor: pointer; color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+@media (max-width: 700px) {
+  .slideshow-stage { height: min(50vh, 430px); min-height: 260px; }
+  .slideshow-controls { gap: 12px; }
+  .slideshow-navigation { width: 100%; }
+  .slideshow-navigation .btn { flex: 1; }
+  .slideshow-speed select { font-size: 16px; }
 }

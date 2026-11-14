@@ -23,6 +23,11 @@ npm-debug.log*
 
 # local verification artefacts
 /scripts/.cache/
+__pycache__/
+.venv/
 
 # local tool configuration
 /.claude/
+
+# persistent local comparison metadata
+/.comparison-data/

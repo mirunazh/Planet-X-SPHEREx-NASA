@@ -22,6 +22,11 @@ try {
   const upstreamCalls = new Map();
   globalThis.fetch = async (input) => {
     const url = new URL(String(input));
+    if (url.pathname === '/inventory' || url.pathname === '/health' || url.pathname.startsWith('/searches/')) {
+      assert.equal(url.origin, process.env.COMPARISON_SERVICE_URL ?? 'http://127.0.0.1:8000');
+      if (url.pathname === '/searches/smoke') return Response.json({ id: 'smoke', state: 'finished', status: 'empty', collections: [], updatedAt: '', verifiedAt: null, stale: false, version: 'version1', total: 0, truncated: false, queueMs: 0 });
+      return Response.json(url.pathname === '/health' ? { ok: true } : { version: 'version1', products: [], total: 0, status: 'empty', nextCursor: null, warnings: [], truncated: false, retrievedAt: new Date().toISOString() });
+    }
     assert.equal(`${url.origin}${url.pathname}`, 'https://ned.ipac.caltech.edu/srs/ObjectLookup');
     const name = url.searchParams.get('name');
     const count = (upstreamCalls.get(name) ?? 0) + 1;
@@ -63,6 +68,18 @@ try {
     assert.ok(asset.text.length > 0, path);
   }
   console.log(`PASS: production page, ${assets.size} JS/CSS assets and security headers`);
+
+  const comparison = await request('/compare?ra=0&dec=90&size=10');
+  assert.equal(comparison.status, 200);
+  assert.match(comparison.text, /Compare images/);
+  assert.equal((await request('/api/comparison/health')).status, 200);
+  assert.equal((await request('/api/comparison/searches/smoke')).status, 200);
+  const inventory = await request('/api/comparison/searches/smoke/results?version=version1');
+  assert.equal(inventory.status, 200);
+  assert.equal(JSON.parse(inventory.text).status, 'empty');
+  assert.equal(inventory.headers['cache-control'], 'no-store');
+  assert.equal((await request('/api/comparison/inventory?url=https://example.test')).status, 400);
+  console.log('PASS: compiled comparison page and same-origin progress/results/health proxies (simulated service)');
 
   const hosts = JSON.parse((await request('/data/exoplanet-hosts.json')).text);
   const targets = JSON.parse((await request('/data/targets.json')).text);

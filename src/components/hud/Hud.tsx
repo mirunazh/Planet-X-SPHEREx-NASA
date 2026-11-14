@@ -13,6 +13,7 @@ import { Dock } from './Dock';
 import { SidePanel } from './SidePanel';
 import { HoverTooltip, Reticle, SkyLabels, StatusLine } from './Overlays';
 import { Dialogs } from './Dialogs';
+import { CropSelector } from '@/components/comparison/CropSelector';
 
 type MobilePanel = 'layers' | 'places' | 'details';
 
@@ -26,6 +27,7 @@ function TopBar({ onNavigate }: { onNavigate: () => void }) {
       </div>
       <SearchBox onNavigate={onNavigate} />
       <nav className="top-actions" aria-label="Information and sharing">
+        <CropSelector />
         <CopyButton label="Share view" text={() => buildViewUrl(useNav.getState(), window.location.href)} />
         <button className="btn ghost" onClick={() => setPanel('help')}>Help</button>
         <button className="btn ghost" onClick={() => setPanel('credits')}>Sources</button>

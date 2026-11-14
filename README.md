@@ -104,3 +104,26 @@ The full acknowledgement texts are in the app under **Data & credits**. The rati
 - The SPHEREx cube's blank channels (frames 50 and 51) are skipped by the wavelength slider.
 
 The final verification record and remaining browser/live-data checks are in [docs/stage-6-review.md](docs/stage-6-review.md). For production testing, orientation checks, an exact demonstration sequence and performance recording, use [docs/demo-checklist.md](docs/demo-checklist.md).
+## IRSA image comparison
+
+Run `docker compose up --build -d` to start the navigator and the internal Python inventory service together. The web app is available at `http://localhost:3000`. In the navigator, choose **Compare images**, adjust the crop, then **Find images**. Image comparison is restricted to SPHEREx. The first comparison stage includes SPHEREx archive discovery, detector/wavelength/date/product filters, metadata and A/B selections. The comparison page now includes an image slideshow with sequential FITS cutout loading, previous/next navigation, keyboard and wheel navigation, autoplay and observation timestamps. Overlay/subtraction tools remain later work.
+
+If a local Next.js dev server is already using port 3000 over IPv6, `localhost:3000` may reach it while `127.0.0.1:3000` reaches Docker. The comparison service is also published on loopback port 8000 so both web instances can use it. For development, `docker compose up -d comparison` is sufficient alongside `npm run dev`.
+
+For separate local development, run `pip install -r services/comparison/requirements.txt`, start `COMPARISON_DB="$PWD/.comparison-data/inventory.sqlite3" uvicorn app:app --app-dir services/comparison --host 127.0.0.1 --port 8000`, then `npm run dev`. Next.js uses `http://127.0.0.1:8000` by default; `COMPARISON_SERVICE_URL` overrides the internal service address. The browser uses same-origin API routes.
+
+Inventory searches now run as persistent background jobs. Available metadata appears before slower collections finish. Refresh keeps displayed results and A/B selections; updates are explicitly adopted so loaded pages stay fixed. Collection failures, endpoint suspension and verification dates are visible in the inventory. SQLite metadata is stored in the `comparison-metadata` Docker volume; run only one comparison-service process/worker. The default metadata cache is 256 MiB, separate from any future FITS cache. Positive metadata is fresh for 24 hours and retained up to seven days; complete empty results are fresh for 15 minutes. Discovery returns metadata; the slideshow then requests the current FITS cutout and preloads one successor.
+
+The API uses `POST /api/comparison/searches` (region/filter JSON, optional `refresh`), `GET /api/comparison/searches/{id}` for progress, and `GET /api/comparison/searches/{id}/results?version=…&cursor=…` for immutable pages of 100. `/api/comparison/inventory` is retired with HTTP 410. `/api/comparison/health` reports process health separately from the last known IRSA response. See the [resilient inventory review and deterministic acceptance instructions](docs/comparison-resilience-review.md).
+
+See [stage 1 review and acceptance steps](docs/comparison-stage-1-review.md) for limits, verification status, and the test checklist.
+
+For the current archive diagnosis, Compose temporarily sets `IRSA_REQUEST_TIMEOUT_SECONDS`, `SEARCH_EXECUTION_TIMEOUT_SECONDS` and `SEARCH_QUEUE_TIMEOUT_SECONDS` to `0` (no application time limit). Requests can keep waiting until IRSA responds, a network error occurs, or the service is stopped. Restore `25`, `120` and `30`, respectively, to re-enable the approved bounded defaults. Concurrency and metadata size limits remain active. `/api/comparison/health` exposes the effective timeout values (`null` means disabled).
+
+### SPHEREx slideshow
+
+Searches use IRSA SIA `POS=CIRCLE` for `spherex_dr1` and `spherex_qr3`, equivalent to the spatial/release selection in `Irsa.query_sia(pos=(coord, search_radius), collection=[...])`. The cone circumscribes the navigator's square crop. Frames are ordered by observation time, with unknown times last. In the comparison page, use **Previous**, **Next**, **Play/Pause**, or arrow keys/scroll over the viewer. **Next** loads subsequent inventory pages when needed; **View image** opens a specific row in the viewer. Images load inside the app.
+
+The Python service reads the FITS `IMAGE` extension with Astropy, resamples the selected crop to a common north-up/east-left grid, and returns a display PNG. Per-image asinh contrast helps inspection; it is not a calibrated brightness comparison. Missing pixels remain transparent, and wavelength metadata is still labelled as detector range. One FITS cutout downloads at a time, sharing the global two-request IRSA limit. The PNG cache is separate from metadata, defaults to 128 MiB under `/data/previews`, and persists in the existing Docker volume. `PREVIEW_CACHE_DIR` and `PREVIEW_CACHE_BYTES` override it. The browser retains at most six preview blobs and only preloads the next frame. Image requests respect the temporarily disabled IRSA timeout setting.
+
+See [slideshow implementation and acceptance](docs/comparison-slideshow-review.md). Run `python3 scripts/verify-slideshow-live.py` against the Compose web app for a live metadata-to-PNG check.
