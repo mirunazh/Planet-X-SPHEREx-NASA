@@ -3,6 +3,7 @@ import { type Vec3, radecToVec } from './sky/coords';
 import type { Mode } from './sky/view';
 import { type SurveyId, SURVEYS } from './sky/surveys';
 import type { SkyTarget, TargetOrigin } from './sky/target';
+import { type SkyLayer, requestedLayer, sameLayer } from './sky/layer';
 
 export interface PinSource {
   service: string;
@@ -51,6 +52,10 @@ export interface NavState {
   distance: number;
   surveyId: SurveyId;
   frame: number;
+  /** Requested selection above; this changes only when the renderer swaps images. */
+  displayedLayer: SkyLayer | null;
+  /** Changes for every effective selection or retry, including A → B → A in one render. */
+  layerRevision: number;
   rawPixels: boolean;
   /** Display gain applied to the survey images (display only, not data). */
   gain: number;
@@ -80,6 +85,7 @@ export interface NavActions {
   setView: (v: Partial<Pick<NavState, 'center' | 'fov'>>) => void;
   setSurvey: (id: SurveyId) => void;
   setFrame: (frame: number) => void;
+  retryLayer: () => void;
   toggle: (key: 'showGrid' | 'showHosts' | 'showTargets' | 'rawPixels') => void;
   setPins: (hosts: Pin[], targets: Pin[], retrievedAt: string | null) => void;
   setHover: (pin: Pin | null, pos: { x: number; y: number } | null) => void;
@@ -100,6 +106,8 @@ export const useNav = create<NavState & NavActions>()((set) => ({
   ...INITIAL_VIEW,
   surveyId: 'spherex',
   frame: SURVEYS.spherex.defaultFrame,
+  displayedLayer: null,
+  layerRevision: 0,
   rawPixels: false,
   gain: 1,
   showGrid: false,
@@ -122,8 +130,13 @@ export const useNav = create<NavState & NavActions>()((set) => ({
   anim: [],
 
   setView: (v) => set(v),
-  setSurvey: (surveyId) => set({ surveyId }),
-  setFrame: (frame) => set({ frame }),
+  setSurvey: (surveyId) => set((s) => surveyId === s.surveyId ? {} : { surveyId, layerRevision: s.layerRevision + 1, allskyStatus: 'loading', locked: null }),
+  setFrame: (frame) => set((s) => {
+    const next = requestedLayer({ surveyId: 'spherex', frame }).frame;
+    const changed = !sameLayer(requestedLayer(s), requestedLayer({ ...s, frame: next }));
+    return { frame: next, ...(changed ? { layerRevision: s.layerRevision + 1, allskyStatus: 'loading' as const, locked: null } : {}) };
+  }),
+  retryLayer: () => set((s) => ({ layerRevision: s.layerRevision + 1, allskyStatus: 'loading', locked: null })),
   toggle: (key) => set((s) => ({ [key]: !s[key] }) as Partial<NavState>),
   setPins: (hosts, targets, dataRetrievedAt) => set({ hosts, targets, dataRetrievedAt, dataStatus: 'ready' }),
   setHover: (hovered, hoverPos) => set({ hovered, hoverPos }),

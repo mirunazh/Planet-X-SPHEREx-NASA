@@ -5,6 +5,7 @@ import { useNav } from '@/lib/store';
 import { radecToVec, vecToRadec } from '@/lib/sky/coords';
 import { cameraBasis, projectWithBasis } from '@/lib/sky/view';
 import { tileStore } from '../sky/TileStore';
+import { layerKey } from '@/lib/sky/layer';
 
 export function Reticle() {
   const mode = useNav((s) => s.mode);
@@ -84,16 +85,19 @@ export function SkyLabels() {
 
 /** Loading and error state for the NASA data connections. */
 export function StatusLine() {
-  const allsky = useNav((s) => s.allskyStatus);
+  const displayed = useNav((s) => s.displayedLayer);
+  const prefix = displayed ? layerKey(displayed) : null;
   const data = useNav((s) => s.dataStatus);
-  const [tiles, setTiles] = useState({ pending: 0, failed: 0, loaded: 0 });
+  const [stats, setStats] = useState({ prefix, pending: 0, failed: 0, loaded: 0 });
   useEffect(() => {
-    const t = setInterval(() => setTiles(tileStore.stats()), 400);
+    if (prefix === null) return;
+    const update = () => setStats({ prefix, ...tileStore.stats(prefix) });
+    update();
+    const t = setInterval(update, 400);
     return () => clearInterval(t);
-  }, []);
+  }, [prefix]);
+  const tiles = stats.prefix === prefix ? stats : { pending: 0, failed: 0 };
   const messages: { text: string; tone: 'info' | 'warn' }[] = [];
-  if (allsky === 'loading') messages.push({ text: 'Loading the whole-sky preview from IRSA…', tone: 'info' });
-  if (allsky === 'error') messages.push({ text: 'Could not reach NASA/IPAC IRSA. Check the network and reload.', tone: 'warn' });
   if (tiles.pending > 0) messages.push({ text: `Streaming ${tiles.pending} sky tile${tiles.pending === 1 ? '' : 's'} from IRSA…`, tone: 'info' });
   if (tiles.failed > 0) messages.push({ text: `${tiles.failed} tile${tiles.failed === 1 ? '' : 's'} unavailable, showing the coarser layer`, tone: 'warn' });
   if (data === 'error') messages.push({ text: 'Pins unavailable: run "npm run data" to build the NASA data snapshot.', tone: 'warn' });

@@ -2,12 +2,13 @@
 
 /**
  * Whole-sky map in galactic Mollweide (Milky Way across the middle, longitude
- * increasing to the left), painted from the same NASA Allsky image as the globe,
+ * increasing to the left), painted from the same NASA Allsky image as the sky viewport,
  * with the current footprint drawn on top. Click to fly there.
  */
 import { useEffect, useRef } from 'react';
 import * as healpix from '@hscmap/healpix';
 import { useNav } from '@/lib/store';
+import { layerKey, sameLayer } from '@/lib/sky/layer';
 import { SURVEYS } from '@/lib/sky/surveys';
 import { ALLSKY_COLUMNS, allskyPixel, allskyUrl } from '@/lib/sky/hips';
 import { type Vec3, DEG, RAD, add, cross, eqToGal, galToEq, normalize, radecToVec, scale, vecToRadec } from '@/lib/sky/coords';
@@ -119,22 +120,27 @@ function footprint(): Vec3[] {
 
 export function MiniMap() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const background = useRef<HTMLCanvasElement | null>(null);
-  const surveyId = useNav((s) => s.surveyId);
-  const frame = useNav((s) => s.frame);
+  const background = useRef<{ canvas: HTMLCanvasElement; key: string } | null>(null);
+  const displayed = useNav((s) => s.displayedLayer);
 
   useEffect(() => {
-    const survey = SURVEYS[surveyId];
+    if (!displayed) {
+      background.current = null;
+      return;
+    }
+    const survey = SURVEYS[displayed.surveyId];
     let cancelled = false;
-    loadAllsky(allskyUrl(survey, survey.isCube ? frame : 0))
+    loadAllsky(allskyUrl(survey, displayed.frame))
       .then((asset) => {
-        if (!cancelled) background.current = paintBackground(asset.bitmap);
+        if (!cancelled && sameLayer(displayed, useNav.getState().displayedLayer)) {
+          background.current = { canvas: paintBackground(asset.bitmap), key: layerKey(displayed) };
+        }
       })
       .catch(() => {});
     return () => {
       cancelled = true;
     };
-  }, [surveyId, frame]);
+  }, [displayed]);
 
   useEffect(() => {
     let raf = 0;
@@ -146,7 +152,8 @@ export function MiniMap() {
       if (!canvas || !ctx) return;
       const st = useNav.getState();
       const dpr = st.viewport.dpr || 1;
-      const sig = `${st.center.join()}|${st.fov}|${st.distance}|${st.mode}|${background.current ? 1 : 0}|${dpr}`;
+      const image = st.displayedLayer && background.current?.key === layerKey(st.displayedLayer) ? background.current : null;
+      const sig = `${st.center.join()}|${st.fov}|${st.distance}|${st.mode}|${image?.key ?? ''}|${dpr}`;
       if (sig === lastSig) return;
       lastSig = sig;
       if (canvas.width !== W * dpr) {
@@ -161,9 +168,9 @@ export function MiniMap() {
       ctx.clip();
       ctx.fillStyle = '#070b16';
       ctx.fillRect(0, 0, W, H);
-      if (background.current) {
+      if (image) {
         ctx.globalAlpha = 0.9;
-        ctx.drawImage(background.current, 0, 0, W, H);
+        ctx.drawImage(image.canvas, 0, 0, W, H);
         ctx.globalAlpha = 1;
       }
       ctx.strokeStyle = 'rgba(160, 190, 235, 0.25)';

@@ -12,13 +12,15 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import * as healpix from '@hscmap/healpix';
 import { useNav } from '@/lib/store';
+import { type SkyLayer, requestedLayer, layerKey } from '@/lib/sky/layer';
+import { LayerRequest } from '@/lib/sky/layerRequest';
 import { SURVEYS } from '@/lib/sky/surveys';
 import { allskyUrl, tileUrl } from '@/lib/sky/hips';
 import { type Mode, pixelScaleDeg, tileOrderFor, visibleRadiusDeg } from '@/lib/sky/view';
 import { DEG, type Vec3, angularDistance, normalize } from '@/lib/sky/coords';
 import { tileStore } from './TileStore';
-import { loadAllsky, pinAllsky } from './allsky';
-import { buildTileGeometry, getAllskyGeometry } from './geometry';
+import { allskyCache, loadAllsky, pinAllsky } from './allsky';
+import { buildTileGeometry, disposeAllskyGeometries, getAllskyGeometry } from './geometry';
 
 const MAX_TILES = 72;
 const PLAN_INTERVAL_MS = 90;
@@ -41,10 +43,13 @@ export function HipsLayer() {
   const allskyMesh = useRef<THREE.Mesh | null>(null);
   const tileMeshes = useRef(new Map<string, THREE.Mesh>());
   const renderKeys = useRef(new Set<string>());
-  const lastPlan = useRef(0);
+  const wantedKeys = useRef(new Set<string>());
+  const lastPlan = useRef(-Infinity);
+  const displayed = useRef<SkyLayer | null>(null);
 
   const surveyId = useNav((s) => s.surveyId);
-  const frame = useNav((s) => s.frame);
+  const frame = useNav((s) => SURVEYS[s.surveyId].isCube ? s.frame : 0);
+  const revision = useNav((s) => s.layerRevision);
   const mode = useNav((s) => s.mode);
   const rawPixels = useNav((s) => s.rawPixels);
   const gain = useNav((s) => s.gain);
@@ -56,50 +61,55 @@ export function HipsLayer() {
     });
   }, [gain, group]);
 
-  // Base layer: the Allsky preview of the current survey / wavelength.
-  useEffect(() => {
-    const survey = SURVEYS[surveyId];
-    const url = allskyUrl(survey, survey.isCube ? frame : 0);
-    let cancelled = false;
-    pinAllsky(url);
-    useNav.setState({ allskyStatus: 'loading' });
-    loadAllsky(url)
-      .then((asset) => {
-        if (cancelled) return;
-        const st = useNav.getState();
-        asset.texture.magFilter = st.rawPixels ? THREE.NearestFilter : THREE.LinearFilter;
-        asset.texture.needsUpdate = true;
-        const mesh = new THREE.Mesh(getAllskyGeometry(asset.width, asset.height), tileMaterial(asset.texture, st.mode, st.gain));
-        mesh.renderOrder = 1;
-        mesh.frustumCulled = false;
-        if (allskyMesh.current) {
-          group.remove(allskyMesh.current);
-          disposeMesh(allskyMesh.current, false); // geometry is shared and cached
-        }
-        allskyMesh.current = mesh;
-        group.add(mesh);
-        useNav.setState({ allskyStatus: 'ready' });
-      })
-      .catch((err) => {
-        console.error('[hips] Allsky load failed', err);
-        if (!cancelled) useNav.setState({ allskyStatus: 'error' });
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [surveyId, frame, group]);
+  const transition = useMemo(() => new LayerRequest({
+    requested: () => requestedLayer(useNav.getState()),
+    revision: () => useNav.getState().layerRevision,
+    load: (layer: SkyLayer) => loadAllsky(allskyUrl(SURVEYS[layer.surveyId], layer.frame)),
+    loading: () => useNav.setState({ allskyStatus: 'loading' }),
+    commit: (asset, layer) => {
+      const st = useNav.getState();
+      asset.texture.magFilter = st.rawPixels ? THREE.NearestFilter : THREE.LinearFilter;
+      asset.texture.needsUpdate = true;
+      const mesh = new THREE.Mesh(getAllskyGeometry(asset.width, asset.height), tileMaterial(asset.texture, st.mode, st.gain));
+      mesh.renderOrder = 1;
+      mesh.frustumCulled = false;
+      // One synchronous swap: no frame can contain an old-band tile over a
+      // new-band preview. Until this point all geometry uses the displayed band.
+      for (const tile of tileMeshes.current.values()) {
+        group.remove(tile);
+        disposeMesh(tile);
+      }
+      tileMeshes.current.clear();
+      renderKeys.current.clear();
+      wantedKeys.current.clear();
+      tileStore.retain(new Set());
+      lastPlan.current = -Infinity;
+      if (allskyMesh.current) {
+        group.remove(allskyMesh.current);
+        disposeMesh(allskyMesh.current, false);
+      }
+      allskyMesh.current = mesh;
+      group.add(mesh);
+      displayed.current = layer;
+      pinAllsky([asset.url]);
+      useNav.setState({ displayedLayer: layer, allskyStatus: 'ready', activeOrder: null });
+    },
+    error: (error) => {
+      console.error('[hips] Allsky load failed', error);
+      useNav.setState({ allskyStatus: 'error' });
+    },
+  }), [group]);
 
-  // A new survey or wavelength replaces all tile meshes (textures stay cached).
   useEffect(() => {
-    const meshes = tileMeshes.current;
-    for (const mesh of meshes.values()) {
-      group.remove(mesh);
-      disposeMesh(mesh);
-    }
-    meshes.clear();
-    renderKeys.current = new Set();
-    lastPlan.current = 0;
-  }, [surveyId, frame, group]);
+    const layer = requestedLayer(useNav.getState());
+    const previous = displayed.current;
+    pinAllsky([
+      allskyUrl(SURVEYS[layer.surveyId], layer.frame),
+      ...(previous ? [allskyUrl(SURVEYS[previous.surveyId], previous.frame)] : []),
+    ]);
+    transition.request(layer);
+    return () => transition.cancel();
+  }, [surveyId, frame, revision, transition]);
 
   // Inside the sphere we see back faces, outside we see front faces.
   useEffect(() => {
@@ -123,17 +133,33 @@ export function HipsLayer() {
 
   useEffect(
     () => () => {
-      for (const mesh of tileMeshes.current.values()) disposeMesh(mesh);
+      for (const mesh of tileMeshes.current.values()) {
+        group.remove(mesh);
+        disposeMesh(mesh);
+      }
       tileMeshes.current.clear();
-      if (allskyMesh.current) disposeMesh(allskyMesh.current, false);
+      if (allskyMesh.current) {
+        group.remove(allskyMesh.current);
+        disposeMesh(allskyMesh.current, false);
+      }
+      allskyMesh.current = null;
+      displayed.current = null;
+      renderKeys.current.clear();
+      wantedKeys.current.clear();
+      tileStore.clear();
+      allskyCache.clear();
+      disposeAllskyGeometries();
+      useNav.setState({ displayedLayer: null, activeOrder: null });
     },
     [],
   );
 
   useFrame((state) => {
     const st = useNav.getState();
-    const survey = SURVEYS[st.surveyId];
-    const frameIdx = survey.isCube ? st.frame : 0;
+    const layer = displayed.current;
+    if (!layer) return;
+    const survey = SURVEYS[layer.surveyId];
+    const frameIdx = layer.frame;
     const now = performance.now();
 
     if (now - lastPlan.current > PLAN_INTERVAL_MS) {
@@ -156,13 +182,14 @@ export function HipsLayer() {
         order = order > 3 ? order - 1 : null;
       }
       if (order !== null) {
-        const prefix = `${survey.id}|${frameIdx}|`;
+        const prefix = layerKey(layer);
         // Already-loaded coarser tiles fill the gaps while finer ones arrive.
         for (let o = 3; o < order; o++) {
           healpix.query_disc_inclusive_nest(2 ** o, center, radius, (p) => {
             const key = `${prefix}${o}|${p}`;
             if (tileStore.peek(key)?.status === 'loaded') {
               keys.add(key);
+              wanted.add(key);
               tileStore.touch(key);
             }
           });
@@ -175,12 +202,10 @@ export function HipsLayer() {
           if (tileStore.peek(key)?.status === 'loaded') keys.add(key);
         }
       }
-      tileStore.retain(wanted);
       renderKeys.current = keys;
+      wantedKeys.current = wanted;
       if (st.activeOrder !== order) useNav.setState({ activeOrder: order });
     }
-
-    tileStore.pump();
 
     // Sync meshes with the plan.
     const meshes = tileMeshes.current;
@@ -201,6 +226,10 @@ export function HipsLayer() {
       group.add(mesh);
       meshes.set(key, mesh);
     }
+    // Unprotect old textures only after their meshes have been detached. New
+    // completed tiles are protected by wantedKeys until the next planning pass.
+    tileStore.retain(wantedKeys.current, new Set(meshes.keys()));
+    tileStore.pump();
   });
 
   return <primitive object={group} />;

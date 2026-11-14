@@ -19,10 +19,11 @@ function useReadout() {
   const distance = useNav((s) => s.distance);
   const surveyId = useNav((s) => s.surveyId);
   const frame = useNav((s) => s.frame);
+  const displayed = useNav((s) => s.displayedLayer);
   const viewport = useNav((s) => s.viewport);
   const order = useNav((s) => s.activeOrder);
 
-  const survey = SURVEYS[surveyId];
+  const survey = SURVEYS[displayed?.surveyId ?? surveyId];
   const view = { mode, center, fov, distance };
   const cssPixelArcsec = pixelScaleDeg(view, Math.max(1, viewport.height)) * 3600;
   const devicePixelDeg = pixelScaleDeg(view, Math.max(1, viewport.height * viewport.dpr));
@@ -33,7 +34,8 @@ function useReadout() {
   return {
     mode,
     survey,
-    frame: survey.isCube ? SPHEREX_FRAMES[frame] : null,
+    frame: survey.isCube ? SPHEREX_FRAMES[displayed?.frame ?? frame] : null,
+    hasImage: displayed !== null,
     ra,
     dec,
     l,
@@ -71,7 +73,9 @@ export function CoordinateReadout() {
           className={`chip ${r.detail === 'magnified' ? 'chip-warn' : ''}`}
           title={`${r.survey.shortName} native pixel: ${r.survey.pixelScaleArcsec}″`}
         >
-          {r.detail === 'preview'
+          {!r.hasImage
+            ? 'Waiting for sky image'
+            : r.detail === 'preview'
             ? 'Whole-sky preview'
             : r.detail === 'magnified'
               ? `Beyond native resolution ×${r.magnification.toFixed(1)}`
@@ -79,7 +83,7 @@ export function CoordinateReadout() {
         </span>
       </div>
       <p className="readout-mode">
-        {`Sky view: true orientation, north up, east left${r.frame ? ` · ${r.survey.shortName} λ ${r.frame.wavelengthUm.toFixed(3)} µm` : ` · ${r.survey.shortName}`}`}
+        {`Sky view: true orientation, north up, east left${!r.hasImage ? '' : r.frame ? ` · ${r.survey.shortName} λ ${r.frame.wavelengthUm.toFixed(3)} µm` : ` · ${r.survey.shortName}`}`}
       </p>
     </section>
   );

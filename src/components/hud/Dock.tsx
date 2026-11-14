@@ -8,7 +8,10 @@ import { MiniMap } from './MiniMap';
 export function Dock() {
   // Re-render when the lock condition can change.
   useNav((s) => s.fov);
+  useNav((s) => s.allskyStatus);
+  useNav((s) => s.displayedLayer);
   const lockable = canLock();
+  const zoomedIn = useNav((s) => s.fov <= LOCK_MAX_FOV);
 
   return (
     <section className="dock panel" aria-label="Navigation">
@@ -28,9 +31,9 @@ export function Dock() {
         className="btn primary lock"
         disabled={!lockable}
         onClick={lockTarget}
-        title={lockable ? 'Lock these coordinates (Enter)' : `Zoom in below ${LOCK_MAX_FOV}° to lock`}
+        title={lockable ? 'Lock these coordinates (Enter)' : zoomedIn ? 'Load the selected sky layer before locking' : `Zoom in below ${LOCK_MAX_FOV}° to lock`}
       >
-        {lockable ? 'Lock target' : `Zoom below ${LOCK_MAX_FOV}° to lock`}
+        {lockable ? 'Lock target' : zoomedIn ? 'Load selected layer to lock' : `Zoom below ${LOCK_MAX_FOV}° to lock`}
       </button>
     </section>
   );

@@ -3,6 +3,29 @@
 import { useEffect, useState } from 'react';
 import { useNav } from '@/lib/store';
 import { SPHEREX_FRAMES, SPHEREX_PRESETS, SURVEYS, SURVEY_ORDER, nearestUsableFrame } from '@/lib/sky/surveys';
+import { layerLabel, requestedLayer } from '@/lib/sky/layer';
+
+function LayerStatus() {
+  const surveyId = useNav((s) => s.surveyId);
+  const frame = useNav((s) => s.frame);
+  const displayed = useNav((s) => s.displayedLayer);
+  const status = useNav((s) => s.allskyStatus);
+  const requested = layerLabel(requestedLayer({ surveyId, frame }));
+  return (
+    <div className="small">
+      <p role="status" aria-live="polite">
+        {status === 'loading' || status === 'idle' ? `Loading ${requested}… ` : ''}
+        {displayed ? `Showing ${layerLabel(displayed)}.` : 'No sky image loaded yet.'}
+      </p>
+      {status === 'error' && (
+        <div role="alert">
+          <p>Could not load {requested}. Check your connection and retry.</p>
+          <button className="btn ghost" onClick={() => useNav.getState().retryLayer()}>Retry layer</button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function LayerPanel() {
   const surveyId = useNav((s) => s.surveyId);
@@ -37,6 +60,7 @@ export function LayerPanel() {
           {collapsed ? 'Show' : 'Hide'}
         </button>
       </header>
+      <LayerStatus />
       {!collapsed && (
         <>
           <div className="seg" role="radiogroup" aria-label="NASA survey">

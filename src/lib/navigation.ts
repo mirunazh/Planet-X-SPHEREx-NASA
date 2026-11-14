@@ -22,6 +22,7 @@ import {
 } from './sky/view';
 import { SPHEREX_FRAMES, SURVEYS } from './sky/surveys';
 import { type TargetOrigin, buildSkyTarget } from './sky/target';
+import { requestedLayer, sameLayer } from './sky/layer';
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 const reducedMotion = () =>
@@ -163,13 +164,14 @@ export function startInertia(axis: Vec3, omegaRadPerSec: number): void {
 
 export function canLock(): boolean {
   const s = useNav.getState();
-  return s.fov <= LOCK_MAX_FOV;
+  return s.fov <= LOCK_MAX_FOV && s.allskyStatus === 'ready' && sameLayer(s.displayedLayer, requestedLayer(s));
 }
 
 export function lockTarget(): void {
   if (!canLock()) return;
   const s = useNav.getState();
-  const survey = SURVEYS[s.surveyId];
+  const layer = s.displayedLayer!;
+  const survey = SURVEYS[layer.surveyId];
   const screenArcsec = pixelScaleDeg(currentView(), Math.max(1, s.viewport.height)) * 3600;
   const target = buildSkyTarget({
     center: s.center,
@@ -177,8 +179,8 @@ export function lockTarget(): void {
     uncertaintyArcsec: Math.max(screenArcsec, survey.pixelScaleArcsec),
     survey: survey.id,
     hipsUrl: survey.baseUrl,
-    frames: survey.isCube ? [s.frame] : undefined,
-    wavelengthUm: survey.isCube ? SPHEREX_FRAMES[s.frame].wavelengthUm : undefined,
+    frames: survey.isCube ? [layer.frame] : undefined,
+    wavelengthUm: survey.isCube ? SPHEREX_FRAMES[layer.frame].wavelengthUm : undefined,
     origin: s.origin,
   });
   useNav.setState({ locked: target, selected: null });

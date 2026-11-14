@@ -74,6 +74,11 @@ export function buildTileGeometry(order: number, ipix: number): THREE.BufferGeom
 
 const allskyCache = new Map<string, THREE.BufferGeometry>();
 
+export function disposeAllskyGeometries(): void {
+  for (const geometry of allskyCache.values()) geometry.dispose();
+  allskyCache.clear();
+}
+
 /** One merged mesh for all 768 order-3 cells, textured from the Allsky mosaic. */
 export function getAllskyGeometry(width: number, height: number): THREE.BufferGeometry {
   const key = `${width}x${height}`;
