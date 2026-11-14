@@ -1,0 +1,18 @@
+{
+  "name": "spherex-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Browser-side SPHEREx data path: FITS headers, TAN-SIP WCS, wavelength lookup, S3 range reads, reprojection, stacking, live missions.",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "test": "vitest run",
+    "test:live": "SPHEREX_LIVE=1 vitest run test/live.test.ts",
+    "test:e2e": "SPHEREX_LIVE=1 vitest run test/e2e.test.ts --silent=false",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "vitest": "4.1.12"
+  }
+}
