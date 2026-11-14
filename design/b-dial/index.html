@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skyblink</title>
+<meta name="description" content="Watch real SPHEREx infrared photos of one patch of sky taken months apart, find what moved, then measure it.">
+<link rel="preload" href="fonts/plex-sans-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/plex-sans-latin-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/plex-mono-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="skip">Skip to the picture</a>
+
+<header class="bar">
+  <a class="brand" href="#/" aria-label="Skyblink, start">
+    <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 12 L12 4.5"/></svg>
+    <span class="brand-name" data-name>Skyblink</span>
+  </a>
+  <nav class="steps" aria-label="Steps" data-i18n-label="steps">
+    <ol>
+      <li><a href="#/look" data-step="look"><span class="step-n">1</span> <span data-i18n="stepLook">Look</span></a></li>
+      <li><a href="#/measure" data-step="measure"><span class="step-n">2</span> <span data-i18n="stepMeasure">Mark and measure</span></a></li>
+    </ol>
+  </nav>
+  <div class="bar-end">
+    <button class="theme" type="button" aria-pressed="false" data-theme-toggle>
+      <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 3 A7 7 0 0 1 10 17 Z"/></svg>
+      <span data-i18n="dark">Dark</span>
+    </button>
+    <nav class="lang" aria-label="Language">
+      <a href="#" data-lang="en" lang="en" hreflang="en">English</a>
+      <a href="#" data-lang="ro" lang="ro" hreflang="ro">Română</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+
+  <!-- S1: first screen -->
+  <section class="screen s1" data-route="/" aria-labelledby="s1-h">
+    <div class="s1-text">
+      <h1 id="s1-h" class="display" data-i18n="s1Title">Find the next Tombaugh.</h1>
+      <p class="lead" data-i18n="s1Lead">In 1930 a 24-year-old found Pluto by flipping between two photos of the same sky. Here are five real infrared photos from NASA’s SPHEREx telescope, taken months apart. One dot does not stay put.</p>
+      <div class="s1-actions">
+        <a class="btn btn-primary" href="#/look" data-i18n="s1Go">Find what moved</a>
+        <a class="quiet" href="#/elsewhere" data-i18n="s1Else">Look somewhere else</a>
+      </div>
+    </div>
+    <div class="slot" data-slot></div>
+  </section>
+
+  <!-- S2: look -->
+  <section class="screen s2" data-route="/look" aria-labelledby="s2-h" hidden>
+    <div class="s2-text">
+      <h1 id="s2-h">Epsilon Indi B</h1>
+      <p class="lead">Five photos of the same small patch of sky, taken between April 2025 and October 2026. Turn the dial and watch the middle: one dot will not stay put. It is a
+        <button class="term" type="button" aria-expanded="true" aria-controls="def-bd">brown dwarf</button>.</p>
+      <div class="def" id="def-bd">
+        <p><strong>Brown dwarf.</strong> A ball of gas too small to shine like a star. It glows only from leftover heat, so infrared cameras see it best.</p>
+      </div>
+      <p class="body">This one is 12 light years away. It looks like it barely moves, but between the first and last photo it slid 6.5
+        <button class="term" type="button" aria-expanded="false" aria-controls="def-as">arcseconds</button>.</p>
+      <div class="def" id="def-as" hidden>
+        <p><strong>Arcsecond.</strong> A tiny angle on the sky. The full Moon is about 1,800 arcseconds wide; one pixel of this camera covers 3.</p>
+      </div>
+
+      <fieldset class="marks-ctl">
+        <legend>On the picture</legend>
+        <button class="mark-btn" type="button" aria-pressed="true" data-mark="ring">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7" class="g-ring"/></svg>
+          <span>Circle the mover</span><span class="state" aria-hidden="true"></span>
+        </button>
+        <button class="mark-btn" type="button" aria-pressed="false" data-mark="path">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14" class="g-cross"/></svg>
+          <span>Where the catalogue puts it</span><span class="state" aria-hidden="true"></span>
+        </button>
+      </fieldset>
+
+      <a class="btn btn-primary" href="#/measure">Mark what moved</a>
+    </div>
+    <div class="slot" data-slot></div>
+  </section>
+
+  <!-- S3: mark and measure -->
+  <section class="screen s3" data-route="/measure" aria-labelledby="s3-h" hidden>
+    <div class="s3-head">
+      <h1 id="s3-h">You marked it. Now measure it.</h1>
+      <p class="lead">You clicked the dot in the first visit (27 Apr 2025) and the last (1 Oct 2026). Three numbers follow from those two clicks.</p>
+    </div>
+    <div class="s3-grid">
+      <figure class="s3-figure">
+        <div class="finder-window finder-still">
+          <canvas class="sky" id="s3-canvas" width="27" height="27" role="img" aria-label="Infrared photo of the last visit, 1 Oct 2026, with your two marks: the dot sat 6.5 arcseconds further south-east than in April 2025."></canvas>
+          <svg class="overlay" id="s3-overlay" viewBox="0 0 27 27" aria-hidden="true"></svg>
+          <span class="corner tl" aria-hidden="true"></span><span class="corner tr" aria-hidden="true"></span><span class="corner bl" aria-hidden="true"></span><span class="corner br" aria-hidden="true"></span>
+        </div>
+        <figcaption class="readout readout-cap">
+          <span class="ro-key">Your marks</span>
+          <span class="ro-val">Dashed ring: 27 Apr 2025. Solid ring: 1 Oct 2026.</span>
+        </figcaption>
+      </figure>
+
+      <ol class="measures">
+        <li class="measure" aria-labelledby="m1-h">
+          <h2 id="m1-h"><span class="m-n">1</span> How far it moved</h2>
+          <p class="body">6.54 arcseconds in 1.43 years. That is its speed across the sky.</p>
+          <div class="compare">
+            <div class="cmp-you"><span class="cmp-label">You</span><span class="num"><span id="mu-you">4.58</span><span class="unit">arcseconds a year</span></span></div>
+            <dl class="cmp-true">
+              <div><dt>Catalogue (Gaia)</dt><dd>4.68</dd></div>
+            </dl>
+          </div>
+          <p class="verdict">Close: within 3 percent of the catalogue.</p>
+        </li>
+
+        <li class="measure" aria-labelledby="m2-h">
+          <h2 id="m2-h"><span class="m-n">2</span> How far away it is</h2>
+          <p class="body">Earth circles the Sun, so near things seem to wobble once a year. The bigger the wobble, the closer the object. Slide until the curve runs through the five points.</p>
+          <figure class="chart">
+            <svg id="plx-chart" viewBox="0 0 560 220" role="img" aria-labelledby="plx-chart-t"><title id="plx-chart-t">East to west wobble of Epsilon Indi B after taking out its straight-line motion: five measured points and the curve for your parallax.</title></svg>
+            <figcaption class="small">Points: the five visits, with error bars. Line: the wobble your parallax predicts.</figcaption>
+          </figure>
+          <div class="slider-row">
+            <label for="plx" class="slider-label">Wobble size (<button class="term" type="button" aria-expanded="false" aria-controls="def-plx">parallax</button>)</label>
+            <input type="range" id="plx" min="0" max="600" step="1" value="300" aria-describedby="plx-out">
+            <output id="plx-out" for="plx" class="slider-out">300 milliarcseconds</output>
+          </div>
+          <div class="def" id="def-plx" hidden><p><strong>Parallax.</strong> Half the size of the yearly wobble, as an angle. 1 arcsecond of parallax means 3.26 light years away.</p></div>
+          <div class="compare">
+            <div class="cmp-you"><span class="cmp-label">You</span><span class="num"><span id="ly-you">10.9</span><span class="unit">light years</span></span></div>
+            <dl class="cmp-true">
+              <div><dt>Our team’s fit</dt><dd>10.7 <span class="dd-unit">(306 ± 28 mas)</span></dd></div>
+              <div><dt>Catalogue (Gaia)</dt><dd>12.05</dd></div>
+            </dl>
+          </div>
+          <p class="verdict" id="plx-verdict">The curve fits the points well.</p>
+        </li>
+
+        <li class="measure" aria-labelledby="m3-h">
+          <h2 id="m3-h"><span class="m-n">3</span> How fast it travels</h2>
+          <p class="body">Speed across the sky times distance gives its real speed through space.</p>
+          <div class="compare">
+            <div class="cmp-you"><span class="cmp-label">You</span><span class="num"><span id="v-you">72.4</span><span class="unit">km per second</span></span></div>
+            <dl class="cmp-true">
+              <div><dt>Our team’s fit</dt><dd>72.5</dd></div>
+              <div><dt>Catalogue (Gaia)</dt><dd>82.0</dd></div>
+            </dl>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- S4: look somewhere else -->
+  <section class="screen s4" data-route="/elsewhere" aria-labelledby="s4-h" hidden>
+    <h1 id="s4-h">Look somewhere else</h1>
+    <form class="search" role="search" onsubmit="return false">
+      <label for="q">Search a star or object by name</label>
+      <div class="field-row">
+        <input id="q" type="search" autocomplete="off" placeholder="Barnard’s Star, R Draconis …" aria-describedby="q-hint">
+        <button class="btn btn-secondary" type="submit">Search</button>
+      </div>
+      <p id="q-hint" class="small">Names we have photos for are listed below.</p>
+    </form>
+
+    <div class="s4-grid">
+      <article class="feature" aria-labelledby="f-h">
+        <a class="feature-img" href="#/look" tabindex="-1" aria-hidden="true"><canvas class="sky thumb" data-thumb="wise0855" width="40" height="40"></canvas></a>
+        <div class="feature-text">
+          <p class="kicker">The challenge’s own case</p>
+          <h2 id="f-h">WISE 0855</h2>
+          <p class="body">The coldest brown dwarf known, 7.4 light years away. It only glows in deep infrared, so it appears in one SPHEREx camera and not the others.</p>
+          <dl class="facts">
+            <div><dt>Visits</dt><dd>4, May 2025 to May 2026</dd></div>
+            <div><dt>Moves</dt><dd>8.2 arcseconds a year, west</dd></div>
+          </dl>
+          <a class="btn btn-primary" href="#/look">Look at WISE 0855</a>
+        </div>
+      </article>
+
+      <div class="others">
+        <h2 class="h-small">Four more patches</h2>
+        <ul class="target-list">
+          <li><canvas class="sky mini" data-thumb="barnard" width="24" height="24" aria-hidden="true"></canvas>
+            <div><a href="#/look" class="t-name">Barnard’s Star</a><p class="t-line">The fastest-moving star in the sky. 3 visits.</p></div></li>
+          <li><canvas class="sky mini" data-thumb="epsindb" width="24" height="24" aria-hidden="true"></canvas>
+            <div><a href="#/look" class="t-name">Epsilon Indi B</a><p class="t-line">A brown dwarf pair 12 light years away. 5 visits.</p></div></li>
+          <li><canvas class="sky mini" data-thumb="rwaur" width="24" height="24" aria-hidden="true"></canvas>
+            <div><a href="#/look" class="t-name">RW Aurigae</a><p class="t-line">A young star that dims and brightens. 3 visits.</p></div></li>
+          <li><canvas class="sky mini" data-thumb="rdra" width="24" height="24" aria-hidden="true"></canvas>
+            <div><a href="#/look" class="t-name">R Draconis</a><p class="t-line">A giant star that swells every 246 days. 3 visits.</p></div></li>
+        </ul>
+        <button class="btn btn-secondary surprise" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="9" cy="9" r="1.4"/><circle cx="15" cy="15" r="1.4"/><circle cx="15" cy="9" r="1.4"/><circle cx="9" cy="15" r="1.4"/></svg>
+          Surprise me</button>
+      </div>
+    </div>
+
+    <section class="coords" aria-labelledby="c-h">
+      <h2 id="c-h" class="h-small">Or type sky coordinates</h2>
+      <div class="coords-grid">
+        <div>
+          <label for="radec">Right ascension and declination</label>
+          <input id="radec" type="text" inputmode="text" spellcheck="false" value="08h55m10.83s -07d14m42.5s" aria-describedby="radec-hint radec-echo">
+          <p id="radec-hint" class="small">Hours and degrees or plain degrees both work, for example 08 55 10.8 -07 14 42 or 133.795 -7.245.</p>
+          <p id="radec-echo" class="echo" role="status"></p>
+        </div>
+        <div class="answer" id="radec-answer">
+          <p class="answer-text">This is where WISE 0855 was in 2010. Today it is 134 arcseconds to the west.</p>
+          <a class="btn btn-primary" href="#/look">Go to where it is now</a>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- the instrument: one instance, moved into the slot of the current screen -->
+  <div class="instrument" id="instrument">
+    <figure class="finder">
+      <div class="finder-window">
+        <canvas class="sky" id="sky" width="27" height="27" role="img" aria-label="Infrared photo of the sky around Epsilon Indi B."></canvas>
+        <svg class="overlay" id="overlay" viewBox="0 0 27 27" aria-hidden="true"></svg>
+        <span class="corner tl" aria-hidden="true"></span><span class="corner tr" aria-hidden="true"></span><span class="corner bl" aria-hidden="true"></span><span class="corner br" aria-hidden="true"></span>
+        <svg class="scale" viewBox="0 0 120 40" aria-hidden="true">
+          <path d="M8 6 V20 M4 10 L8 5 L12 10" class="compass"/><text x="3.5" y="33" class="scale-t">N</text>
+          <path d="M22 20 H36 M26 16 L21 20 L26 24" class="compass"/><text x="38" y="24" class="scale-t">E</text>
+        </svg>
+        <div class="scalebar" aria-hidden="true"><span class="scalebar-line"></span><span class="scalebar-t">10 arcseconds</span></div>
+      </div>
+      <figcaption class="readout">
+        <dl>
+          <div class="ro"><dt data-i18n="roVisit">Visit</dt><dd id="ro-visit">1 of 5</dd></div>
+          <div class="ro"><dt data-i18n="roDate">Date</dt><dd id="ro-date">27 Apr 2025</dd></div>
+          <div class="ro ro-wide"><dt data-i18n="roLight">Light</dt><dd id="ro-light">Near infrared, 1.11 to 1.65 µm</dd></div>
+          <div class="ro"><dt data-i18n="roPhotos">Photos</dt><dd id="ro-photos">19</dd></div>
+        </dl>
+      </figcaption>
+    </figure>
+
+    <div class="dial-unit">
+      <div class="dial" id="dial">
+        <svg class="dial-face" id="dial-face" viewBox="-150 -150 300 300" aria-hidden="true"></svg>
+        <input class="dial-input" id="dial-input" type="range" min="0" max="4" step="1" value="0" aria-label="Visit date">
+      </div>
+      <div class="keys" role="group" aria-label="Step through the visits" data-i18n-label="keysLabel">
+        <button class="key" type="button" data-step-by="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6 L8.5 12 L14.5 18"/></svg><span data-i18n="earlier">Earlier</span></button>
+        <button class="key key-play" type="button" data-play><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M8 5.5 L18.5 12 L8 18.5 Z"/><path class="i-pause" d="M8 5.5 V18.5 M16 5.5 V18.5"/></svg><span data-play-label>Play</span></button>
+        <button class="key" type="button" data-step-by="1"><span data-i18n="later">Later</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6 L15.5 12 L9.5 18"/></svg></button>
+      </div>
+      <p class="dial-hint small" data-i18n="dialHint">Turn the dial, or use the arrow keys.</p>
+    </div>
+  </div>
+
+  <p class="sr-only" role="status" id="live"></p>
+</main>
+
+<footer class="foot">
+  <p data-i18n="credit">Images: NASA/JPL-Caltech, SPHEREx, via the NASA/IPAC Infrared Science Archive (IRSA), releases DR1 (doi 10.26131/IRSA678) and QR3 (doi 10.26131/IRSA662). Stacked and aligned by the Skyblink team.</p>
+  <p data-i18n="disclaimer">An independent student project for the 2026 NASA Space Apps Challenge. It is not made, reviewed or endorsed by NASA.</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

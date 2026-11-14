@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skyblink</title>
+<meta name="description" content="Watch real SPHEREx infrared photos of one patch of sky taken months apart, find what moved, and measure it.">
+<link rel="preload" href="fonts/dm-mono-latin-300.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/inter-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="skip">Skip to the image</a>
+
+<header class="bar">
+  <div class="wrap bar-in">
+    <a class="brand" href="#/" data-app></a>
+    <nav class="bar-nav" aria-label="Site">
+      <a href="#/elsewhere" class="bar-link" data-i18n="navElsewhere">Look somewhere else</a>
+      <a href="#/look" class="bar-link" data-help data-i18n="navGlossary">Glossary</a>
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="en" lang="en" aria-pressed="true">EN</button>
+        <button type="button" data-lang="ro" lang="ro" aria-pressed="false">RO</button>
+      </div>
+      <button type="button" class="bar-link theme-btn" id="themeBtn" aria-pressed="false"><span data-i18n="themeLight">Light</span></button>
+    </nav>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+
+<!-- S1. First screen -->
+<section class="screen s1" data-screen="home" aria-labelledby="s1-h" hidden>
+  <div class="wrap s1-grid">
+    <div class="s1-copy">
+      <h1 id="s1-h"><span class="s1-year">1930</span><span class="s1-line" data-i18n="s1Line">A 24-year-old found Pluto by flipping between two photos of the sky.</span></h1>
+      <p class="s1-sub" data-i18n="s1Sub">These two infrared photos of one patch of sky were taken 17 months apart by NASA’s SPHEREx telescope. One dot moved.</p>
+      <p class="s1-actions">
+        <a class="btn btn-primary" href="#/look" data-i18n="s1Cta">Find what moved</a>
+        <a class="quiet" href="#/elsewhere" data-i18n="s1Else">Look somewhere else</a>
+      </p>
+    </div>
+    <figure class="s1-fig">
+      <div class="plate-wrap">
+        <div class="plate" id="s1Plate" role="img" aria-label="Two SPHEREx photos of the sky around Epsilon Indi B, shown one after the other. A bright dot near the centre jumps down and to the left between them; the stars around it stay still."></div>
+        <div class="compass" aria-hidden="true"><svg viewBox="0 0 56 56" width="56" height="56"><path d="M44 44V8M44 44H8" fill="none" stroke="currentColor" stroke-width="1"/><path d="M40 13l4-6 4 6M13 40l-6 4 6 4" fill="none" stroke="currentColor" stroke-width="1"/></svg><span class="cN">N</span><span class="cE">E</span></div>
+      </div>
+      <figcaption class="s1-cap">
+        <ol class="blinkset" aria-label="Photos in the blink">
+          <li data-k="0"><span class="sq" aria-hidden="true"></span><span class="mono" data-date="epsindb:0"></span></li>
+          <li data-k="1"><span class="sq" aria-hidden="true"></span><span class="mono" data-date="epsindb:4"></span></li>
+        </ol>
+        <button type="button" class="btn btn-quiet" id="s1Pause" aria-pressed="false"><span class="glyph" aria-hidden="true"></span><span class="lbl" data-i18n="pause">Pause</span></button>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- S2 / S5. Look -->
+<section class="screen s2" data-screen="look" aria-labelledby="s2-h" hidden>
+  <div class="wrap s2-grid">
+    <figure class="s2-fig">
+      <div class="plate-wrap">
+        <div class="plate" id="s2Plate" role="img" aria-describedby="s2Live"></div>
+        <div class="compass" aria-hidden="true"><svg viewBox="0 0 56 56" width="56" height="56"><path d="M44 44V8M44 44H8" fill="none" stroke="currentColor" stroke-width="1"/><path d="M40 13l4-6 4 6M13 40l-6 4 6 4" fill="none" stroke="currentColor" stroke-width="1"/></svg><span class="cN">N</span><span class="cE">E</span></div>
+      </div>
+      <figcaption class="sr-only" id="s2Live" role="status" aria-live="polite"></figcaption>
+
+      <div class="axis" id="s2Axis">
+        <div class="axis-scale" aria-hidden="true"></div>
+        <label class="sr-only" for="s2Range">Visit</label>
+        <input type="range" id="s2Range" class="axis-range">
+      </div>
+      <div class="transport">
+        <button type="button" class="btn btn-key" id="s2Prev"><svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path d="M11 3L5 8l6 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>Previous</span></button>
+        <button type="button" class="btn btn-key btn-play" id="s2Play" aria-pressed="false"><span class="glyph" aria-hidden="true"></span><span class="lbl">Play</span></button>
+        <button type="button" class="btn btn-key" id="s2Next"><span>Next</span><svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path d="M5 3l6 5-6 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+        <p class="keys" id="s2Keys">Arrow keys step through the visits.</p>
+      </div>
+    </figure>
+
+    <div class="s2-side">
+      <p class="kicker mono" id="s2Where"></p>
+      <h1 id="s2-h" class="s2-title"></h1>
+      <p class="s2-what" id="s2What"></p>
+
+      <dl class="strip" id="s2Strip"></dl>
+
+      <div class="explain">
+        <h2 class="h-sm">What am I looking at?</h2>
+        <p id="s2Explain"></p>
+        <div class="gloss" id="s2Gloss" hidden></div>
+      </div>
+
+      <div class="marks" role="group" aria-labelledby="marksH">
+        <h2 class="h-sm" id="marksH">Marks on the image</h2>
+        <div class="marks-row" id="s2Marks"></div>
+      </div>
+
+      <p class="next-step"><a class="btn btn-primary" href="#/measure">Mark it and measure</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- S3. Mark and measure -->
+<section class="screen s3" data-screen="measure" aria-labelledby="s3-h" hidden>
+  <div class="wrap">
+    <div class="s3-head">
+      <p class="kicker mono">Epsilon Indi B</p>
+      <h1 id="s3-h" class="s3-title">How fast, how far, how quick</h1>
+    </div>
+
+    <div class="s3-grid">
+      <figure class="s3-fig">
+        <div class="plate-wrap">
+          <div class="plate" id="s3Plate" role="img" aria-label="The last visit, September to October 2026. Your two marks: number 1 where Epsilon Indi B was in April 2025, number 5 where it is now, 6.54 arcseconds down and to the left. An arrow joins them."></div>
+          <div class="compass" aria-hidden="true"><svg viewBox="0 0 56 56" width="56" height="56"><path d="M44 44V8M44 44H8" fill="none" stroke="currentColor" stroke-width="1"/><path d="M40 13l4-6 4 6M13 40l-6 4 6 4" fill="none" stroke="currentColor" stroke-width="1"/></svg><span class="cN">N</span><span class="cE">E</span></div>
+        </div>
+        <figcaption>
+          <dl class="mark-log">
+            <div><dt><span class="mk mk-1" aria-hidden="true">1</span>Your first mark</dt><dd><span class="mono">27 April 2025</span> <span class="mono dim">x 60.9, y 59.4</span></dd></div>
+            <div><dt><span class="mk mk-5" aria-hidden="true">5</span>Your last mark</dt><dd><span class="mono">1 October 2026</span> <span class="mono dim">x 59.2, y 60.8</span></dd></div>
+          </dl>
+          <p class="undo"><button type="button" class="btn btn-quiet">Move a mark</button> <button type="button" class="btn btn-quiet">Start again</button></p>
+        </figcaption>
+      </figure>
+
+      <div class="s3-results">
+        <section class="step" aria-labelledby="st1">
+          <h2 class="step-h" id="st1"><span class="step-n mono">1</span>How fast it crosses the sky</h2>
+          <div class="pair">
+            <div class="readout readout-you">
+              <p class="label">You measured</p>
+              <p class="n-lg mono"><span class="countup" data-to="4.58" data-dp="2" aria-hidden="true">4.58</span><span class="sr-only">4.58</span></p>
+              <p class="unit">arcseconds per year</p>
+            </div>
+            <div class="readout readout-true">
+              <p class="label">Catalogue (Gaia DR3)</p>
+              <p class="n-md mono">4.68</p>
+              <p class="unit">arcseconds per year</p>
+            </div>
+          </div>
+          <p class="verdict"><svg class="ico" aria-hidden="true" viewBox="0 0 20 20" width="20" height="20"><path d="M4 10.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2"/></svg><span><strong>Within 3 percent.</strong> It moved 6.54 <button type="button" class="term" aria-expanded="false" data-term="arcsec">arcseconds</button> between your two marks, 1.43 years apart.</span></p>
+          <div class="gloss" hidden></div>
+        </section>
+
+        <section class="step" aria-labelledby="st2">
+          <h2 class="step-h" id="st2"><span class="step-n mono">2</span>How far away it is</h2>
+          <p class="body">As Earth goes round the Sun, a near star seems to wobble in a small loop each year. The smaller the loop, the farther the star. Drag until the loop runs through your five dots.</p>
+          <div class="plx">
+            <svg id="plxChart" class="plx-chart" role="img" aria-labelledby="plxChartT plxChartD"><title id="plxChartT">The wobble of Epsilon Indi B</title><desc id="plxChartD"></desc></svg>
+            <div class="plx-ctl">
+              <label for="plxRange" class="label">Size of the yearly wobble</label>
+              <output for="plxRange" id="plxOut" class="n-md mono">306 <span class="u">mas</span></output>
+              <input type="range" id="plxRange" min="100" max="600" step="1" value="306" aria-describedby="plxFit">
+              <p class="fit" id="plxFit"></p>
+            </div>
+          </div>
+          <div class="pair pair-small">
+            <div class="readout readout-you"><p class="label">Your distance</p><p class="n-md mono" id="plxLy">10.7</p><p class="unit">light years <span class="mono dim" id="plxPc">3.27 parsecs</span></p></div>
+            <div class="readout readout-true"><p class="label">Catalogue</p><p class="n-md mono">12.05</p><p class="unit">light years <span class="mono dim">3.69 parsecs</span></p></div>
+          </div>
+        </section>
+
+        <section class="step" aria-labelledby="st3">
+          <h2 class="step-h" id="st3"><span class="step-n mono">3</span>How quick it really travels</h2>
+          <div class="pair pair-small">
+            <div class="readout readout-you"><p class="label">Your speed</p><p class="n-md mono" id="spdYou">72.5</p><p class="unit">kilometres per second</p></div>
+            <div class="readout readout-true"><p class="label">Catalogue</p><p class="n-md mono">82.0</p><p class="unit">kilometres per second</p></div>
+          </div>
+          <p class="body dim-body">Speed across the sky = motion × distance × 4.74. It uses the catalogue motion, 4.68 arcseconds per year, as your distance fit does. Your distance is 11 percent short, so your speed is too.</p>
+        </section>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S4. Look somewhere else -->
+<section class="screen s4" data-screen="elsewhere" aria-labelledby="s4-h" hidden>
+  <div class="wrap">
+    <h1 id="s4-h" class="s4-title">Look somewhere else</h1>
+    <form class="search" id="nameForm" role="search">
+      <label for="nameQ" class="label">Search a star or object by name</label>
+      <div class="field-row">
+        <input id="nameQ" type="search" autocomplete="off" placeholder="Barnard’s Star" aria-describedby="nameHelp">
+        <button class="btn btn-key" type="submit">Search</button>
+      </div>
+      <p id="nameHelp" class="help">Skyblink has SPHEREx photos of five patches of sky so far.</p>
+    </form>
+
+    <div class="s4-grid">
+      <article class="feature">
+        <div class="feature-img"><div class="plate plate-thumb" data-thumb="wise0855" role="img" aria-label="The WISE 0855 field in long-wavelength infrared, May 2025"></div></div>
+        <div class="feature-copy">
+          <p class="kicker mono">The challenge case</p>
+          <h2 class="feature-h"><a href="#/look/wise0855">WISE 0855-0714</a></h2>
+          <p>The coldest known brown dwarf, 7.4 light years away. It only glows at 4 to 5 microns, so SPHEREx sees it in its longest-wavelength camera and nowhere else.</p>
+          <dl class="facts">
+            <div><dt>Moves</dt><dd class="mono">8.15″ a year</dd></div>
+            <div><dt>Visits</dt><dd class="mono">4</dd></div>
+            <div><dt>Distance</dt><dd class="mono">7.4 ly</dd></div>
+          </dl>
+        </div>
+      </article>
+
+      <ul class="targets" aria-label="Other targets">
+        <li><a href="#/look/epsindb" class="target"><span class="plate plate-mini" data-thumb="epsindb" aria-hidden="true"></span><span class="t-name">Epsilon Indi B</span><span class="t-line">Two brown dwarfs creeping south-east</span><span class="t-n mono">4.68″/yr</span></a></li>
+        <li><a href="#/look/barnard" class="target"><span class="plate plate-mini" data-thumb="barnard" aria-hidden="true"></span><span class="t-name">Barnard’s Star</span><span class="t-line">The fastest-moving star in the sky</span><span class="t-n mono">10.39″/yr</span></a></li>
+        <li><a href="#/look/rwaur" class="target"><span class="plate plate-mini" data-thumb="rwaur" aria-hidden="true"></span><span class="t-name">RW Aurigae</span><span class="t-line">A young star that dims and brightens</span><span class="t-n mono">0.36 mag</span></a></li>
+        <li><a href="#/look/rdra" class="target"><span class="plate plate-mini" data-thumb="rdra" aria-hidden="true"></span><span class="t-name">R Draconis</span><span class="t-line">A giant that swells every 246 days</span><span class="t-n mono">246 d</span></a></li>
+      </ul>
+    </div>
+
+    <p class="surprise"><button type="button" class="btn btn-key" id="surprise"><svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><rect x="2.5" y="2.5" width="11" height="11" fill="none" stroke="currentColor"/><circle cx="5.5" cy="5.5" r="1.2" fill="currentColor"/><circle cx="10.5" cy="10.5" r="1.2" fill="currentColor"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/></svg><span>Surprise me</span></button></p>
+
+    <form class="coords" id="coordForm">
+      <h2 class="h-sm">Or type sky coordinates</h2>
+      <label for="coordQ" class="label">Right ascension and declination</label>
+      <div class="field-row">
+        <input id="coordQ" type="text" class="mono" autocomplete="off" spellcheck="false" value="08h55m10.83s -07d14m42.5s" aria-describedby="coordHint coordEcho">
+        <button class="btn btn-key" type="submit">Read</button>
+      </div>
+      <p id="coordHint" class="help">Any common format works: <span class="mono">08 55 10.8 -07 14 42</span> or <span class="mono">133.795 -7.245</span>.</p>
+      <div id="coordEcho" class="echo" role="status" aria-live="polite"></div>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<footer class="folio">
+  <div class="wrap folio-in">
+    <p data-i18n="folio"><span data-app></span> is an independent student project for the 2026 NASA Space Apps Challenge. It is not made, reviewed or endorsed by NASA.</p>
+    <p class="credit" data-i18n="credit">Images: NASA/JPL-Caltech, SPHEREx, via the NASA/IPAC Infrared Science Archive (IRSA). Stacked and aligned by us.</p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
