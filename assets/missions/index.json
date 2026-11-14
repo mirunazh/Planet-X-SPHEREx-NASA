@@ -1,0 +1,78 @@
+{
+ "schema": "mission-index/1",
+ "generatedAt": "2026-11-14T16:24:10Z",
+ "missions": [
+  {
+   "id": "wise0855",
+   "name": "WISE 0855-0714",
+   "kind": "mover",
+   "summary": "The coldest known brown dwarf, 7.4 light years away, creeps west by about 8 arcseconds a year and glows only at 4 to 5 microns, so SPHEREx sees it in its longest-wavelength detectors and not in the short ones.",
+   "manifest": "wise0855/manifest.json",
+   "contactSheet": "wise0855/contact.png",
+   "groups": [
+    "d5d6",
+    "d2"
+   ],
+   "nPasses": {
+    "d5d6": 4,
+    "d2": 4
+   }
+  },
+  {
+   "id": "epsindb",
+   "name": "Epsilon Indi B",
+   "kind": "mover",
+   "summary": "A pair of brown dwarfs 12 light years away that orbit the star Epsilon Indi A and sweep south-east by 4.7 arcseconds a year, bright and clean in SPHEREx's 1 to 1.65 micron detector.",
+   "manifest": "epsindb/manifest.json",
+   "contactSheet": "epsindb/contact.png",
+   "groups": [
+    "d2"
+   ],
+   "nPasses": {
+    "d2": 5
+   }
+  },
+  {
+   "id": "barnard",
+   "name": "Barnard's Star",
+   "kind": "mover",
+   "summary": "The fastest-moving star in the sky, a red dwarf 6 light years away that marches north by 10.4 arcseconds a year, so bright that its centre saturates SPHEREx's detector.",
+   "manifest": "barnard/manifest.json",
+   "contactSheet": "barnard/contact.png",
+   "groups": [
+    "d2"
+   ],
+   "nPasses": {
+    "d2": 3
+   }
+  },
+  {
+   "id": "rwaur",
+   "name": "RW Aurigae",
+   "kind": "variable",
+   "summary": "A young T Tauri star 500 light years away, wrapped in a dusty disk that dims and brightens it; SPHEREx caught it about 0.37 magnitudes brighter in 2026 than in September 2025.",
+   "manifest": "rwaur/manifest.json",
+   "contactSheet": "rwaur/contact.png",
+   "groups": [
+    "d2"
+   ],
+   "nPasses": {
+    "d2": 3
+   }
+  },
+  {
+   "id": "rdra",
+   "name": "R Draconis",
+   "kind": "variable",
+   "summary": "A pulsating red giant (a Mira variable) 2,600 light years away that swells and fades on a roughly 246-day cycle; it is so bright that SPHEREx only measures it from the wings of its saturated image.",
+   "manifest": "rdra/manifest.json",
+   "contactSheet": "rdra/contact.png",
+   "groups": [
+    "d6"
+   ],
+   "nPasses": {
+    "d6": 3
+   }
+  }
+ ]
+}
