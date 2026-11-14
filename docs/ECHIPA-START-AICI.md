@@ -1,5 +1,7 @@
 # Echipa: începeți de aici
 
+**Starea cea mai nouă a proiectului și lista cu ce mai trebuie făcut sunt în `docs/RAPORT-COMPLET.md`.** Unde documentul de față spune altceva despre lucrările în curs, are dreptate raportul.
+
 Document pentru cei patru colegi care nu au văzut încă codul. Scopul: în zece minute rulați tot, în douăzeci înțelegeți cum e făcut, apoi luați un task fără să întrebați pe nimeni.
 
 Echipa: The Sopranos, București. Provocarea: „Planet X and SPHEREx" (NASA Space Apps Challenge 2026). Termen oficial: **duminică 15 noiembrie, 23:59, ora locală**. Ținta internă: **predare duminică 17:00**, restul e rezervă.

@@ -2,6 +2,8 @@
 
 ## Work in progress: the time viewer (branch wip/spherex-time-viewer)
 
+Latest status and the list of what is left to do: `docs/RAPORT-COMPLET.md` (Romanian).
+
 The new folders `web/`, `packages/`, `pipeline/`, `assets/` and `video/` hold the SPHEREx time viewer: real SPHEREx exposures of five target objects stacked into short films, a browser library that reads pixels straight from NASA's public S3 bucket for any coordinate, the logic of guided measuring missions, and the tools for the 30-second demo video. The 3D globe described below is the team's earlier app and is left as it was. Start with [docs/ECHIPA-START-AICI.md](docs/ECHIPA-START-AICI.md) (team onboarding, in Romanian), then [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/DATA.md](docs/DATA.md), [docs/PROCESS.md](docs/PROCESS.md), [docs/DEPENDENCIES.md](docs/DEPENDENCIES.md), [docs/RESEARCH-INDEX.md](docs/RESEARCH-INDEX.md) and [docs/SUBMISSION-CHECKLIST.md](docs/SUBMISSION-CHECKLIST.md).
 
 **SPHEREx Sky Navigator**: a 3D navigator for the infrared sky in the style of Apple's Find My, built **only on NASA data**. Spin the whole sky like a globe, fly *through* the celestial sphere into the real sky, and zoom down to arcseconds. The app works out the exact ICRS coordinates under your view as you move, so you never type a coordinate unless you want to.
