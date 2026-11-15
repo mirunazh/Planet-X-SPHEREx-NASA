@@ -76,6 +76,7 @@ export function ComparisonInventory() {
       <div><Link href={navigatorUrl(new URLSearchParams(params.toString()))}>← Back to navigator</Link><h1>Compare images</h1><p className="mono small">ICRS {region.ra.toFixed(5)}°, {region.dec.toFixed(5)}° · {region.size}′ square</p></div>
       <p className="muted small">SPHEREx image inventory · NASA/IPAC IRSA<br />Browse exposures from DR1 and QR3, directly here.</p>
     </header>
+    <p className="comparison-challenge-link"><Link href="/compare?challenge=weekly">Join the weekly sky challenge →</Link><span className="small muted">Revisit M101 with images prepared in advance.</span></p>
     <div className="comparison-layout">
       <aside className="comparison-filters panel">
         <details open><summary>Filter the inventory</summary>

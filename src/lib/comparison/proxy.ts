@@ -1,10 +1,10 @@
-import { isInventoryPage, isSearchProgress, isPreviewProgress } from './types';
+import { isInventoryPage, isSearchProgress, isPreviewProgress, isWeeklyChallenge } from './types';
 
-type Path = 'inventory' | 'health' | 'searches' | `searches/${string}` | `previews/${string}`;
+type Path = 'challenge' | `challenge/previews/${string}` | 'inventory' | 'health' | 'searches' | `searches/${string}` | `previews/${string}`;
 const FILTERS = new Set(['ra', 'dec', 'size', 'mission', 'band', 'wave_min', 'wave_max', 'start', 'end', 'kind', 'refresh']);
 
 export async function comparisonProxy(request: Request, path: Path): Promise<Response> {
-  if (!/^(inventory|health|searches(?:\/[\w-]{1,100}(?:\/(?:results|previews))?)?|previews\/[a-f0-9]{64}(?:\/image)?)$/.test(path)) {
+  if (!/^(challenge(?:\/previews\/[a-f0-9]{64}(?:\/image)?)?|inventory|health|searches(?:\/[\w-]{1,100}(?:\/(?:results|previews))?)?|previews\/[a-f0-9]{64}(?:\/image)?)$/.test(path)) {
     return Response.json({ detail: 'Invalid search identifier.' }, { status: 400 });
   }
   const incoming = new URL(request.url);
@@ -52,7 +52,7 @@ export async function comparisonProxy(request: Request, path: Path): Promise<Res
     try {
       const data: unknown = JSON.parse(raw);
       if (response.ok) valid = valid && (path.endsWith('/results') || path === 'inventory' ? isInventoryPage(data)
-        : path.startsWith('previews/') || path.endsWith('/previews') ? isPreviewProgress(data) : path === 'health' ? !!data && typeof data === 'object' && 'ok' in data && typeof data.ok === 'boolean' : isSearchProgress(data));
+        : path === 'challenge' ? isWeeklyChallenge(data) : path.startsWith('challenge/previews/') || path.startsWith('previews/') || path.endsWith('/previews') ? isPreviewProgress(data) : path === 'health' ? !!data && typeof data === 'object' && 'ok' in data && typeof data.ok === 'boolean' : isSearchProgress(data));
     } catch { valid = false; }
     if (!valid) return Response.json({ detail: 'The image inventory service returned an invalid response. Retry the search.' }, { status: 502, headers: { 'Cache-Control': 'no-store' } });
     return new Response(raw, { status: response.status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });

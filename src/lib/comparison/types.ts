@@ -120,3 +120,39 @@ export function isPreviewProgress(value: unknown): value is PreviewProgress {
       && Number.isSafeInteger(preview.width) && Number.isSafeInteger(preview.height) && preview.width > 0 && preview.height > 0
       && typeof preview.coverageFraction === 'number' && preview.coverageFraction >= 0 && preview.coverageFraction <= 1);
 }
+
+export interface WeeklyChallenge {
+  id: string;
+  title: string;
+  startsAt: string;
+  endsAt: string;
+  region: { ra: number; dec: number; size: number };
+  state: 'preparing' | 'ready' | 'partial' | 'unavailable';
+  checkedAt: string | null;
+  latestObservation: string | null;
+  error: string | null;
+  ready: number;
+  target: number;
+  found: number;
+  newThisWeek: number;
+  band: string | null;
+  prompt: string;
+  inventoryStatus: InventoryPage['status'] | null;
+  frames: { product: ImageProduct; previewId: string }[];
+}
+
+export function isWeeklyChallenge(value: unknown): value is WeeklyChallenge {
+  if (!value || typeof value !== 'object') return false;
+  const c = value as WeeklyChallenge;
+  return /^\d{4}-W\d{2}$/.test(c.id) && typeof c.title === 'string' && typeof c.prompt === 'string'
+    && ['preparing', 'ready', 'partial', 'unavailable'].includes(c.state)
+    && [c.startsAt, c.endsAt].every((v) => typeof v === 'string' && Number.isFinite(Date.parse(v)))
+    && [c.checkedAt, c.latestObservation, c.error, c.band].every((v) => v === null || typeof v === 'string')
+    && !!c.region && [c.region.ra, c.region.dec, c.region.size].every(Number.isFinite)
+    && c.region.ra >= 0 && c.region.ra < 360 && Math.abs(c.region.dec) <= 90 && c.region.size >= .5 && c.region.size <= 30
+    && [c.ready, c.target, c.found, c.newThisWeek].every((v) => Number.isSafeInteger(v) && v >= 0)
+    && Array.isArray(c.frames) && c.frames.length <= 12 && c.ready === c.frames.length
+    && c.frames.every((f) => /^[a-f0-9]{64}$/.test(f.previewId))
+    && isInventoryPage({ products: c.frames.map((f) => f.product), total: c.frames.length, nextCursor: null,
+      status: 'complete', truncated: false, warnings: [], retrievedAt: c.startsAt });
+}

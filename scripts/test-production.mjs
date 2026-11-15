@@ -22,7 +22,8 @@ try {
   const upstreamCalls = new Map();
   globalThis.fetch = async (input) => {
     const url = new URL(String(input));
-    if (url.pathname === '/inventory' || url.pathname === '/health' || url.pathname.startsWith('/searches/')) {
+    if (url.pathname === '/challenge') return Response.json({ id: '2026-W46', title: 'M101', startsAt: '2026-11-09T00:00:00Z', endsAt: '2026-11-16T00:00:00Z', state: 'preparing', checkedAt: null, latestObservation: null, error: null, ready: 0, target: 12, found: 0, newThisWeek: 0, band: null, prompt: 'Watch this region', region: { ra: 210.80227, dec: 54.34895, size: 6 }, frames: [] });
+    if (url.pathname === '/inventory'  || url.pathname === '/health' || url.pathname.startsWith('/searches/')) {
       assert.equal(url.origin, process.env.COMPARISON_SERVICE_URL ?? 'http://127.0.0.1:8000');
       if (url.pathname === '/searches/smoke') return Response.json({ id: 'smoke', state: 'finished', status: 'empty', collections: [], updatedAt: '', verifiedAt: null, stale: false, version: 'version1', total: 0, truncated: false, queueMs: 0 });
       return Response.json(url.pathname === '/health' ? { ok: true } : { version: 'version1', products: [], total: 0, status: 'empty', nextCursor: null, warnings: [], truncated: false, retrievedAt: new Date().toISOString() });
@@ -79,6 +80,13 @@ try {
   assert.equal(JSON.parse(inventory.text).status, 'empty');
   assert.equal(inventory.headers['cache-control'], 'no-store');
   assert.equal((await request('/api/comparison/inventory?url=https://example.test')).status, 400);
+  const challenge = await request('/compare?challenge=weekly');
+  assert.equal(challenge.status, 200);
+  assert.match(challenge.text, /Weekly sky challenge/);
+  const challengeStatus = await request('/api/comparison/challenge');
+  assert.equal(challengeStatus.status, 200);
+  assert.equal(JSON.parse(challengeStatus.text).id, '2026-W46');
+  console.log('PASS: compiled weekly challenge page and read-only status proxy');
   console.log('PASS: compiled comparison page and same-origin progress/results/health proxies (simulated service)');
 
   const hosts = JSON.parse((await request('/data/exoplanet-hosts.json')).text);

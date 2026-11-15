@@ -974,3 +974,21 @@ summary { cursor: pointer; min-height: 32px; }
   .slideshow-navigation .btn { flex: 1; }
   .slideshow-speed select { font-size: 16px; }
 }
+
+/* The weekly challenge extends the existing image workspace. */
+.challenge-entry { display: flex; flex-direction: column; gap: 4px; margin: 12px 0; text-decoration: none; }
+.challenge-entry small { color: var(--muted); }
+.comparison-challenge-link { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 0 0 24px; }
+.challenge-page { max-width: 1160px; }
+.challenge-brief { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, .6fr); gap: 24px 48px; margin: 28px 0; }
+.challenge-brief h2 { margin: 0 0 8px; }
+.challenge-brief p { max-width: 68ch; }
+.challenge-cache { border-top: 1px solid var(--border); padding-top: 12px; }
+.challenge-cache p:first-child { margin-top: 0; }
+.challenge-notes { margin-top: 24px; }
+.challenge-notes > p { max-width: 75ch; }
+.challenge-links { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 16px; }
+@media (max-width: 700px) {
+  .challenge-brief { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .challenge-page .comparison-header { align-items: flex-start; }
+}

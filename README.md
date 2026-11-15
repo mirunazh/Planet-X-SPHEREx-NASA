@@ -127,3 +127,30 @@ Searches use IRSA SIA `POS=CIRCLE` for `spherex_dr1` and `spherex_qr3`, equivale
 The Python service reads the FITS `IMAGE` extension with Astropy, resamples the selected crop to a common north-up/east-left grid, and returns a display PNG. Per-image asinh contrast helps inspection; it is not a calibrated brightness comparison. Missing pixels remain transparent, and wavelength metadata is still labelled as detector range. One FITS cutout downloads at a time, sharing the global two-request IRSA limit. The PNG cache is separate from metadata, defaults to 128 MiB under `/data/previews`, and persists in the existing Docker volume. `PREVIEW_CACHE_DIR` and `PREVIEW_CACHE_BYTES` override it. The browser retains at most six preview blobs and only preloads the next frame. Image requests respect the temporarily disabled IRSA timeout setting.
 
 See [slideshow implementation and acceptance](docs/comparison-slideshow-review.md). Run `python3 scripts/verify-slideshow-live.py` against the Compose web app for a live metadata-to-PNG check.
+
+
+### Weekly sky challenge
+
+Open `/compare?challenge=weekly`, or **Weekly sky challenge** in the navigator’s featured places.
+The challenge revisits the same 6′ square around M101 (ICRS 210.80227°, +54.34895°).
+A new challenge week starts Monday at 00:00 UTC. This is the app’s schedule, not a promised IRSA release time.
+IRSA describes QR3 ingestion as approximately weekly; the service checks the regional DR1/QR3 inventory every six hours while it is running.
+The first inventory establishes a baseline. Later newly discovered product IDs are counted for the current week;
+observation dates are shown separately, and no new regional coverage is assumed.
+
+The background worker prepares up to 12 PNG cutouts across observation dates in one detector range
+(prefer D3; retain that detector on subsequent checks). It tries up to 24 candidates, skips unavailable or
+less than half-covered crops, publishes usable frames progressively, and keeps the previous prepared frames
+during refreshes and archive failures. QR3 additions become eligible when the next regional check sees them.
+The full existing inventory remains accessible from the challenge.
+
+The manifest and baseline persist beside the metadata database in `challenge/weekly-challenge.json`.
+Challenge PNGs have a separate 16 MiB cache at `challenge/images`; the current prepared frames are protected
+from eviction. Both persist in the existing Docker volume. Images are served from this cache, independent of
+metadata job expiration, with no FITS request on page open. The worker shares the existing archive connection
+limit and image-rendering semaphore. It runs inside the single-worker comparison service; leave that service
+running for automatic checks. Existing disabled archive timeouts remain unchanged.
+
+Read-only endpoints: `GET /api/comparison/challenge`, `GET /api/comparison/challenge/previews/{id}`,
+and `GET /api/comparison/challenge/previews/{id}/image`. A page visit reads preparation state and never starts
+an extra search. A stopped service resumes preparation after startup using the persisted manifest and PNGs.

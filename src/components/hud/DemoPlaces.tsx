@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useNav } from '@/lib/store';
 import { visitPin } from '@/lib/navigation';
 import { loadPins } from '@/lib/pins';
@@ -16,6 +17,7 @@ export function DemoPlaces({ onVisit }: { onVisit?: () => void }) {
     <section className="places panel" id="places-panel" aria-labelledby="places-title">
       <h2 id="places-title">Explore a place</h2>
       <p className="small muted">Choose a target, then compare sky layers.</p>
+      <Link className="place-link challenge-entry" href="/compare?challenge=weekly"><span>Weekly sky challenge</span><small>Revisit M101 · prepared image slideshow</small></Link>
       <div className="place-list">
         {places.map((pin) => (
           <button key={pin.id} className="place-link" aria-pressed={selected?.id === pin.id} onClick={() => { visitPin(pin); onVisit?.(); }}>

@@ -14,6 +14,7 @@ from inventory import Search
 from jobs import Coordinator, Store, public
 from transport import ArchiveClient
 from previews import PreviewManager, PreviewBusy
+from challenges import WeeklyChallenge
 
 
 def timeout_setting(name, default):
@@ -38,9 +39,16 @@ async def lifespan(app):
     app.state.previews = PreviewManager(store, archive,
         os.environ.get("PREVIEW_CACHE_DIR", str(Path(os.environ.get("COMPARISON_DB", "/data/inventory.sqlite3")).parent / "previews")),
         limit=int(os.environ.get("PREVIEW_CACHE_BYTES", 128 * 1024 * 1024)))
+    challenge_directory = Path(os.environ.get("COMPARISON_DB", "/data/inventory.sqlite3")).parent / "challenge"
+    app.state.challenge_previews = PreviewManager(store, archive, challenge_directory / "images", limit=16 * 1024 * 1024)
+    app.state.challenge_previews.worker = app.state.previews.worker
+    app.state.challenge = WeeklyChallenge(app.state.coordinator, app.state.challenge_previews, challenge_directory)
+    app.state.challenge.start()
     try:
         yield
     finally:
+        await app.state.challenge.close()
+        await app.state.challenge_previews.close()
         await app.state.previews.close()
         await app.state.coordinator.close()
         await archive.close()
@@ -136,6 +144,28 @@ async def preview_progress(preview_id: str):
 async def preview_image(preview_id: str):
     try:
         return FileResponse(app.state.previews.image(preview_id), media_type="image/png",
+            headers={"Cache-Control": "private, max-age=86400, immutable"})
+    except KeyError as error:
+        raise HTTPException(404, error.args[0]) from error
+
+
+@app.get("/challenge")
+async def weekly_challenge():
+    return app.state.challenge.snapshot()
+
+
+@app.get("/challenge/previews/{preview_id}")
+async def challenge_preview_progress(preview_id: str):
+    try:
+        return app.state.challenge_previews.state(preview_id)
+    except KeyError as error:
+        raise HTTPException(404, error.args[0]) from error
+
+
+@app.get("/challenge/previews/{preview_id}/image")
+async def challenge_preview_image(preview_id: str):
+    try:
+        return FileResponse(app.state.challenge_previews.image(preview_id), media_type="image/png",
             headers={"Cache-Control": "private, max-age=86400, immutable"})
     except KeyError as error:
         raise HTTPException(404, error.args[0]) from error

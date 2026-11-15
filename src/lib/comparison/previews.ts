@@ -16,7 +16,8 @@ export class PreviewLoader {
   private cache = new Map<string, LoadedPreview>();
   constructor(private searchId: string, private version: string,
     private fetcher: typeof fetch = (...args) => fetch(...args),
-    private createUrl = (blob: Blob) => URL.createObjectURL(blob), private revokeUrl = (url: string) => URL.revokeObjectURL(url)) {}
+    private createUrl = (blob: Blob) => URL.createObjectURL(blob), private revokeUrl = (url: string) => URL.revokeObjectURL(url),
+    private prepared?: Record<string, string>) {}
 
   private async json(path: string, signal: AbortSignal, body?: object): Promise<PreviewProgress> {
     const response = await this.fetcher(`/api/comparison/${path}`, {
@@ -36,7 +37,9 @@ export class PreviewLoader {
       this.cache.delete(productId); this.cache.set(productId, cached);
       return cached;
     }
-    let progress = await this.json(`searches/${this.searchId}/previews`, signal, { version: this.version, productId, retry });
+    const preparedId = this.prepared?.[productId];
+    let progress = preparedId ? await this.json(`challenge/previews/${preparedId}`, signal)
+      : await this.json(`searches/${this.searchId}/previews`, signal, { version: this.version, productId, retry });
     onProgress(progress);
     while (progress.state !== 'ready' && progress.state !== 'error') {
       await wait(signal);
@@ -44,7 +47,7 @@ export class PreviewLoader {
       onProgress(progress);
     }
     if (progress.state === 'error') throw new Error(progress.error ?? 'The exposure could not be loaded. Retry or choose another image.');
-    const response = await this.fetcher(`/api/comparison/previews/${progress.id}/image`, { signal });
+    const response = await this.fetcher(`/api/comparison/${preparedId ? 'challenge/' : ''}previews/${progress.id}/image`, { signal });
     if (!response.ok || !response.headers.get('content-type')?.includes('image/png')) throw new Error('The rendered image is unavailable. Retry the image.');
     const blob = await response.blob();
     signal.throwIfAborted();

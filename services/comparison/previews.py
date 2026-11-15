@@ -104,6 +104,7 @@ class PreviewManager:
         self.sleep = sleep
         self.entries = OrderedDict()
         self.tasks = {}
+        self.protected = set()
         self.worker = asyncio.Semaphore(1)
         self.prune()
 
@@ -113,7 +114,7 @@ class PreviewManager:
         for path in files:
             if total <= self.limit:
                 break
-            if path.stem in self.tasks:
+            if path.stem in self.tasks or path.stem in self.protected:
                 continue
             total -= path.stat().st_size
             path.unlink(missing_ok=True)

@@ -7,6 +7,7 @@ import type { ImageProduct, InventoryPage, PreviewProgress } from '@/lib/compari
 type Page = InventoryPage & { version: string; searchId: string };
 interface Props {
   page: Page | null;
+  prepared?: Record<string, string>;
   searching: boolean;
   status: string;
   activeId: string | null;
@@ -21,7 +22,7 @@ function observation(product: ImageProduct) {
   return date ? new Date(date).toLocaleString(undefined, { timeZone: 'UTC', dateStyle: 'medium', timeStyle: 'medium' }) + ' UTC' : 'Observation time unknown';
 }
 
-export function Slideshow({ page, searching, status, activeId, onSelect, onLoadMore, loadingMore, onRetrySearch }: Props) {
+export function Slideshow({ page, prepared, searching, status, activeId, onSelect, onLoadMore, loadingMore, onRetrySearch }: Props) {
   const products = useMemo(() => [...(page?.products ?? [])].sort((a, b) =>
     (a.observedStart ?? a.observedEnd ?? '9999').localeCompare(b.observedStart ?? b.observedEnd ?? '9999') || a.id.localeCompare(b.id)), [page?.products]);
   const index = Math.max(0, products.findIndex((p) => p.id === activeId));
@@ -44,7 +45,7 @@ export function Slideshow({ page, searching, status, activeId, onSelect, onLoadM
   useEffect(() => {
     if (!page) return;
     setPlaying(false); setSkipped(0); hasShownImage.current = false;
-    const instance = new PreviewLoader(page.searchId, page.version);
+    const instance = new PreviewLoader(page.searchId, page.version, undefined, undefined, undefined, prepared);
     loader.current = instance;
     return () => { instance.dispose(); loader.current = null; };
   }, [page?.searchId, page?.version]);
@@ -122,7 +123,7 @@ export function Slideshow({ page, searching, status, activeId, onSelect, onLoadM
     return () => node.removeEventListener('wheel', scroll);
   }, [product, index, products.length, page?.nextCursor, next, previous]);
 
-  const loadingLabel = progress?.state === 'rendering' ? 'Preparing the sky image…' : progress?.state === 'queued' ? 'Waiting to load this exposure…' : 'Loading this exposure from IRSA…';
+  const loadingLabel = prepared ? 'Loading the cached sky image…' : progress?.state === 'rendering' ? 'Preparing the sky image…' : progress?.state === 'queued' ? 'Waiting to load this exposure…' : 'Loading this exposure from IRSA…';
   const canNext = !!product && (index < products.length - 1 || !!page?.nextCursor);
 
   return <section className="slideshow" aria-label="SPHEREx image slideshow">
