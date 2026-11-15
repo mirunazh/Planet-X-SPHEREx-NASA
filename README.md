@@ -4,6 +4,8 @@
 
 Built for the NASA Space Apps Challenge 2026.
 
+**Ghid în română:** [Pornire pas cu pas, funcționalități și prezentarea proiectului](docs/GHID-PORNIRE-SI-PREZENTARE.md).
+
 > NASA does not endorse this project. NASA data is used under NASA's data and media guidelines. See **Data & credits** in the app.
 
 ## What it does
