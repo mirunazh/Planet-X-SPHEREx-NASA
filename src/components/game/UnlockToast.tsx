@@ -2,7 +2,8 @@
 
 /**
  * Announces the first queued game toast: a new figurine (with "Try it") or a
- * finished quest. Closes itself after 8 s, paused while hovered or focused.
+ * finished quest. A small card at the bottom that never covers the middle of the
+ * sky (the place being looked at). Closes itself after 5 s, paused while hovered or focused.
  * The live region stays mounted so screen readers hear each new toast.
  */
 import { useEffect, useRef, useState, type FocusEvent, type KeyboardEvent } from 'react';
@@ -12,11 +13,11 @@ import { useGame } from '@/lib/game/store';
 import { Patch } from './Patch';
 import styles from './UnlockToast.module.css';
 
-const AUTO_DISMISS_MS = 8000;
+const AUTO_DISMISS_MS = 5000;
 
 function QuestBadge() {
   return (
-    <svg className={styles.badge} width="48" height="48" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+    <svg className={styles.badge} width="32" height="32" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
       <circle cx="32" cy="32" r="31" fill="#ffb547" />
       <circle cx="32" cy="32" r="27.6" fill="none" stroke="#94661f" strokeWidth="1.7" strokeDasharray="3 2.2" strokeLinecap="round" />
       <circle cx="32" cy="32" r="23.4" fill="#f4f1e8" stroke="#94661f" strokeWidth="1.3" />
@@ -97,7 +98,7 @@ export function UnlockToast({ onTry }: { onTry: (id: FigurineId) => void }) {
           <div key={`${toast.kind}:${toast.id}`} className={styles.content}>
             {toast.kind === 'figurine' && figurine ? (
               <>
-                <Patch id={toast.id} size={48} />
+                <Patch id={toast.id} size={32} />
                 <div className={styles.text}>
                   <p className={styles.eyebrow}>New figurine found</p>
                   <p className={styles.title}>{figurine.label}</p>

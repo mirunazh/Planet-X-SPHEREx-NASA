@@ -13,7 +13,7 @@ export interface ColorStop {
 
 export const COLOR_STOPS: ColorStop[] = [
   { frame: 0, name: 'Near red', detail: 'Just beyond red light; mostly starlight' },
-  { frame: 22, name: 'Starlight', detail: 'Near-infrared starlight' },
+  { frame: 22, name: 'Starlight', detail: 'Mostly starlight; thick dust still dims it' },
   { frame: 46, name: 'Through dust', detail: 'Starlight that gets through much of the dust' },
   { frame: 62, name: 'Glowing dust', detail: 'Carbon-rich dust molecules (PAHs) glow here' },
   { frame: 80, name: 'CO₂ ice', detail: 'Where carbon dioxide ice absorbs light' },

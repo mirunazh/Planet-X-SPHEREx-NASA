@@ -11,7 +11,7 @@ Built for the NASA Space Apps Challenge 2026.
 ## What a visitor sees
 
 1. **SPHEREx intro** (first visit, or `/?intro=1`): a SPHEREx DR1 projection at 2.19 µm around the south ecliptic pole. `npm run data:intro` rebuilds the image; `public/intro/sources.json` records its provenance and display processing.
-2. **Simple navigator** (the default): one next step at a time (choose a place, look closer, compare its photos), a dock of tools, the Places, Telescope and Settings sheets, "What you're seeing" help with a guided tour, and a light game layer (figurines, quests, field guide). The original full interface is **Settings → Expert layout**.
+2. **Simple navigator** (the default): one next step at a time (choose a place, look closer, compare its photos), a dock of tools, the Places, Telescope and Settings sheets, "What you're seeing" help with a guided tour, and a light game layer (figurines, quests, field guide). The step card can be hidden and reopened; its preference is remembered. Telescope opens directly on SPHEREx colors, with Light and Layers alongside. Unlock notifications appear briefly at the bottom of the screen. The original full interface is **Settings → Expert layout**.
 3. **Compare**: every SPHEREx exposure of a small square of sky, aligned north-up, as a flipbook. Searches query IRSA live and can take a minute when the archive is slow.
 4. **Weekly sky challenge**: the same square around M101, with up to 12 photos prepared in advance. This is the reliable demo path when IRSA is slow.
 

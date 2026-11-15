@@ -113,7 +113,7 @@ function Help() {
       <h3>Try an exploration</h3>
       <ol>
         <li>Open <strong>Places</strong> and choose Andromeda, or search for <strong>M31</strong>. In the Expert layout, featured places are in the left rail.</li>
-        <li>Open <strong>Telescope</strong> (<strong>Layers</strong> in the Expert layout) and explore SPHEREx wavelengths.</li>
+        <li>Open <strong>Telescope → Color</strong> (<strong>Layers</strong> in the Expert layout) and step through the SPHEREx wavelengths, from 0.75 to 5 µm.</li>
         <li>The loading message names the requested layer and the image still on screen. Image sources follow the layer actually displayed.</li>
         <li>Copy a link to this view from <strong>Settings</strong> (<strong>Share view</strong> in the Expert layout). It keeps the coordinates, zoom and selected layer; it does not restore a target lock.</li>
       </ol>
@@ -134,7 +134,7 @@ function Help() {
         </p>
         <h3>Precision</h3>
         <p>
-          Digits follow the real uncertainty: the larger of one screen pixel and one survey pixel (SPHEREx 12.9″). Lock
+          Digits follow the real uncertainty: the larger of one screen pixel and one SPHEREx map pixel (12.9″). Lock
           becomes available at a 1° field of view or closer, once the selected sky layer is ready.
         </p>
       </details>

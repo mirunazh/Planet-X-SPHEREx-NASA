@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import * as healpix from '@hscmap/healpix';
 import { allskyUrl, allskyUv, tileUrl, tileUv } from '@/lib/sky/hips';
-import { SPHEREX_FRAMES, SURVEYS, nearestUsableFrame } from '@/lib/sky/surveys';
+import { SPHEREX_FRAMES, SURVEYS, SURVEY_ORDER, isSurveyId, nearestUsableFrame } from '@/lib/sky/surveys';
 import { buildSkyTarget } from '@/lib/sky/target';
 import { radecToVec } from '@/lib/sky/coords';
 import { flyPath } from '@/lib/sky/flyto';
@@ -17,6 +17,7 @@ describe('HiPS addressing', () => {
 
   it('builds Allsky URLs', () => {
     expect(allskyUrl(SURVEYS.spherex, 10)).toMatch(/Norder3\/Allsky_10\.png$/);
+    expect(allskyUrl(SURVEYS.spherex, 0)).toMatch(/SPHEREx\/spherex_allsky_cube\/Norder3\/Allsky\.png$/);
   });
 
   it('maps cell corners to image corners (x = nw, y = ne, verified orientation)', () => {
@@ -30,6 +31,19 @@ describe('HiPS addressing', () => {
     const [u, v] = allskyUv(28, 0.5, 0.5, 1728, 1856);
     expect(u * 1728).toBeCloseTo(64 + 32, 9);
     expect(v * 1856).toBeCloseTo(64 + 32, 9);
+  });
+});
+
+describe('survey registry', () => {
+  it('holds SPHEREx only, the project scope', () => {
+    expect(SURVEY_ORDER).toEqual(['spherex']);
+    expect(Object.keys(SURVEYS)).toEqual(['spherex']);
+    expect(Object.values(SURVEYS).every((s) => s.baseUrl.includes('/SPHEREx/'))).toBe(true);
+  });
+
+  it('rejects unsupported surveys, so old links and saves fall back to SPHEREx', () => {
+    expect(isSurveyId('spherex')).toBe(true);
+    for (const unsupported of ['unsupported-survey', 'legacy-survey', '', null, undefined]) expect(isSurveyId(unsupported)).toBe(false);
   });
 });
 

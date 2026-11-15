@@ -9,7 +9,7 @@ The default interface is now the **simple navigator**, and a first visit opens t
 | Checklist step (Expert layout) | Same action in the simple layout |
 | --- | --- |
 | Explore a place | 🧭 **Places**, or **Choose a place** on the next-step card |
-| Layers / wavelength | 🔭 **Telescope** |
+| Layers / wavelength | 🔭 **Telescope → Color** (the default tab) |
 | Lock target, Copy target link | **Settings → Map and target** |
 | Share view | **Settings → Copy link to this view** |
 | Help / Sources | **Settings → Keyboard and help / Data sources and credits** |
@@ -24,6 +24,8 @@ Recommended order before presenting:
 5. Open the app with `/?intro=1`: a browser that has seen the intro skips it otherwise.
 
 Reliable story for the video: intro → **Explore SPHEREx** → search **M101** → **Compare its photos →**, or **Places → Weekly sky challenge**. When explaining Compare, say that SPHEREx sees each spot at a slightly different infrared color in every photo, so the flipbook shows color and contrast differences as well as time.
+
+Check **Hide the steps**, reload, then **Show**: the folded step card should stay folded across visits and reopen on demand. Telescope should have only Color, Light and Layers tabs. Changing the wavelength after startup should still complete the color quest; loading a deep link should not complete it by itself.
 
 ## Prepare the production build
 
