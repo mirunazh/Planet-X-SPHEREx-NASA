@@ -137,7 +137,7 @@ export function ComparisonInventory() {
     setDraft((value) => ({ ...value, band: DEFAULT_BAND }));
   };
   const photosLine = state.page ? `${state.page.total} photo${state.page.total === 1 ? '' : 's'}` : 'photos loading';
-  const colorLine = color === 'one' ? `one color (${DEFAULT_BAND})` : color === 'custom' ? 'colors chosen in the filters' : 'all colors';
+  const colorLine = color === 'one' ? `one detector (${DEFAULT_BAND})` : color === 'custom' ? 'colors chosen in the filters' : 'all detectors';
   const contextLine = `Right now: ${name ?? `RA ${region.ra.toFixed(3)}°, Dec ${region.dec.toFixed(3)}°`} · ${photosLine} · ${colorLine}`;
 
   const field = (key: keyof Filters, label: string, type = 'text', describedBy?: string) => <label>{label}<input type={type} value={draft[key]} step={type === 'number' ? 'any' : undefined} min={type === 'number' ? '0.001' : undefined} max={type === 'number' ? '1000' : undefined} aria-describedby={describedBy} onChange={(event) => setDraft((value) => ({ ...value, [key]: event.target.value }))} /></label>;

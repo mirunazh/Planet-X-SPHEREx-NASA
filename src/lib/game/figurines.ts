@@ -57,7 +57,7 @@ export const FIGURINES: Record<FigurineId, Figurine> = {
   },
   challenge: {
     label: 'Weekly challenge',
-    tip: 'Look closer at one patch of sky, with new NASA images each week',
+    tip: 'Look closer at one patch of sky, rechecked against NASA’s archive every week',
     unlockHint: 'Finish 3 sky quests',
     emoji: '🏆',
     alwaysUnlocked: false,

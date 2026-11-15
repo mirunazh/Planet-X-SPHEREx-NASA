@@ -9,7 +9,11 @@ import { HELP, type HelpScreenId } from '@/content/help';
 import type { ImageProduct, InventoryPage } from '@/lib/comparison/types';
 import styles from './CompareGuide.module.css';
 
-/** The page opens on one detector, so every frame of the flipbook shows the same infrared colors. */
+/**
+ * The page opens on one detector, so every frame covers the same range of infrared colors. It is
+ * not one exact color: SPHEREx's linear variable filter changes wavelength across each detector, so
+ * a given spot lands at a different wavelength within this range in each photo.
+ */
 export const DEFAULT_BAND = 'SPHEREx-D3';
 const DEFAULT_RANGE = '1.6–2.4 µm';
 
@@ -54,10 +58,10 @@ function summarize(size: number, products: ImageProduct[], total: number, more: 
 }
 
 const COLOR_TEXT: Record<ColorMode, string> = {
-  one: `Showing one color (${DEFAULT_BAND}, ${DEFAULT_RANGE}) so the photos are comparable.`,
+  one: `Showing one detector (${DEFAULT_BAND}, ${DEFAULT_RANGE}). Its filter changes color across the chip, so each photo sees this spot at a slightly different infrared color.`,
   custom: 'Showing only the colors chosen in the filters.',
-  fallback: `No ${DEFAULT_BAND} (${DEFAULT_RANGE}) photos of this square were found, so all colors are shown. A photo can look different just because it was taken in another color.`,
-  all: 'Showing all colors, from all 6 detectors. A photo can look different just because it was taken in another color.',
+  fallback: `No ${DEFAULT_BAND} (${DEFAULT_RANGE}) photos of this square were found, so all detectors are shown. A photo can look different just because it was taken in another color.`,
+  all: 'Showing all 6 detectors. A photo can look different just because it was taken in another color.',
 };
 
 /**
@@ -106,8 +110,8 @@ interface Props {
 export function CompareGuide({ size, products, total, more, loading, status, filtered, color, onShowAllColors, onShowOneColor, contextLine }: Props) {
   const titleId = useId();
   const summary = summarize(size, products, total, more, loading, status, filtered);
-  const action = color === 'all' ? { label: 'Show one color', run: onShowOneColor }
-    : color === 'fallback' ? null : { label: 'Show all colors', run: onShowAllColors };
+  const action = color === 'all' ? { label: 'Show one detector', run: onShowOneColor }
+    : color === 'fallback' ? null : { label: 'Show all detectors', run: onShowAllColors };
   return <section className={styles.guide} aria-labelledby={titleId}>
     <div className={styles.head}>
       <h2 id={titleId} className={styles.title}>How to compare</h2>
@@ -115,7 +119,7 @@ export function CompareGuide({ size, products, total, more, loading, status, fil
     </div>
     <p className={styles.text}>
       {summary.text}
-      {summary.comparable && <> Press <strong>Play</strong> to flip through them like a flipbook. A dot that shows up in only one photo may have moved, or may be a glitch: check its date and color.</>}
+      {summary.comparable && <> Press <strong>Play</strong> to flip through them like a flipbook. Most differences come from color and contrast, not real changes. A dot that shows up in only one photo may be a passing asteroid or a glitch: check its date and color.</>}
     </p>
     <div className={styles.color}>
       <p className={styles.colorText} role="status">{COLOR_TEXT[color]}</p>

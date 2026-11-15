@@ -14,6 +14,7 @@ log = logging.getLogger("comparison.challenges")
 TARGET = ("M101 · the Pinwheel Galaxy", 210.80227, 54.34895, 6)
 FRAME_LIMIT = 12
 CHECK_INTERVAL = 6 * 3600
+RETRY_AFTER_FAILURE = 5 * 60
 
 
 def weekly_target(now):
@@ -85,7 +86,7 @@ class WeeklyChallenge:
             except KeyError:
                 pass
         return {**{k: v for k, v in self.manifest.items() if k not in ("knownIds", "newIds", "baselineEstablished")}, "newThisWeek": len(self.manifest.get("newIds", [])), "frames": frames, "ready": len(frames), "target": FRAME_LIMIT,
-            "prompt": "Watch this patch of sky. Scroll through the exposures and look for a source that moves or changes. Check the observation dates and detector range before drawing conclusions."}
+            "prompt": "Flip through a year of this patch of sky. Most differences come from color, contrast or detector glitches rather than real changes: SPHEREx sees this spot at a slightly different infrared color in each photo. Check the date and detector under each photo before calling anything a change."}
 
     def next_delay(self):
         now = self.clock()
@@ -111,7 +112,9 @@ class WeeklyChallenge:
                 self.manifest.update(state="partial" if self.snapshot()["ready"] else "unavailable",
                     error="The archive could not be checked. Prepared images remain available; another check runs automatically.")
                 self.save()
-            await self.sleep(CHECK_INTERVAL if failed else self.next_delay())
+            # A failed check (IRSA down or slow) is retried soon, so a fresh deployment is not left
+            # without images for six hours.
+            await self.sleep(RETRY_AFTER_FAILURE if failed else self.next_delay())
 
     async def prepare(self):
         manifest = self.manifest

@@ -117,9 +117,9 @@ export const HELP: Record<HelpScreenId, HelpScreen> = {
     science: {
       paragraphs: [
         'Each frame is one SPHEREx exposure, a single photo taken on the date shown. The photos are lined up so that north is up and east is to the left.',
-        'SPHEREx has six detectors, light-sensing chips that each see a different range of infrared colors. So two frames may record different colors, not just different dates. The caption under the photo names the detector, from D1 to D6.',
+        'SPHEREx has six detectors, light-sensing chips that each see a different range of infrared colors. Within one detector the color also changes across the chip, so each photo sees a spot at its own color. The caption under the photo names the detector, from D1 to D6.',
         'The contrast of each photo is adjusted on its own, so faint details show up. That means a change in brightness between frames is not evidence that something changed in the sky.',
-        'Flipping quickly between two aligned photos is called blinking, and it is how moving things are spotted. Something that moved, like an asteroid, seems to jump while the stars stay put. Blinking works best with two photos from the same detector.',
+        'Flipping quickly between two aligned photos is called blinking, and it is how moving things are spotted. Something that moved, like an asteroid, seems to jump while the stars stay put. Here, color and contrast also change between photos, so most differences are not real changes.',
       ],
       sources: [SOURCE.spherexMission, SOURCE.spherexAccess, SOURCE.spherexCutouts],
     },
