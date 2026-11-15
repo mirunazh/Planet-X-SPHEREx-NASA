@@ -12,7 +12,7 @@ Are trei funcții principale:
 
 | Funcție | Ce poți face |
 | --- | --- |
-| Navigatorul cerului | Deplasezi harta, faci zoom, cauți obiecte sau coordonate și schimbi straturile SPHEREx, 2MASS și WISE. |
+| Navigatorul cerului | Deplasezi harta, faci zoom, cauți obiecte sau coordonate și explorezi lungimile de undă SPHEREx. |
 | Slideshow SPHEREx | Alegi o zonă, cauți expunerile disponibile în arhiva IRSA și răsfoiești imaginile direct în aplicație. |
 | Challenge săptămânal | Revizitezi aceeași zonă din jurul galaxiei M101, cu până la 12 imagini pregătite în cache și un contor al produselor nou găsite în arhivă. |
 
@@ -120,7 +120,7 @@ curl http://127.0.0.1:3000/api/comparison/health
 2. Trage cu mouse-ul pentru a schimba direcția privirii.
 3. Folosește rotița mouse-ului sau gestul de zoom pentru a apropia imaginea.
 4. Caută un obiect, de exemplu `M101`, ori alege o destinație din **Explore a place**.
-5. Schimbă stratul de observație din panoul de straturi. Pentru SPHEREx poți schimba și canalul spectral.
+5. Deschide panoul Telescope și schimbă canalul spectral SPHEREx.
 
 Coordonatele RA/Dec se actualizează odată cu poziția privirii. `RA` și `Dec` sunt coordonate pe cer, exprimate aici în grade, în sistemul ICRS.
 
@@ -185,7 +185,7 @@ Răspunsul inițial conține metadate și adresele fișierelor. Serviciul descar
 
 | Date | Locație în container | Limită configurată implicit |
 | --- | --- | --- |
-| Inventare și căutări SQLite | `/data/inventory.sqlite3` | 256 MiB pentru cache-ul de metadate |
+| Inventare și căutări SQLite | `/data/inventory.sqlite3` | 32 MiB în Compose; 256 MiB implicit în serviciu |
 | PNG-uri pentru slideshow obișnuit | `/data/previews/` | 128 MiB |
 | Starea challenge-ului și baza de comparație | `/data/challenge/weekly-challenge.json` | Manifestul challenge-ului |
 | PNG-uri pentru challenge | `/data/challenge/images/` | 16 MiB; cadrele curente sunt protejate de evacuare |
@@ -262,7 +262,7 @@ Pornirea doar a interfeței cu npm, fără serviciul `comparison`, permite acces
 | O singură imagine eșuează, inclusiv cu HTTP 503 | Apasă **Retry image** sau treci la altă expunere. Fișierul respectiv poate fi temporar indisponibil la IRSA. |
 | Challenge-ul arată mai puțin de 12 imagini | Pregătirea poate fi în curs sau pot exista mai puține cadre utilizabile. Pagina își actualizează periodic starea. |
 | Contorul de produse noi este 0 | Poate fi prima verificare, începutul unei săptămâni noi sau lipsa unor produse nou descoperite în acea regiune. Verifică data ultimei verificări. |
-| O căutare pare să aștepte foarte mult | În `compose.yaml`, limitele de timp pentru arhivă, execuție și coadă sunt momentan dezactivate prin valoarea `0`. Cererea poate aștepta până răspunde IRSA, apare o eroare de rețea sau serviciul este oprit. |
+| O căutare pare să aștepte foarte mult | IRSA poate răspunde lent. Configurația Compose limitează cererea la 60 s, execuția căutării la 180 s și așteptarea în coadă la 60 s. Rezultatele deja obținute rămân disponibile. |
 | Apare `Method Not Allowed` | Verifică dacă folosești instanța actuală a aplicației și configurația corectă a serviciilor. Crearea căutării folosește POST; pentru diagnostic consultă logurile ambelor servicii. |
 
 Valorile efective ale limitelor de timp sunt afișate în `/api/comparison/health`, la `timeouts`; `null` înseamnă limită dezactivată. Valorile implicite ale serviciului, când nu sunt suprascrise de Compose, sunt 25 s pentru cererea IRSA, 120 s pentru execuția căutării și 30 s pentru așteptarea în coadă.
@@ -272,7 +272,7 @@ Valorile efective ale limitelor de timp sunt afișate în `/api/comparison/healt
 Pregătește demonstrația din timp: pornește serviciile și verifică dacă există imagini în cache-ul challenge-ului. Numărul de observații găsite depinde de datele disponibile și de răspunsul arhivei.
 
 1. **Arată navigatorul:** „Putem explora cerul în infraroșu, căuta un obiect și vedea coordonatele regiunii spre care privim.”
-2. **Alege M101:** folosește căutarea sau destinația recomandată și arată schimbarea stratului de observație.
+2. **Alege M101:** folosește căutarea sau destinația recomandată și arată schimbarea canalului spectral SPHEREx.
 3. **Arată slideshow-ul:** deschide linkul M101 din secțiunea 3, schimbă câteva cadre și indică data observației și detectorul.
 4. **Explică proveniența:** „Aplicația cere metadatele de la IRSA, descarcă decupajele FITS necesare și le transformă în imagini afișabile în browser.”
 5. **Arată challenge-ul:** „Revenim în fiecare săptămână la aceeași zonă. Serviciul verifică periodic arhiva și pregătește imaginile în cache, iar utilizatorii pot explora setul disponibil imediat.”

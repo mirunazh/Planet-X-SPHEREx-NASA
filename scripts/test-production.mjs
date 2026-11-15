@@ -89,16 +89,15 @@ try {
   console.log('PASS: compiled weekly challenge page and read-only status proxy');
   console.log('PASS: compiled comparison page and same-origin progress/results/health proxies (simulated service)');
 
-  const hosts = JSON.parse((await request('/data/exoplanet-hosts.json')).text);
   const targets = JSON.parse((await request('/data/targets.json')).text);
-  assert.ok(hosts.provenance.service && hosts.provenance.retrievedAt);
-  assert.ok(hosts.hosts.length > 0);
-  for (const pin of [...hosts.hosts, ...targets.targets]) {
+  assert.ok(targets.provenance.retrievedAt);
+  assert.ok(targets.targets.length > 0);
+  for (const pin of targets.targets) {
     assert.ok(Number.isFinite(pin.ra) && pin.ra >= 0 && pin.ra < 360, pin.name);
     assert.ok(Number.isFinite(pin.dec) && Math.abs(pin.dec) <= 90, pin.name);
   }
   for (const id of ['m31', 'm101', 'spherex-deep-north', 'teegardens-star']) assert.ok(targets.targets.some((pin) => pin.id === id), id);
-  console.log(`PASS: ${hosts.hosts.length} host positions, ${targets.targets.length} featured places and demo destinations`);
+  console.log(`PASS: ${targets.targets.length} featured places and demo destinations`);
 
   assert.equal((await request('/api/resolve?name=%3Cinvalid%3E')).status, 400);
   assert.equal(upstreamCalls.size, 0);

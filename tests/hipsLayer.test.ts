@@ -249,7 +249,7 @@ describe('HiPS band swaps', () => {
     if (kind === 'band') {
       useNav.getState().setFrame(90); useNav.getState().setFrame(46);
     } else {
-      useNav.getState().setSurvey('twomass'); useNav.getState().setSurvey('spherex');
+      useNav.getState().setFrame(22); useNav.getState().setFrame(46);
     }
     render();
     loads.get(url(46))!.resolve(asset(url(46)));

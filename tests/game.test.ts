@@ -47,8 +47,8 @@ const teegardenTarget = pin({ id: 'teegardens-star', kind: 'target', name: "Teeg
 const teegardenHost = pin({ id: 'host-3857', kind: 'host', name: "Teegarden's Star", distPc: 3.83, planetCount: 3 });
 const otherHost = pin({ id: 'host-0', kind: 'host', name: '11 Com', distPc: 93.18, planetCount: 1 });
 
-const visit = (p: Pin, surveyId: 'spherex' | 'twomass' | 'allwise' = 'spherex'): GameEvent => ({ type: 'visitedPlace', pin: p, surveyId });
-const select = (p: Pin, surveyId: 'spherex' | 'twomass' | 'allwise' = 'spherex'): GameEvent => ({ type: 'selectedPin', pin: p, surveyId });
+const visit = (p: Pin, surveyId: 'spherex' = 'spherex'): GameEvent => ({ type: 'visitedPlace', pin: p, surveyId });
+const select = (p: Pin, surveyId: 'spherex' = 'spherex'): GameEvent => ({ type: 'selectedPin', pin: p, surveyId });
 const run = (events: GameEvent[], from: GameProgress = initialProgress(), now = NOW) =>
   events.reduce((state, event) => applyEvent(state, event, now), from);
 
@@ -68,13 +68,13 @@ describe('figurines and quests', () => {
     expect(FIGURINE_ORDER.filter((id) => FIGURINES[id].alwaysUnlocked)).toEqual(['places', 'telescope', 'explain', 'compare']);
     expect(new Set(FIGURINE_ORDER.map((id) => FIGURINES[id].emoji)).size).toBe(6);
     expect(FIGURINES.explain.label).toBe("What you're seeing");
-    expect(FIGURINES.guide.unlockHint).toBe('Try another telescope or color');
+    expect(FIGURINES.guide.unlockHint).toBe('Try another SPHEREx color');
     expect(FIGURINES.challenge.unlockHint).toBe('Finish 3 sky quests');
     for (const id of FIGURINE_ORDER) expect(FIGURINES[id].emoji.trim().length).toBeGreaterThan(0);
   });
 
   it('has three quests with titles, tasks and takeaways', () => {
-    expect(QUEST_ORDER).toEqual(['galaxy', 'dust', 'planets']);
+    expect(QUEST_ORDER).toEqual(['galaxy', 'dust', 'deep-field']);
     for (const id of QUEST_ORDER) {
       expect(QUESTS[id].title.length).toBeGreaterThan(0);
       expect(QUESTS[id].task.length).toBeGreaterThan(0);
@@ -107,9 +107,9 @@ describe('applyEvent: unlock rules', () => {
   });
 
   it('records a visit with the current telescope', () => {
-    const state = run([visit(m31, 'twomass')]);
+    const state = run([visit(m31, 'spherex')]);
     expect(state.unlocked).toContain('telescope');
-    expect(state.visited.m31).toEqual({ name: 'Andromeda Galaxy (M31)', kind: 'target', targetKind: 'galaxy', surveys: ['twomass'], firstVisit: NOW });
+    expect(state.visited.m31).toEqual({ name: 'Andromeda Galaxy (M31)', kind: 'target', targetKind: 'galaxy', surveys: ['spherex'], firstVisit: NOW });
     expect(state.current).toBe('m31');
   });
 
@@ -120,19 +120,15 @@ describe('applyEvent: unlock rules', () => {
     expect(host.toasts.some((t) => t.kind === 'figurine')).toBe(false);
   });
 
-  it('finds the Field guide with a second telescope or a new infrared color', () => {
+  it('finds the Field guide and completes the color quest by changing SPHEREx wavelength', () => {
     const one = run([{ type: 'usedSurvey', surveyId: 'spherex' }, { type: 'usedSurvey', surveyId: 'spherex' }]);
     expect(one.unlocked).not.toContain('guide');
     expect(one.surveysUsed).toEqual(['spherex']);
-
-    const two = run([{ type: 'usedSurvey', surveyId: 'allwise' }], one);
-    expect(two.unlocked).toContain('guide');
-    expect(two.quests.dust).toBe(true);
-    expect(two.toasts).toEqual([{ kind: 'figurine', id: 'guide' }, { kind: 'quest', id: 'dust' }]);
-
-    const color = run([{ type: 'changedColor' }]);
+    const color = run([{ type: 'changedColor' }], one);
     expect(color.unlocked).toContain('guide');
-    expect(color.quests.dust).toBe(false);
+    expect(color.quests.dust).toBe(true);
+    expect(color.toasts).toEqual([{ kind: 'figurine', id: 'guide' }, { kind: 'quest', id: 'dust' }]);
+    expect(run([{ type: 'changedColor' }], color)).toBe(color);
   });
 
   it('keeps Compare photos open from the start', () => {
@@ -142,7 +138,7 @@ describe('applyEvent: unlock rules', () => {
 
   it('ignores unknown surveys and pins without an id', () => {
     const start = initialProgress();
-    expect(applyEvent(start, { type: 'usedSurvey', surveyId: 'hubble' as never }, NOW)).toBe(start);
+    expect(applyEvent(start, { type: 'usedSurvey', surveyId: 'unsupported' as never }, NOW)).toBe(start);
     expect(applyEvent(start, visit({ ...m31, id: '' }), NOW)).toBe(start);
     expect(applyEvent(start, { type: 'somethingElse' } as never, NOW)).toBe(start);
   });
@@ -157,41 +153,37 @@ describe('applyEvent: quests', () => {
     expect(run([select(m31)]).quests.galaxy).toBe(true);
   });
 
-  it('completes the planets quest for a host, or a featured star the archive lists as a host', () => {
-    expect(run([select(otherHost)]).quests.planets).toBe(true);
-    expect(run([visit(teegardenTarget)]).quests.planets).toBe(false);
-    const enriched = withPlanetData(teegardenTarget, [otherHost, teegardenHost]);
-    expect(enriched.planetCount).toBe(3);
-    expect(enriched.distPc).toBe(3.83);
-    expect(run([visit(enriched)]).quests.planets).toBe(true);
-    expect(withPlanetData(m31, [teegardenHost])).toBe(m31);
+  it('completes the deep-field quest for SPHEREx deep fields only', () => {
+    expect(run([visit(m31)]).quests['deep-field']).toBe(false);
+    expect(run([visit(teegardenTarget)]).quests['deep-field']).toBe(false);
+    expect(run([visit(deepField)]).quests['deep-field']).toBe(true);
   });
 
   it('finds the Weekly challenge after all three quests, announced after the last quest', () => {
-    const state = run([visit(m31), { type: 'usedSurvey', surveyId: 'spherex' }, { type: 'usedSurvey', surveyId: 'twomass' }, select(otherHost)]);
+    const state = run([visit(m31), { type: 'changedColor' }, visit(deepField)]);
     expect(Object.values(state.quests).every(Boolean)).toBe(true);
     expect(state.unlocked).toContain('challenge');
-    expect(state.toasts.slice(-2)).toEqual([{ kind: 'quest', id: 'planets' }, { kind: 'figurine', id: 'challenge' }]);
+    expect(state.toasts.slice(-2)).toEqual([{ kind: 'quest', id: 'deep-field' }, { kind: 'figurine', id: 'challenge' }]);
     expect(state.toasts.filter((t) => t.kind === 'figurine' && t.id === 'challenge')).toHaveLength(1);
   });
 });
 
 describe('applyEvent: telescope stamps', () => {
   it('stamps the telescope used during a visit, without duplicates', () => {
-    const state = run([visit(m31, 'spherex'), { type: 'usedSurvey', surveyId: 'allwise' }, { type: 'usedSurvey', surveyId: 'allwise' }]);
-    expect(state.visited.m31.surveys).toEqual(['spherex', 'allwise']);
+    const state = run([visit(m31, 'spherex'), { type: 'usedSurvey', surveyId: 'spherex' }, { type: 'usedSurvey', surveyId: 'spherex' }]);
+    expect(state.visited.m31.surveys).toEqual(['spherex']);
   });
 
   it('stops stamping once the visit ends', () => {
     const visiting = run([visit(m31, 'spherex')]);
     const ended = { ...visiting, current: null };
-    expect(run([{ type: 'usedSurvey', surveyId: 'twomass' }], ended).visited.m31.surveys).toEqual(['spherex']);
+    expect(run([{ type: 'usedSurvey', surveyId: 'spherex' }], ended).visited.m31.surveys).toEqual(['spherex']);
   });
 
   it('adds a stamp on a return visit and keeps the first visit time', () => {
     const first = run([visit(m31, 'spherex')]);
-    const again = run([visit(m31, 'twomass')], first, LATER);
-    expect(again.visited.m31.surveys).toEqual(['spherex', 'twomass']);
+    const again = run([visit(m31, 'spherex')], first, LATER);
+    expect(again.visited.m31.surveys).toEqual(['spherex']);
     expect(again.visited.m31.firstVisit).toBe(NOW);
   });
 });
@@ -210,25 +202,25 @@ describe('unlockAll, merge and sanitize', () => {
     expect(sanitizeSaved('nope')).toBeNull();
     const saved = sanitizeSaved({
       unlocked: ['places', 'places', 'laser', 42],
-      surveysUsed: ['spherex', 'hubble'],
+      surveysUsed: ['spherex', 'unsupported'],
       quests: { galaxy: true, dust: 'yes' },
-      visited: { m31: { name: 'Andromeda', kind: 'target', surveys: ['twomass', 'x'], firstVisit: NOW }, bad: { kind: 'planet' } },
+      visited: { m31: { name: 'Andromeda', kind: 'target', surveys: ['spherex', 'x'], firstVisit: NOW }, bad: { kind: 'planet' } },
     });
     expect(saved).toEqual({
       unlocked: ['places', 'telescope', 'explain', 'compare'],
       surveysUsed: ['spherex'],
-      quests: { galaxy: true, dust: false, planets: false },
-      visited: { m31: { name: 'Andromeda', kind: 'target', surveys: ['twomass'], firstVisit: NOW } },
+      quests: { galaxy: true, dust: false, 'deep-field': false },
+      visited: { m31: { name: 'Andromeda', kind: 'target', surveys: ['spherex'], firstVisit: NOW } },
     });
   });
 
   it('merges saved progress with progress made before loading', () => {
     const saved = run([visit(m31, 'spherex'), { type: 'lookedAround' }]);
-    const memory = run([{ type: 'lookedAround' }, visit(m31, 'twomass')], initialProgress(), LATER);
+    const memory = run([{ type: 'lookedAround' }, visit(m31, 'spherex'), { type: 'changedColor' }], initialProgress(), LATER);
     const merged = mergeProgress(saved, memory);
-    expect(merged.visited.m31.surveys).toEqual(['spherex', 'twomass']);
+    expect(merged.visited.m31.surveys).toEqual(['spherex']);
     expect(merged.visited.m31.firstVisit).toBe(NOW);
-    // Places and the galaxy quest were already saved: no second announcement. Two telescopes now: the Field guide.
+    // Places and the galaxy quest were already saved: no second announcement. A changed SPHEREx color now opens the Field guide.
     expect(merged.toasts).toEqual([{ kind: 'figurine', id: 'guide' }, { kind: 'quest', id: 'dust' }]);
     expect(mergeProgress(saved, memory, true).toasts[0]).toEqual({ kind: 'quest', id: 'galaxy' });
   });
@@ -255,7 +247,7 @@ describe('useGame store', () => {
     const { record, dismissToast } = useGame.getState();
     record({ type: 'lookedAround' });
     record(visit(m31));
-    record({ type: 'usedSurvey', surveyId: 'allwise' });
+    record({ type: 'changedColor' });
     expect(useGame.getState().toasts.map((t) => t.id)).toEqual(['galaxy', 'guide', 'dust']);
     dismissToast();
     expect(useGame.getState().toasts.map((t) => t.id)).toEqual(['guide', 'dust']);
@@ -280,7 +272,7 @@ describe('useGame store', () => {
   it('ends a visit so later telescope changes are not stamped', () => {
     useGame.getState().record(visit(m31, 'spherex'));
     useGame.getState().endVisit();
-    useGame.getState().record({ type: 'usedSurvey', surveyId: 'allwise' });
+    useGame.getState().record({ type: 'changedColor' });
     expect(useGame.getState().visited.m31.surveys).toEqual(['spherex']);
   });
 
@@ -316,7 +308,7 @@ describe('useGame store', () => {
     const storage = memoryStorage({ [GAME_STORAGE_KEY]: JSON.stringify({ unlocked: ['explain', 'telescope'] }) });
     vi.stubGlobal('window', { localStorage: storage });
     useGame.getState().record({ type: 'usedSurvey', surveyId: 'spherex' });
-    useGame.getState().record({ type: 'usedSurvey', surveyId: 'allwise' });
+    useGame.getState().record({ type: 'changedColor' });
     expect(JSON.parse(storage.getItem(GAME_STORAGE_KEY) ?? '{}').unlocked).toEqual(['places', 'telescope', 'explain', 'compare', 'guide']);
   });
 
@@ -390,10 +382,10 @@ describe('field guide helpers', () => {
 
   it('shows one card when a featured star and its planet-host dot are both visited', () => {
     const first = run([visit(teegardenTarget, 'spherex'), visit(m31)], initialProgress(), NOW);
-    const both = run([select(teegardenHost, 'allwise')], first, LATER);
+    const both = run([select(teegardenHost, 'spherex')], first, LATER);
     const cards = fieldGuideEntries(both.visited);
     expect(cards.map((c) => c.id)).toEqual(['host-3857', 'm31']);
-    expect(cards[0].place.surveys).toEqual(['allwise', 'spherex']);
+    expect(cards[0].place.surveys).toEqual(['spherex']);
     expect(both.visited['teegardens-star'].surveys).toEqual(['spherex']);
   });
 

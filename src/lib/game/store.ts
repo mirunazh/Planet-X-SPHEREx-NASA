@@ -13,7 +13,7 @@ import { type SurveyId, isSurveyId } from '@/lib/sky/surveys';
 import { FIGURINES, FIGURINE_ORDER, type FigurineId } from './figurines';
 import { QUEST_ORDER, type QuestId } from './quests';
 
-export const GAME_STORAGE_KEY = 'skynav.game.v1';
+export const GAME_STORAGE_KEY = 'skynav.game.spherex.v2';
 
 export type GameEvent =
   | { type: 'lookedAround' }
@@ -54,7 +54,7 @@ export function isUnlocked(id: FigurineId, unlocked: FigurineId[]): boolean {
   return FIGURINES[id]?.alwaysUnlocked === true || unlocked.includes(id);
 }
 
-const noQuests = (): Record<QuestId, boolean> => ({ galaxy: false, dust: false, planets: false });
+const noQuests = (): Record<QuestId, boolean> => ({ galaxy: false, dust: false, 'deep-field': false });
 
 export function initialProgress(): GameProgress {
   return {
@@ -70,9 +70,6 @@ export function initialProgress(): GameProgress {
 const union = <T>(a: readonly T[], b: readonly T[]): T[] => [...a, ...b.filter((item) => !a.includes(item))];
 
 const isGalaxy = (pin: Pin) => pin.kind === 'target' && (pin.targetKind ?? '').toLowerCase().includes('galaxy');
-
-/** Host pins are planet hosts; a featured star counts when it carries a planet count (see withPlanetData). */
-const hasKnownPlanets = (pin: Pin) => pin.kind === 'host' || (typeof pin.planetCount === 'number' && pin.planetCount > 0);
 
 // ---------------------------------------------------------------------------
 // Rules
@@ -129,12 +126,8 @@ function recordPin(d: Draft, pin: Pin, id: SurveyId, now: string): void {
   d.current = pin.id;
 }
 
-/** Rules that depend on totals: a second survey finds the field guide and the telescope quest; three quests find the challenge. */
+/** Finishing all three SPHEREx quests opens the weekly challenge. */
 function settle(d: Draft): void {
-  if (d.surveysUsed.length >= 2) {
-    unlock(d, 'guide');
-    complete(d, 'dust');
-  }
   if (QUEST_ORDER.every((id) => d.quests[id])) unlock(d, 'challenge');
 }
 
@@ -169,7 +162,7 @@ function finish(state: GameProgress, d: Draft): GameProgress {
  *
  * - places    <- lookedAround
  * - telescope <- visitedPlace, or selectedPin of a target
- * - guide     <- a second distinct survey, or changedColor
+ * - guide     <- changedColor
  * - compare   <- zoomedClose
  * - challenge <- all three quests done
  */
@@ -187,7 +180,7 @@ export function applyEvent(state: GameProgress, event: GameEvent, now: string): 
       recordPin(d, pin, surveyId, now);
       if (event.type === 'visitedPlace' || pin.kind === 'target') unlock(d, 'telescope');
       if (isGalaxy(pin)) complete(d, 'galaxy');
-      if (hasKnownPlanets(pin)) complete(d, 'planets');
+      if (pin.targetKind === 'deep-field') complete(d, 'deep-field');
       noteSurvey(d, surveyId);
       break;
     }
@@ -197,6 +190,7 @@ export function applyEvent(state: GameProgress, event: GameEvent, now: string): 
       break;
     case 'changedColor':
       unlock(d, 'guide');
+      complete(d, 'dust');
       break;
     case 'zoomedClose':
       unlock(d, 'compare');

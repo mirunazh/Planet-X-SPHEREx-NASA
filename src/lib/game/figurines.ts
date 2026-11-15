@@ -29,7 +29,7 @@ export const FIGURINES: Record<FigurineId, Figurine> = {
   },
   telescope: {
     label: 'Telescope',
-    tip: 'See the same sky through other NASA telescopes and infrared colors',
+    tip: 'Explore SPHEREx infrared colors and display settings',
     unlockHint: 'Always available',
     emoji: '🔭',
     alwaysUnlocked: true,
@@ -43,8 +43,8 @@ export const FIGURINES: Record<FigurineId, Figurine> = {
   },
   guide: {
     label: 'Field guide',
-    tip: 'Keep track of the places you visit and the telescopes you used',
-    unlockHint: 'Try another telescope or color',
+    tip: 'Keep track of the places you visit in the SPHEREx sky',
+    unlockHint: 'Try another SPHEREx color',
     emoji: '📖',
     alwaysUnlocked: false,
   },

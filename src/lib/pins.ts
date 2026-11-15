@@ -1,22 +1,10 @@
 /**
- * Pins: NASA Exoplanet Archive host stars and featured targets, loaded from the
+ * Pins: featured SPHEREx sky regions and named targets, loaded from the
  * build-time snapshot in public/data (see scripts/fetch-nasa-data.mjs).
  */
 import { type Pin, type PinSource, useNav } from './store';
 import { radecToVec } from './sky/coords';
 import { type View, cameraBasis, projectWithBasis } from './sky/view';
-
-interface HostRecord {
-  name: string;
-  ra: number;
-  dec: number;
-  distPc: number | null;
-  planetCount: number | null;
-  kmag: number | null;
-  planets: string[];
-  firstDiscovery: number | null;
-  facilities: string[];
-}
 
 interface TargetRecord {
   id: string;
@@ -32,31 +20,9 @@ interface TargetRecord {
 export async function loadPins(): Promise<void> {
   useNav.setState({ dataStatus: 'loading' });
   try {
-    const [hostsRes, targetsRes] = await Promise.all([fetch('/data/exoplanet-hosts.json'), fetch('/data/targets.json')]);
-    if (!hostsRes.ok || !targetsRes.ok) throw new Error(`data files: HTTP ${hostsRes.status}/${targetsRes.status}`);
-    const hostsJson = (await hostsRes.json()) as { provenance: { service: string; retrievedAt: string }; hosts: HostRecord[] };
-    const targetsJson = (await targetsRes.json()) as { targets: TargetRecord[] };
-    const hostSource: PinSource = {
-      service: hostsJson.provenance.service,
-      url: 'https://exoplanetarchive.ipac.caltech.edu/',
-      retrievedAt: hostsJson.provenance.retrievedAt,
-    };
-    const hosts: Pin[] = hostsJson.hosts.map((h, i) => ({
-      id: `host-${i}`,
-      kind: 'host',
-      name: h.name,
-      ra: h.ra,
-      dec: h.dec,
-      vec: radecToVec(h.ra, h.dec),
-      fov: 0.25,
-      distPc: h.distPc,
-      planetCount: h.planetCount,
-      kmag: h.kmag,
-      planets: h.planets,
-      firstDiscovery: h.firstDiscovery,
-      facilities: h.facilities,
-      source: hostSource,
-    }));
+    const targetsRes = await fetch('/data/targets.json');
+    if (!targetsRes.ok) throw new Error(`target data: HTTP ${targetsRes.status}`);
+    const targetsJson = (await targetsRes.json()) as { provenance?: { retrievedAt?: string }; targets: TargetRecord[] };
     const targets: Pin[] = targetsJson.targets.map((t) => ({
       id: t.id,
       kind: 'target',
@@ -69,7 +35,7 @@ export async function loadPins(): Promise<void> {
       description: t.description,
       source: t.source,
     }));
-    useNav.getState().setPins(hosts, targets, hostsJson.provenance.retrievedAt);
+    useNav.getState().setPins([], targets, targetsJson.provenance?.retrievedAt ?? null);
   } catch (err) {
     console.error('[pins] could not load NASA data snapshot', err);
     useNav.setState({ dataStatus: 'error' });
@@ -98,7 +64,7 @@ export function pickPin(view: View, width: number, height: number, px: number, p
   return (s.showTargets ? scan(s.targets, 16) : null) ?? (s.showHosts ? scan(s.hosts, 9) : null);
 }
 
-/** Local name search over featured targets and exoplanet hosts. */
+/** Local name search over featured targets and optional reference pins. */
 export function searchPins(query: string, targets: Pin[], hosts: Pin[], limit = 8): Pin[] {
   const q = query.trim().toLowerCase();
   if (q.length < 2) return [];

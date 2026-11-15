@@ -112,11 +112,11 @@ export function NextStep({ step, place, flying = false, opening = false, destina
               ? destination ? <>Flying to <strong>{destination}</strong>…</> : <>Flying there…</>
               : opening
                 ? <>Opening the photos of <strong>{place ?? 'this spot'}</strong>…</>
-                : <><strong>{place ?? 'This spot'}</strong> is inside the square. Look around, try other telescopes, then compare its photos.</>}
+                : <><strong>{place ?? 'This spot'}</strong> is inside the square. Look around, explore SPHEREx colors, then compare its photos.</>}
           </p>
           <div className={styles.actions}>
             <button type="button" className={styles.secondary} onClick={onTelescope}>
-              <span className={styles.emoji} aria-hidden="true">🔭</span> Other telescopes
+              <span className={styles.emoji} aria-hidden="true">🔭</span> SPHEREx colors
             </button>
             <button type="button" className={styles.primary} onClick={onCompare} disabled={flying || opening} aria-busy={opening || undefined}>
               <span className={styles.emoji} aria-hidden="true">🎞️</span> {flying ? 'Flying there…' : opening ? 'Opening photos…' : 'Compare its photos →'}

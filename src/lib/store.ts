@@ -115,7 +115,7 @@ export const useNav = create<NavState & NavActions>()((set) => ({
   rawPixels: false,
   gain: 1,
   showGrid: false,
-  showHosts: true,
+  showHosts: false,
   showTargets: true,
   hosts: [],
   targets: [],
@@ -135,7 +135,7 @@ export const useNav = create<NavState & NavActions>()((set) => ({
   anim: [],
 
   setView: (v) => set(v),
-  setSurvey: (surveyId) => set((s) => surveyId === s.surveyId ? {} : { surveyId, layerRevision: s.layerRevision + 1, allskyStatus: 'loading', locked: null }),
+  setSurvey: (surveyId) => set((s) => surveyId !== 'spherex' || surveyId === s.surveyId ? {} : { surveyId, layerRevision: s.layerRevision + 1, allskyStatus: 'loading', locked: null }),
   setFrame: (frame) => set((s) => {
     const next = requestedLayer({ surveyId: 'spherex', frame }).frame;
     const changed = !sameLayer(requestedLayer(s), requestedLayer({ ...s, frame: next }));

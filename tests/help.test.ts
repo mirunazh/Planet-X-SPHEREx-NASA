@@ -88,7 +88,7 @@ describe('help screens', () => {
   it('keeps the tour ids the pages are built with, in tour order', () => {
     const expected: Record<HelpScreenId, string[]> = {
       navigator: ['sky', 'next-step', 'dock-telescope'],
-      intro: ['intro-orbits', 'intro-scale', 'intro-cta'],
+      intro: ['intro-sky', 'intro-cta'],
       compare: ['compare-filters', 'compare-viewer', 'compare-controls', 'compare-list'],
       challenge: ['challenge-status', 'challenge-viewer', 'challenge-browse'],
     };

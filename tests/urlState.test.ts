@@ -22,14 +22,14 @@ afterEach(() => {
 describe('panoramic deep links', () => {
   it.each(['?mode=globe&d=3.2', '?mode=globe', '?mode=sky', '', '?mode=unknown&d=8'])(
     'opens legacy or incomplete links in the panorama: %s', (query) => {
-      location(query + (query ? '&' : '?') + 'ra=10.68479&dec=41.26907&survey=allwise');
+      location(query + (query ? '&' : '?') + 'ra=10.68479&dec=41.26907&survey=unsupported');
       applyUrlState();
       const s = useNav.getState();
       expect(s.mode).toBe('sky');
       expect(s.fov).toBe(INITIAL_VIEW.fov);
       expect(angularDistance(s.center, radecToVec(10.68479, 41.26907))).toBeLessThan(1e-6);
       expect(s.origin).toBe('deeplink');
-      expect(s.surveyId).toBe('allwise');
+      expect(s.surveyId).toBe('spherex');
     },
   );
 
@@ -98,7 +98,7 @@ describe('panoramic deep links', () => {
 });
 
 describe('shareable demonstration views', () => {
-  it.each(['spherex', 'twomass', 'allwise'] as const)('round trips position, zoom and the selected %s layer without waiting for address-bar sync', async (surveyId) => {
+  it.each(['spherex'] as const)('round trips position, zoom and the selected %s layer without waiting for address-bar sync', async (surveyId) => {
     const { buildViewUrl } = await import('@/lib/urlState');
     useNav.setState({ center: radecToVec(12.34567, -56.78901), fov: 0.05, surveyId, frame: 90 });
     const shared = new URL(buildViewUrl(useNav.getState(), 'https://example.com/explore?old=value#outdated'));
@@ -123,7 +123,7 @@ describe('shareable demonstration views', () => {
     const { buildTargetUrl } = await import('@/lib/urlState');
     const { buildSkyTarget } = await import('@/lib/sky/target');
     const target = buildSkyTarget({ center: radecToVec(10.68, 41.27), fovDeg: 0.5, uncertaintyArcsec: 13, survey: 'spherex', hipsUrl: 'https://irsa.ipac.caltech.edu/', frames: [46], origin: 'pin' });
-    useNav.setState({ center: radecToVec(200, -20), fov: 10, surveyId: 'allwise' });
+    useNav.setState({ center: radecToVec(200, -20), fov: 10, surveyId: 'spherex' });
     const url = new URL(buildTargetUrl(target, 'https://example.com/explore'));
     location(url.search); applyUrlState();
     expect(angularDistance(useNav.getState().center, radecToVec(target.ra, target.dec))).toBeLessThan(0.00001);

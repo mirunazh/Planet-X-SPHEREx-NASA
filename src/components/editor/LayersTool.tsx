@@ -4,17 +4,13 @@ import { useId, type ReactNode } from 'react';
 import { useNav } from '@/lib/store';
 import styles from './tools.module.css';
 
-type OverlayKey = 'showTargets' | 'showHosts' | 'showGrid' | 'rawPixels';
+type OverlayKey = 'showTargets' | 'showGrid' | 'rawPixels';
 
 export function LayersTool() {
-  const hostCount = useNav((s) => s.hosts.length);
 
   return (
     <div className={styles.switches}>
       <SwitchRow field="showTargets" title="Famous places" detail="Named pins for well-known galaxies, stars and sky landmarks" />
-      <SwitchRow field="showHosts" title="Stars with planets"
-        extra={hostCount > 0 && <span className={styles.count}> ({hostCount.toLocaleString('en-US')})</span>}
-        detail="Pins for stars with confirmed planets, from the NASA Exoplanet Archive" />
       <SwitchRow field="showGrid" title="Coordinate grid"
         detail="Coordinate lines, the sky's equator, the Sun's path and the Milky Way's plane" />
       <SwitchRow field="rawPixels" title="Raw pixels" detail="Show the image pixels without smoothing" />

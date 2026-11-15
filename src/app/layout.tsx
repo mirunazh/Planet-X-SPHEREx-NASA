@@ -5,7 +5,7 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'SPHEREx Sky Navigator',
   description:
-    'Fly around the infrared sky seen by NASA SPHEREx, 2MASS and WISE and pick any position without typing coordinates. Built only on NASA data.',
+    'Fly around the infrared sky seen by NASA SPHEREx and pick any position without typing coordinates. Built only on NASA data.',
 };
 
 export const viewport: Viewport = {

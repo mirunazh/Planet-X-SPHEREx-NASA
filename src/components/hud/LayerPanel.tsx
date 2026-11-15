@@ -10,11 +10,9 @@ export function LayerPanel() {
   const frame = useNav((s) => s.frame);
   const displayed = useNav((s) => s.displayedLayer);
   const showGrid = useNav((s) => s.showGrid);
-  const showHosts = useNav((s) => s.showHosts);
   const showTargets = useNav((s) => s.showTargets);
   const rawPixels = useNav((s) => s.rawPixels);
   const gain = useNav((s) => s.gain);
-  const hostCount = useNav((s) => s.hosts.length);
   const toggle = useNav((s) => s.toggle);
   const [pending, setPending] = useState(frame);
   const survey = SURVEYS[surveyId];
@@ -76,7 +74,6 @@ export function LayerPanel() {
           <legend className="sr-only">Overlays</legend>
           <label><input type="checkbox" checked={showGrid} onChange={() => toggle('showGrid')} /> Coordinate grid and sky planes</label>
           <label><input type="checkbox" checked={showTargets} onChange={() => toggle('showTargets')} /> Featured targets</label>
-          <label><input type="checkbox" checked={showHosts} onChange={() => toggle('showHosts')} /> Exoplanet hosts{hostCount > 0 && <span className="muted">({hostCount.toLocaleString('en-US')})</span>}</label>
           <label><input type="checkbox" checked={rawPixels} onChange={() => toggle('rawPixels')} /> Show raw pixels</label>
         </fieldset>
       </details>

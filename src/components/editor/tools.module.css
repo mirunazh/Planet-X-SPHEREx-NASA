@@ -73,14 +73,14 @@
 .cards {
   flex: 1;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: minmax(56px, 1fr) auto auto auto;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(56px, 1fr) auto auto auto auto;
   column-gap: 10px;
 }
 
 .card {
   position: relative;
-  grid-row: span 4;
+  grid-row: span 5;
   display: grid;
   grid-template-rows: subgrid;
   row-gap: 3px;
@@ -90,7 +90,7 @@
   border-radius: 16px;
   border: 1px solid var(--border-strong);
   background: rgba(255, 255, 255, 0.03);
-  cursor: pointer;
+  cursor: default;
 }
 
 .card:hover {
@@ -124,27 +124,7 @@
     linear-gradient(90deg, #5b2a86 0%, #b23a73 26%, #e8613c 52%, #f5a547 76%, #ffe08f 100%);
 }
 
-.thumbTwomass {
-  background:
-    radial-gradient(circle at 18% 28%, #ffffff 0 1px, transparent 1.6px),
-    radial-gradient(circle at 42% 66%, #dbe8ff 0 1.2px, transparent 1.8px),
-    radial-gradient(circle at 63% 22%, #ffe3c4 0 0.9px, transparent 1.5px),
-    radial-gradient(circle at 79% 58%, #ffffff 0 1.4px, transparent 2px),
-    radial-gradient(circle at 30% 86%, #cfe0ff 0 0.8px, transparent 1.4px),
-    radial-gradient(circle at 88% 84%, #ffd9b0 0 1px, transparent 1.6px),
-    radial-gradient(circle at 53% 44%, #ffffff 0 0.7px, transparent 1.3px),
-    radial-gradient(circle at 8% 60%, #e4ecff 0 0.8px, transparent 1.4px),
-    linear-gradient(160deg, #0d1733, #060a17);
-}
 
-.thumbAllwise {
-  background:
-    radial-gradient(ellipse 48% 40% at 32% 64%, rgba(255, 118, 70, 0.85), transparent 70%),
-    radial-gradient(ellipse 36% 32% at 70% 34%, rgba(255, 186, 96, 0.7), transparent 72%),
-    radial-gradient(circle at 82% 78%, rgba(130, 205, 255, 0.95) 0 1.2px, transparent 2px),
-    radial-gradient(circle at 18% 22%, rgba(150, 215, 255, 0.95) 0 1px, transparent 1.8px),
-    linear-gradient(160deg, #1f0e1d, #09070f);
-}
 
 .check {
   position: absolute;
@@ -240,7 +220,7 @@
 
 .chips {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 6px;
   margin-top: 12px;
 }

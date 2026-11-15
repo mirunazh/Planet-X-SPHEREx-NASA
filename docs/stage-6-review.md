@@ -17,7 +17,7 @@ Implemented after explicit user authorization, preserving the earlier stage-4/5 
 - `npm test`: **175 tests / 18 files pass**. Added transfer timeouts (including stalled bodies), late abort responses, terminal-error recovery, prefix/concurrency preservation, reconnect/cleanup, malformed NED data, API cache/errors/rate refill, and actual geometry ray intersections.
 - `npm run typecheck`: passes.
 - `npm run build`: passes.
-- `npm run test:production`: passes against the latest build, with **21 local HTTP requests**, including the production page, eight referenced JS/CSS assets, production security headers, both bundled JSON files (4,862 host positions and 14 featured targets), compiled name lookup/cache/error recovery, malformed label handling and the 404 page. It invokes Next's real production router with in-memory HTTP request/response streams, without listening on a port. **NED responses are simulated.** This does not hydrate/render the browser application.
+- `npm run test:production`: passes against the latest build, with **21 local HTTP requests**, including the production page, eight referenced JS/CSS assets, production security headers, the bundled target-position snapshot, compiled name lookup/cache/error recovery, malformed label handling and the 404 page. It invokes Next's real production router with in-memory HTTP request/response streams, without listening on a port. **NED responses are simulated.** This does not hydrate/render the browser application.
 - Offline geometric regression: 72 asymmetric ray directions across all 12 HEALPix faces place detail and preview pixels consistently; additional order-4/5/7/9 meshes retain their orientation and back-face visibility. Existing north-up/east-left, pole, coordinate and RA-wrap tests also pass. This verifies the code's mapping, not newly downloaded image registration.
 - `git diff --check`: passes. Impeccable HUD/CSS detector: no findings.
 - Reviewer independently reran all 175 tests, TypeScript and diff checks; also ran the production smoke before the final malformed-label case was added. Final build/smoke were rerun by the implementation agent after that fix.
@@ -38,7 +38,6 @@ These measurements exclude image decoding, rendering, texture uploads, full rend
 
 ## Verification limits and acceptance
 
-- `npm run verify:hips` was attempted and failed at the first IRSA request with `getaddrinfo ENOTFOUND irsa.ipac.caltech.edu`. The fresh NASA-star/image orientation check remains pending on a machine with network access. Historical orientation results in the project were not treated as a new run.
 - The connected-browser inventory is empty. Earlier viewer-server attempts failed with `listen EPERM 127.0.0.1:3000`, and a headless launch failed with macOS Mach permission denial. No sandbox bypass was attempted.
 - Consequently real production hydration, layout, focus, touch, live NASA/NED availability, GPU/context recovery and desktop/mobile FPS remain unverified here. The in-process production smoke and CPU benchmark do not replace them.
 

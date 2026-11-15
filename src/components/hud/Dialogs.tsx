@@ -3,7 +3,6 @@
 import { type ReactNode, useCallback, useEffect, useRef } from 'react';
 import { useNav } from '@/lib/store';
 import { PLATFORM_CREDITS, SURVEYS, SURVEY_ORDER } from '@/lib/sky/surveys';
-import { PLANET_SOURCES } from '@/lib/sky/planets';
 import { INTRO_IMAGE_SOURCES } from '@/components/intro/imagery';
 
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
@@ -38,7 +37,7 @@ function Credits() {
   return (
     <>
       <p>
-        Sky images stream from NASA/IPAC IRSA. Featured places and exoplanet hosts use bundled position snapshots; other galaxy names are looked up in NED.
+        Sky images stream from NASA/IPAC IRSA. Featured places use bundled position snapshots; other galaxy names are looked up in NED.
         Reference directions use the coordinate definitions recorded with each target.
       </p>
       <h3>Sky surveys</h3>
@@ -76,8 +75,8 @@ function Credits() {
         </p>
       ))}
       {retrievedAt && <p className="muted small">Pin data snapshot retrieved {new Date(retrievedAt).toUTCString()}.</p>}
-      <h3>Solar System intro</h3>
-      {[...PLANET_SOURCES, ...INTRO_IMAGE_SOURCES].map((c) => (
+      <h3>SPHEREx intro</h3>
+      {INTRO_IMAGE_SOURCES.map((c) => (
         <p key={c.label}>
           <strong>{c.label}.</strong> {c.text}{' '}
           <a href={c.url} target="_blank" rel="noreferrer">
@@ -114,12 +113,12 @@ function Help() {
       <h3>Try an exploration</h3>
       <ol>
         <li>Open <strong>Places</strong> and choose Andromeda, or search for <strong>M31</strong>. In the Expert layout, featured places are in the left rail.</li>
-        <li>Open <strong>Telescope</strong> (<strong>Layers</strong> in the Expert layout) and compare SPHEREx wavelengths, then try the 2MASS or AllWISE colour composites.</li>
+        <li>Open <strong>Telescope</strong> (<strong>Layers</strong> in the Expert layout) and explore SPHEREx wavelengths.</li>
         <li>The loading message names the requested layer and the image still on screen. Image sources follow the layer actually displayed.</li>
         <li>Copy a link to this view from <strong>Settings</strong> (<strong>Share view</strong> in the Expert layout). It keeps the coordinates, zoom and selected layer; it does not restore a target lock.</li>
       </ol>
       <h3>Search formats</h3>
-      <p>Search featured places or host stars by name. Other galaxy names use NED. Enter ICRS coordinates as decimal degrees, for example <code>10.68, +41.27</code>, or hours and degrees: <code>00 42 44 +41 16 09</code>.</p>
+      <p>Search featured places by name. Other galaxy names use NED. Enter ICRS coordinates as decimal degrees, for example <code>10.68, +41.27</code>, or hours and degrees: <code>00 42 44 +41 16 09</code>.</p>
       <details>
         <summary>How positions and precision work</summary>
         <h3>Coordinates</h3>
@@ -135,7 +134,7 @@ function Help() {
         </p>
         <h3>Precision</h3>
         <p>
-          Digits follow the real uncertainty: the larger of one screen pixel and one survey pixel (SPHEREx 12.9″, AllWISE 1.6″, 2MASS 0.8″). Lock
+          Digits follow the real uncertainty: the larger of one screen pixel and one survey pixel (SPHEREx 12.9″). Lock
           becomes available at a 1° field of view or closer, once the selected sky layer is ready.
         </p>
       </details>

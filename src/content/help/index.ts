@@ -20,9 +20,6 @@ const SOURCE = {
     label: 'The map tiles: SPHEREx all-sky cube (IRSA)',
     url: 'https://irsa.ipac.caltech.edu/data/hips/SPHEREx/spherex_allsky_cube/properties',
   },
-  exoplanets: { label: 'NASA Exoplanet Archive', url: 'https://exoplanetarchive.ipac.caltech.edu/' },
-  twomass: { label: '2MASS survey (IRSA)', url: 'https://irsa.ipac.caltech.edu/Missions/2mass.html' },
-  wise: { label: 'WISE and AllWISE (IRSA)', url: 'https://irsa.ipac.caltech.edu/Missions/wise.html' },
   spherexAccess: {
     label: 'How SPHEREx photos are archived (IRSA)',
     url: 'https://irsa.ipac.caltech.edu/spherex-archive-documentation/spherex-data-access/',
@@ -36,13 +33,6 @@ const SOURCE = {
     url: 'https://irsa.ipac.caltech.edu/spherex-archive-documentation/spherex-data-releases/',
   },
   ned: { label: 'NASA/IPAC Extragalactic Database (NED)', url: 'https://ned.ipac.caltech.edu/' },
-  planetPositions: {
-    label: 'Approximate positions of the planets (NASA JPL)',
-    url: 'https://ssd.jpl.nasa.gov/planets/approx_pos.html',
-  },
-  planetFacts: { label: 'Planetary fact sheets (NASA)', url: 'https://nssdc.gsfc.nasa.gov/planetary/factsheet/' },
-  nasaImages: { label: 'NASA Image and Video Library', url: 'https://images.nasa.gov/' },
-  sdo: { label: 'Solar Dynamics Observatory (NASA)', url: 'https://sdo.gsfc.nasa.gov/' },
 } satisfies Record<string, HelpSource>;
 
 /** Screens in the order a visitor meets them. */
@@ -56,9 +46,9 @@ export const HELP: Record<HelpScreenId, HelpScreen> = {
       paragraphs: [
         'Imagine standing at the center of a giant ball with the whole sky painted on the inside. This map is stitched together from photos taken by NASA’s SPHEREx space telescope from April 2025 to May 2026. It shows directions, not distances, so a nearby star and a far-off galaxy can sit side by side.',
         'The bright band across the sky is the Milky Way, our home galaxy, seen from inside its flat disk. Its center is about 26,000 light-years away, toward the constellation Sagittarius. Dust hides the center from our eyes, but infrared light, which we cannot see, gets through dust better than visible light.',
-        'SPHEREx launched in March 2025 and maps the whole sky every six months, in 102 infrared colors. The SPHEREx map shows one color at a time, in black and white, and you can pick which. Orange dots mark stars with known planets, as listed in the NASA Exoplanet Archive.',
+        'SPHEREx launched in March 2025 and maps the whole sky every six months, in 102 infrared colors. The SPHEREx map shows one color at a time, in black and white, and you can pick which. Named markers help you visit galaxies, stars and deep fields.',
       ],
-      sources: [SOURCE.spherexMission, SOURCE.spherexMap, SOURCE.spherexTiles, SOURCE.exoplanets, SOURCE.twomass, SOURCE.wise],
+      sources: [SOURCE.spherexMission, SOURCE.spherexMap, SOURCE.spherexTiles],
     },
     steps: [
       {
@@ -74,40 +64,25 @@ export const HELP: Record<HelpScreenId, HelpScreen> = {
       {
         tour: 'dock-telescope',
         title: 'Change how it is seen',
-        text: 'See the same sky through other telescopes, or pick another infrared color. Each one shows different details.',
+        text: 'Pick another SPHEREx infrared color. Each wavelength shows different details in the same region.',
       },
     ],
   },
 
   intro: {
     id: 'intro',
-    title: 'The Solar System from above',
+    title: 'The sky through SPHEREx',
     science: {
       paragraphs: [
-        'The planets travel around the Sun at different speeds. The closer a planet is to the Sun, the faster it moves. Earth takes one year to go around once.',
-        'Nearby things, like the planets, move against the background of stars. Things much farther away, like stars and galaxies, seem to stay in place. So a map of the sky can show them in fixed places.',
-        'Each planet is drawn in its real direction from the Sun on the date shown. Sizes and distances are not to scale, so that everything fits on one screen. Seen from above, each planet is half in sunlight and half in shadow.',
-        'The pictures are real NASA photos. The Sun is a recent image from the Solar Dynamics Observatory. The planets come from missions such as Cassini and Voyager 2.',
-        'Behind them is the real sky beyond the Sun, seen from above the Solar System and mapped by SPHEREx. The two hazy patches to the lower right of the Sun are small galaxies, the Magellanic Clouds.',
+        'SPHEREx maps the sky in infrared light. Stars, dust and galaxies appear in its all-sky map.',
+        'The opening image is a projection of the SPHEREx DR1 map around the south ecliptic pole. It shows the 2.19 micrometre channel.',
+        'Enter the navigator to explore the sky, change SPHEREx wavelengths and inspect individual observations of a chosen region.',
       ],
-      sources: [SOURCE.planetPositions, SOURCE.planetFacts, SOURCE.nasaImages, SOURCE.sdo, SOURCE.spherexTiles],
+      sources: [SOURCE.spherexMission, SOURCE.spherexTiles],
     },
     steps: [
-      {
-        tour: 'intro-orbits',
-        title: 'Planets on the move',
-        text: 'Each planet travels around the Sun on its own path. Planets closer to the Sun go around faster.',
-      },
-      {
-        tour: 'intro-scale',
-        title: 'Not to scale',
-        text: 'Planet sizes are enlarged and distances squeezed, so that everything fits on one screen.',
-      },
-      {
-        tour: 'intro-cta',
-        title: 'On to the sky',
-        text: 'When you are ready, look out from Earth at the infrared sky map made from SPHEREx photos.',
-      },
+      { tour: 'intro-sky', title: 'An infrared view', text: 'This image comes from the SPHEREx all-sky map.' },
+      { tour: 'intro-cta', title: 'Explore the sky', text: 'Open the navigator to choose a region and view its SPHEREx observations.' },
     ],
   },
 
@@ -202,11 +177,11 @@ export const GLOSSARY: GlossaryEntry[] = [
   },
   {
     term: 'Telescope survey',
-    definition: 'A project that photographs large areas of the sky the same way, so the photos join into one map. 2MASS used ground telescopes in Arizona and Chile in 1997–2001. AllWISE is made from photos taken by NASA’s WISE satellite in 2010–2011.',
+    definition: 'A project that photographs large areas of the sky the same way, so the photos join into one map. SPHEREx observes the sky in infrared light.',
   },
   {
     term: 'Exoplanet',
-    definition: 'A planet that travels around a star other than the Sun. Orange dots on the map mark stars with known exoplanets.',
+    definition: 'A planet that travels around a star other than the Sun.',
   },
   {
     term: 'Field of view',

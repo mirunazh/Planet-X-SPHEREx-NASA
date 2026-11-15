@@ -33,7 +33,7 @@ Run `npm run dev` in this repository and open <http://localhost:3000>.
 1. Wait for the initial SPHEREx image. The layer panel should say **Showing SPHEREx · 2.189 µm**.
 2. Keep the camera stationary. Click several wavelength presets quickly, ending on **4.60 µm**. Until that preview is ready, **Loading** should name the requested band and **Showing** should name the retained band. The final image, coordinate readout and minimap should all settle on SPHEREx at **4.600 µm**.
 3. Search for M31 and zoom to around 0.5° so detailed tiles appear. Repeat rapid band changes. Watch for fragments of one band over another: all tiles and the preview must belong to the same displayed band.
-4. Switch rapidly between SPHEREx, 2MASS and AllWISE, finishing on 2MASS. The final viewport, readout and minimap must all use 2MASS, even if an earlier SPHEREx request finishes later.
+4. Switch rapidly between SPHEREx wavelengths, finishing at 4.60 µm. The final viewport, readout and minimap must all use that wavelength, even if an earlier request finishes later.
 5. If browser developer tools are available, enable a slow network profile and repeat steps 2–4. Then block the requested Allsky image or go offline and select an uncached band. An error should appear while the previous image remains visible. Restore connectivity, remove any request block and click **Retry layer**. The requested image should replace the retained one.
 6. At FOV ≤ 1°, confirm **Lock target** is unavailable while a new band loads or fails, then available when the selected image is ready. Lock and copy its JSON; the layer wavelength must match the displayed band.
 7. Reload the URL after a successful change. Confirm the requested selection and the final displayed image match.

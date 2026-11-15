@@ -1,230 +1,61 @@
-# Image sources and processing pipeline
+# SPHEREx images and processing
 
-**Version:** v0.1, draft. Written 2026-11-14 (Europe/Bucharest).
-**Purpose:** record which images we use, why we chose them, how we filter them and how we process them. This document is the source material for the project presentation.
-**Companion:** [plan-sky-navigator.md](plan-sky-navigator.md), which covers how the user chooses a target.
+The application displays SPHEREx images only. NASA/IPAC IRSA is the archive used for maps, spectral images and cutouts. Named-place coordinates come from recorded NED, IRSA and IAU reference metadata; the two named-star reference positions retain their NASA Exoplanet Archive provenance.
 
-> **Status (15 Nov 2026): sections 3–5 are the plan, not this build.** The Compare page shows SPHEREx exposures of one square of sky, aligned north-up, with honest captions. It does not yet compute the wavelength at the target, subtract zodiacal light, propagate Gaia positions, label asteroids or check detectability. Talking points 3–6 in section 7 depend on that roadmap.
+## Data used now
 
----
+| Surface | SPHEREx product | Access |
+| --- | --- | --- |
+| Navigator | DR1 all-sky spectral cube, 102 channels | HiPS tiles streamed from IRSA |
+| Introduction | DR1 map projection around the south ecliptic pole, 2.19 µm | Bundled JPEG generated from SPHEREx HiPS |
+| Slideshow | Individual spectral images from DR1 and QR3 | IRSA SIA metadata, followed by FITS cutouts |
+| Weekly challenge | Up to twelve prepared images of the M101 region | Persistent server-side PNG cache |
 
-## 1. Principle: one NASA hub
+The map and slideshow have different resolutions and loading paths. Map pixels are about 12.9 arcseconds; deeper zoom magnifies them. Individual exposure cutouts are processed separately and are not substituted into the map.
 
-Every image and every reference catalogue in our comparison view comes from **NASA archives**. We access them through **one hub: IRSA, the NASA/IPAC Infrared Science Archive**. Three NASA services complement it:
+## Navigator and introduction
 
-| Service | Operator | What we use it for |
-|---|---|---|
-| **IRSA** (hub) | NASA/IPAC (Caltech) | All images, all reference catalogues, sky tiles |
-| **NED** | NASA/IPAC | Converting object names to coordinates (galaxies) |
-| **NASA Exoplanet Archive** | NASA/IPAC (NExScI) | Exoplanet host-star pins in the navigator |
-| **JPL Small-Body Identification API (SB-Ident)** | NASA JPL Solar System Dynamics | Known asteroids and comets in a field at a given time |
+The browser requests SPHEREx HiPS tiles from:
 
-**Why centralise?**
-
-- **One protocol set.** IVOA standards everywhere: TAP/ADQL queries, the ObsCore metadata model, SIA image search, server-side cutouts and HiPS sky tiles. One client library covers every mission.
-- **Provenance.** Releases are versioned and carry DOIs, so every image we show can be traced to an exact file.
-- **Consistency.** Calibrated, documented releases from the mission teams. We never mix in unknown reprocessing.
-- **Reliability and performance.** IRSA is CORS-enabled for browsers and mirrors key datasets to AWS (`nasa-irsa-spherex`, `nasa-irsa-wise`, `nasa-irsa-spitzer`) with anonymous access.
-- **Legal clarity.** NASA data with published acknowledgement text, so there's no licensing ambiguity.
-- **Story.** It is NASA's own record of the same sky across 25 years.
-
-**Verified on 2026-11-14:** IRSA holds every dataset below. That includes Gaia DR3 (`gaia_dr3_source`), which is ESA data served by NASA's archive and is listed by the challenge under NASA resources.
-
----
-
-## 2. Source selection
-
-### 2.1 Selection criteria
-
-1. **NASA data**, served by a NASA archive.
-2. **All-sky coverage.** Users can pick any coordinate, so every core source must cover it.
-3. **Wavelength overlap with SPHEREx (0.75–5.0 µm).** This lets us compare like with like.
-4. **Adds a time baseline.** Older epochs make motion and variability visible.
-5. **Calibrated, documented, versioned releases**, available through standard services at IRSA.
-
-### 2.2 Decision matrix
-
-| Candidate | NASA | All-sky | Inside 0.75–5 µm | Epoch(s) | At IRSA | Decision |
-|---|---|---|---|---|---|---|
-| SPHEREx Level 2 spectral images (DR1 + QR3) | ✓ | ✓ | ✓ (102 channels) | 2025–2026 | ✓ | **Core: primary science images** |
-| SPHEREx DR1 all-sky spectral cube | ✓ | ✓ | ✓ | 2025-04 → 2026-05, combined | ✓ | **Core: fast colour overview** |
-| NEOWISE-R single exposures (L1b) | ✓ | ✓ | ✓ (W1 3.4 µm, most of W2 4.6 µm) | Dec 2013 – Aug 2024, about 2 visits a year | ✓ | **Core: recent time baseline** |
-| WISE 2010 cryogenic exposures + AllWISE Atlas | ✓ | ✓ | ✓ (W1, W2; W3/W4 are outside) | 2010–2011 | ✓ | **Core: first WISE epoch** |
-| 2MASS All-Sky Atlas images | ✓ (NASA/NSF) | ✓ | ✓ (J 1.24, H 1.66, Ks 2.16 µm) | 1997–2001 | ✓ | **Core: oldest epoch** |
-| Spitzer IRAC | ✓ | ✗ (partial) | ✓ (3.6, 4.5 µm) | 2003–2020 | ✓ | Optional extra epochs where available |
-| unWISE time-resolved coadds (unwise.me, used by WiseView) | Derived from NASA data | ✓ | ✓ | 2010 → | ✗ (hosted at NERSC) | **Not used.** We rebuild epoch stacks from NASA's NEOWISE L1b at IRSA |
-| NEOSSat (CSA, via CADC) | ✗ | ✗ (targeted 0.85° fields) | ✗ (optical) | 2013 → | ✗ | **Not core.** Possible later extension for asteroid follow-up |
-| GALEX | ✓ | partial | ✗ (ultraviolet) | 2003–2013 | HiPS only | Navigator colour layer only |
-| DSS, SDSS, Planck, Herschel, DENIS, MSX | ✗ | — | — | — | — | Excluded (not NASA) |
-
-### 2.3 Chosen image sources: technical detail
-
-| Role | Dataset | Pixel scale | IRSA access (verified) |
-|---|---|---|---|
-| Primary science | SPHEREx Level 2 spectral images, 2040×2040 MEF (IMAGE, FLAGS, VARIANCE, ZODI, EPSF, WCS-WAVE) | 6.15″ | ObsCore collections `spherex_dr1`, `spherex_qr3`, `spherex_dr1_deep`, `spherex_qr3_deep`. TAP `spherex.plane` ⋈ `spherex.artifact` (columns `time_bounds_lower/upper`, `energy_bounds_lower/upper`, `energy_bandpassname`). Cutouts via `{uri}?center=RA,Decd&size=deg`. S3 `nasa-irsa-spherex/{dr1,qr3}/` |
-| Colour overview | SPHEREx DR1 all-sky cube (102 frames) | 12.9″ | ObsCore `spherex_dr1_cube`; HiPS `…/hips/SPHEREx/spherex_allsky_cube` |
-| Recent epochs | NEOWISE-R L1b frames, W1/W2 | 2.75″ | ObsCore `neowiser`. Frame metadata `neowiser_p1bs_frm`; image inventory `wise.neowiser_p1bm_frm` |
-| First WISE epoch | WISE All-Sky (cryogenic) L1b + AllWISE Atlas | 2.75″ / 1.375″ | ObsCore `wise_allsky`, `wise_3bandcryo`, `wise_2bandcryo`, `wise_allwise`. Atlas inventory `allwise_p3am_cdd` |
-| Oldest epoch | 2MASS All-Sky Release Atlas images, J/H/Ks | 1″ | ObsCore `twomass_allsky`; metadata `twomass.allsky_images` (observation date, filter, telescope) |
-
-### 2.4 Reference catalogues (to recognise what is already known)
-
-| Purpose | Catalogue | IRSA table | Use |
-|---|---|---|---|
-| Known stars, with motion | Gaia DR3 | `gaia_dr3_source` | Propagate positions from J2016.0 to each image epoch |
-| Optical ↔ infrared link | Gaia DR3–AllWISE best neighbour | `gaia_dr3_allwise_best_neighbour` | Ready-made cross-match |
-| Known infrared sources and motions | CatWISE2020; AllWISE; unWISE catalogue | `catwise_2020`, `allwise_p3as_psd`, `unwise_2019` | IR counterparts; CatWISE proper motions |
-| Near-infrared sources, 1997–2001 | 2MASS PSC / XSC | `fp_psc`, `fp_xsc` | Oldest-epoch counterparts |
-| Known asteroids in NEOWISE frames | NEOWISE-R known SSO association list | `neowiser_p1ba_mch` | Flag moving objects (read the caution README first) |
-| Known asteroids in any field and time | JPL SB-Ident | `https://ssd-api.jpl.nasa.gov/sb_ident.api` | Supports spacecraft observers through a geocentric state vector |
-| Every image that caught a given asteroid | IRSA Moving Object Search Tool (MOST) | IRSA application | Covers SPHEREx, WISE/NEOWISE, 2MASS, Spitzer, ZTF |
-
----
-
-## 3. Filtering: what gets into a comparison
-
-Each filter stage exists for a stated reason. Each stage also records what it removed, so the user can always ask "why isn't image X here?"
-
-| # | Filter | Rule (initial, to be tuned) | Why |
-|---|---|---|---|
-| 1 | **Release** | SPHEREx DR1 + QR3 only (QR1 retired, QR2 superseded). Final WISE, NEOWISE and 2MASS releases. Record the version per file | Reproducibility; never mix calibrations |
-| 2 | **Footprint** | The image polygon must contain the target (`CONTAINS(POINT('ICRS', ra, dec), poly)`), and the target must be at least one cutout half-width from the detector edge | Avoid edge artefacts and partial cutouts |
-| 3 | **Wavelength** (SPHEREx) | Compute the wavelength at the target pixel from the spectral WCS. Keep an exposure only if that wavelength falls inside the comparison filter's bandpass (2MASS J/H/Ks, WISE W1/W2), using the official response curves | SPHEREx's filter varies across the detector, so each exposure sees the target at a different wavelength. Compare like with like |
-| 4 | **Time grouping** | Group exposures into epochs: SPHEREx survey passes (~6 months), NEOWISE visits (~6-monthly, many frames each), WISE 2010, 2MASS (single epoch). Use `time_bounds_*`, `mjd` and `ordate` | Stack within an epoch for depth; compare across epochs for change |
-| 5 | **Quality: SPHEREx** | Mask pixels using the FLAGS bitmask (bit list from Explanatory Supplement Table 16: saturation, bad pixels, `STREAK` satellite trails, `SATELLITE_HALO`, etc.). Reject an exposure if the target pixel is flagged | Artefacts are the main source of false "discoveries" |
-| 5 | **Quality: NEOWISE/WISE** | `qual_frame > 0`, `qi_fact > 0`, `saa_sep > 0`, `moon_masked = 0` in the band used (initial cut; check against the NEOWISE Explanatory Supplement) | Removes frames affected by moonlight, South Atlantic Anomaly radiation or poor image quality |
-| 6 | **Known objects** | Label (never silently delete): Gaia DR3 stars propagated to each epoch, CatWISE/AllWISE/2MASS counterparts, and SB-Ident asteroids at each exposure time | A discovery is what remains after subtracting the known |
-| 7 | **Detectability** | A source counts as appearing or disappearing only if it lies above that epoch's detection limit (from VARIANCE / uncertainty maps) | Absence is not disappearance. Older surveys are shallower |
-
----
-
-## 4. Process: from coordinate to comparison
-
-```mermaid
-flowchart TD
-  A["SkyTarget from navigator"] --> B["Discover: one ObsCore/TAP query per collection at IRSA"]
-  B --> C["Filter: release, footprint, wavelength, time, quality"]
-  C --> D["Fetch: IRSA cutout service or S3 range reads"]
-  D --> E["Calibrate: units, zodi and background removal, masks"]
-  E --> F["Align and match: WCS reprojection, PSF match, bandpass match"]
-  F --> G["Stack per epoch and band"]
-  G --> H["Build comparisons: blink, difference, two-epoch RGB, colour flip"]
-  H --> I["Annotate known objects: Gaia DR3, CatWISE, 2MASS, JPL SB-Ident"]
-  I --> J["Package with provenance manifest and credits"]
+```text
+https://irsa.ipac.caltech.edu/data/hips/SPHEREx/spherex_allsky_cube
 ```
 
-| Step | What happens | Tools / services |
-|---|---|---|
-| 1. Target | Receive a `SkyTarget` (ICRS position, field of view, uncertainty) from the navigator | — |
-| 2. Discover | List every image covering the target in each core collection, with time, wavelength and version | IRSA TAP / SIA (`astroquery.ipac.irsa`, `pyvo`) |
-| 3. Filter | Apply section 3, stages 1–5 | Metadata only, so it's fast |
-| 4. Fetch | Download small cutouts (e.g. 0.1–0.25°) instead of full files (~70 MB per SPHEREx image) | IRSA cutout service; S3 `nasa-irsa-spherex` for bulk |
-| 5. Calibrate | Use common units. Subtract SPHEREx's modelled zodiacal light (ZODI layer, not pre-subtracted) and the local background. Apply masks | `astropy`, `photutils` |
-| 6. Align | Reproject every cutout onto one tangent-plane grid centred on the target. Use the images' world coordinate systems (WCS), **not** generic computer-vision feature matching | `reproject` |
-| 7. Match | Convolve sharper images (2MASS ~1″ pixels, WISE ~6″ PSF) to SPHEREx's PSF (ePSF, version ≥ 7). Build synthetic J/H/Ks/W1/W2 images from SPHEREx channels, weighted by each filter's response curve | `astropy.convolution`, response curves from mission documentation |
-| 8. Stack | Inverse-variance weighted, masked stacks per epoch and per band | `numpy`, `astropy` |
-| 9. Compare | Blink sequences, difference images, two-epoch colour composites, SPHEREx wavelength flips. Display stretch (asinh) with stored parameters | Our pipeline; GPU shaders in the app |
-| 10. Annotate | Overlay known objects at each epoch, with proper motion applied | IRSA TAP (Gaia DR3, CatWISE, 2MASS), JPL SB-Ident |
-| 11. Package | Write the provenance manifest (section 5) plus credits | — |
-| 12. Serve | **Hackathon:** precompute the curated targets offline in Python and ship static assets with the Next.js app. **Later:** async jobs running next to the data on AWS (us-east-1) | Python scripts, then a job queue |
+`src/lib/sky/surveys.ts` defines the single supported survey, wavelengths, usable channels and credits. The wavelength slider skips the two blank channels.
 
-**Example story this pipeline enables:** one target seen by four NASA missions across 25 years at the same wavelength. 2MASS Ks (~1999) → WISE W1/W2 (2010) → NEOWISE W1/W2 (2014–2024) → SPHEREx synthetic Ks/W1/W2 plus its full spectrum (2025–2026).
+`npm run data:intro` rebuilds the bundled introduction projection. `public/intro/sources.json` records the SPHEREx source, channel, projection, processing and retrieval time. A small gap in the original map is filled with the local sky level for display and is described in the introduction. This projection is for orientation, not measurement.
 
----
+## Slideshow processing
 
-## 5. Provenance manifest
+1. Choose an ICRS position and a square width between 0.5 and 30 arcminutes.
+2. The Python service queries IRSA SIA for `spherex_dr1` and `spherex_qr3`. Its search circle encloses the requested square.
+3. Versioned metadata pages retain product URLs, collection, detector range and observation dates.
+4. The service requests a FITS cutout for the current exposure, reads its `IMAGE` extension and celestial WCS, and resamples onto a common north-up/east-left grid.
+5. A per-image asinh contrast stretch produces a display PNG; missing pixels remain transparent.
+6. The browser displays the current frame and preloads one successor. PNGs are cached separately from metadata.
 
-Every comparison carries its "passport". The structure is below; the values shown are **illustrative**.
+The slideshow labels the spectral interval as a detector range: the precise wavelength at the target position is not computed in this stage. Per-frame brightness differences cannot establish variability because display contrast and wavelength can differ. Overlay, subtraction, source classification and automated discovery are future work.
 
-```json
-{
-  "target": { "ra": 0.0, "dec": 0.0, "frame": "ICRS", "fovDeg": 0.25 },
-  "inputs": [
-    {
-      "mission": "SPHEREx", "collection": "spherex_dr1", "release": "DR1",
-      "doi": "10.26131/IRSA678", "file": "<IRSA uri>", "version": "<VERSION header>",
-      "mjd": [0, 0], "wavelengthUm": 0.0, "detector": "D2", "flagsRejected": 0
-    },
-    {
-      "mission": "NEOWISE", "collection": "neowiser", "band": "W2",
-      "file": "<IRSA uri>", "mjd": 0, "qual_frame": 0
-    },
-    {
-      "mission": "2MASS", "collection": "twomass_allsky", "band": "Ks",
-      "file": "<IRSA uri>", "ordate": "<date>"
-    }
-  ],
-  "steps": [
-    { "name": "zodi_subtract", "params": {} },
-    { "name": "reproject", "params": { "pixelScaleArcsec": 6.15 } },
-    { "name": "psf_match", "params": { "targetPsf": "SPHEREx ePSF" } },
-    { "name": "stack", "params": { "weighting": "inverse-variance" } },
-    { "name": "stretch", "params": { "function": "asinh", "min": 0, "max": 0 } }
-  ],
-  "knownObjects": { "gaia_dr3": 0, "catwise_2020": 0, "sb_ident": 0 },
-  "software": { "pipeline": "<git sha>", "astropy": "<version>" },
-  "createdAt": "<ISO 8601 UTC>"
-}
-```
+## Weekly challenge
 
----
+The challenge keeps the same 6′ square around M101. Its week starts Monday at 00:00 UTC; background archive checks are due every six hours while the service runs. IRSA errors can delay them.
 
-## 6. Credits we must display
+The first successful inventory establishes the baseline. Products first seen later are counted for the current week, separately from their observation dates. Up to twelve usable frames are selected across dates in one detector range, preferring D3, and stored in a dedicated persistent cache. Existing prepared frames remain available during refreshes.
 
-Use the acknowledgement text that IRSA publishes for each dataset. Don't paraphrase.
+## Provenance and credits
 
-| Dataset | Credit |
-|---|---|
-| SPHEREx | Acknowledgement sentence on the [IRSA SPHEREx page](https://irsa.ipac.caltech.edu/Missions/spherex.html). DOIs: DR1 spectral images `10.26131/IRSA678`, DR1 all-sky cube `10.26131/IRSA679`, QR3 `10.26131/IRSA662` |
-| WISE / NEOWISE | [IRSA WISE page](https://irsa.ipac.caltech.edu/Missions/wise.html) |
-| 2MASS | [IRSA 2MASS page](https://irsa.ipac.caltech.edu/Missions/2mass.html) |
-| IRSA | IRSA's standard archive acknowledgement |
-| Gaia DR3 | ESA/Gaia/DPAC credit and citation instructions |
-| JPL SB-Ident | NASA JPL Solar System Dynamics |
-| NED / NASA Exoplanet Archive | Their published acknowledgements |
+- SPHEREx: NASA/JPL-Caltech; SPHEREx Science Data Center, Caltech/IPAC.
+- Archive: NASA/IPAC Infrared Science Archive.
+- Coordinate reference services: NED, the NASA Exoplanet Archive for the named-star positions, and recorded IAU coordinate definitions.
+- Image provenance is preserved; display transformations are labelled rather than presented as raw science pixels.
 
-### 6.1 Solar System intro imagery
+The project is not endorsed by NASA.
 
-The intro shows NASA pictures only, so the first screen looks like the data that follows. `npm run data:intro` (`scripts/build-intro-imagery.mjs`) rebuilds them into `public/intro/`. `public/intro/sources.json` records each file's source URL, credit, date and processing.
+## References
 
-| Picture | Source | Credit |
-|---|---|---|
-| Sky behind the planets | SPHEREx DR1 all-sky HiPS at IRSA, frame 46 (2.19 µm), the same tiles the map opens on | NASA/JPL-Caltech (SPHEREx), Caltech/IPAC |
-| Sun | SDO/AIA 171 Å browse image, 15 Nov 2026 06:26 UT | NASA/SDO and the AIA science team |
-| Earth | DSCOVR EPIC natural colour, 12 Nov 2026 10:51 UTC | NASA EPIC Team |
-| Mercury, Venus, Mars | MESSENGER PIA15160, Mariner 10 PIA23791, Viking PIA00407 | NASA/JHUAPL/CIW; NASA/JPL-Caltech; NASA/JPL/USGS |
-| Jupiter, Saturn | Cassini PIA02873, PIA21046 | NASA/JPL/University of Arizona; NASA/JPL-Caltech/SSI |
-| Uranus, Neptune | Voyager 2 PIA18182, PIA00046 | NASA/JPL-Caltech; NASA/JPL |
-
-Science choices:
-
-- **The backdrop is the sky in the real direction.** The orrery looks down from the north ecliptic pole, so the stars behind the Sun are those around the south ecliptic pole. The script reprojects SPHEREx tiles stereographically around that pole, with ecliptic longitude 0° to the right as in the orrery. The Large and Small Magellanic Clouds and the Milky Way therefore appear where they really are. Only the angular scale is a display choice.
-- **One known gap, documented.** The DR1 all-sky HiPS has no data within about 2.2° of the south ecliptic pole. This is not the deep field, which SPHEREx placed 6.4° from the pole to avoid the Magellanic Clouds. Those pixels show the local median sky level, with no invented stars, and sit behind the Sun's glare.
-- **Dates.** For the mission photos, `sources.json` records the NASA Image Library's publication date (`published`), not when the photo was taken. Only the SDO and EPIC images carry an observation time (`taken`).
-- **Lighting follows the Sun.** Seen from above, every planet is half lit, so each photo is shaded on the side facing away from the Sun.
-- **Saturn's rings are open.** From above the ecliptic, the rings appear almost face-on, because Saturn's axis is tilted 26.7°. The Cassini view chosen (PIA21046) has open rings for that reason.
-
----
-
-## 7. Presentation talking points
-
-Points 3–6 describe the roadmap in sections 3–5; present them as next steps, not as features of this build.
-
-1. **One NASA hub.** "Every pixel comes from NASA's Infrared Science Archive. One archive, one set of standards, full traceability."
-2. **Four missions, 25 years, one sky.** "2MASS (1997–2001), WISE (2010), NEOWISE (2013–2024), SPHEREx (2025–2026)."
-3. **Like with like.** "SPHEREx sees 102 colours, so it can imitate the filters of the older missions. We compare the same wavelength across decades."
-4. **Subtract the known, keep the unknown.** "Gaia DR3, CatWISE, 2MASS and JPL's asteroid database label everything already catalogued."
-5. **Absence is not disappearance.** "We flag change only when the source would have been detectable in both epochs."
-6. **Every pixel carries its passport.** "Each comparison ships with a manifest of files, releases, DOIs and processing steps."
-7. **What we left out, and why.** "NEOSSat and unWISE are excellent, but targeted or hosted outside NASA. We centralised on NASA for consistency."
-
----
-
-## 8. Open items to verify
-
-- The exact SPHEREx FLAGS bit list (Explanatory Supplement Table 16; the PDF is over 10 MB, so read it locally).
-- NEOWISE frame-quality thresholds, checked against the NEOWISE Explanatory Supplement.
-- Official relative spectral response curves for 2MASS J/H/Ks and WISE W1/W2 (from the mission documentation at IRSA).
-- Whether SPHEREx headers carry the spacecraft position needed for JPL SB-Ident. If not, use IRSA MOST or a geocentric approximation with a wider search radius.
-- What IRSA's unWISE coadd metadata (`unwise.unwise_neo3_images`) offers as a static deep reference.
-- Per-epoch depth maps for the detectability filter.
+- [SPHEREx mission at IRSA](https://irsa.ipac.caltech.edu/Missions/spherex.html)
+- [SPHEREx all-sky HiPS properties](https://irsa.ipac.caltech.edu/data/hips/SPHEREx/spherex_allsky_cube/properties)
+- [SPHEREx first all-sky map](https://www.jpl.nasa.gov/images/pia26600-spherexs-first-all-sky-map/)
+- [SPHEREx data access](https://irsa.ipac.caltech.edu/spherex-archive-documentation/spherex-data-access/)
+- [SPHEREx releases](https://irsa.ipac.caltech.edu/spherex-archive-documentation/spherex-data-releases/)
+- [SPHEREx cutout tutorial](https://caltech-ipac.github.io/irsa-tutorials/spherex-cutouts/)

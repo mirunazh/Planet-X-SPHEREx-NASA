@@ -86,7 +86,7 @@ class RenderTests(unittest.TestCase):
         query = parse_qs(urlsplit(url).query)
         self.assertEqual(query["center"], ["359.9,-89deg"])
         self.assertEqual(query["gzip"], ["false"])
-        for value in ("https://evil.test/image.fits", "https://irsa.ipac.caltech.edu/ibe/data/wise/a.fits", "https://irsa.ipac.caltech.edu/ibe/data/spherex/%2e%2e/secret.fits"):
+        for value in ("https://evil.test/image.fits", "https://irsa.ipac.caltech.edu/ibe/data/unsupported/a.fits", "https://irsa.ipac.caltech.edu/ibe/data/spherex/%2e%2e/secret.fits"):
             with self.assertRaises(ValueError):
                 cutout_url({"accessUrl": value}, Search(0, 0, 10))
 

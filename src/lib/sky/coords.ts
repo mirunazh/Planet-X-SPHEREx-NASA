@@ -114,7 +114,7 @@ export function slerp(a: Vec3, b: Vec3, t: number): Vec3 {
 }
 
 /**
- * ICRS → Galactic rotation matrix (Hipparcos catalogue, ESA 1997, Vol. 1 §1.5.3).
+ * ICRS → Galactic rotation matrix in the standard ICRS galactic frame.
  * Each row is a galactic axis expressed in ICRS.
  */
 const ICRS_TO_GAL: readonly [Vec3, Vec3, Vec3] = [

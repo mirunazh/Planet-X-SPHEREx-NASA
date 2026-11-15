@@ -26,7 +26,7 @@ class InventoryTests(unittest.TestCase):
         self.assertEqual(Search(0, 0, 10).mission, "spherex")
         self.assertEqual(list(COLLECTIONS), ["spherex"])
         self.assertEqual(COLLECTIONS["spherex"], ("spherex_dr1", "spherex_qr3"))
-        for mission in ("wise", "twomass", "spitzer"):
+        for mission in ("unsupported", "unknown_survey", "invalid_mission"):
             with self.assertRaisesRegex(ValueError, "Only SPHEREx"):
                 Search(0, 0, 10, mission)
             self.assertIsNone(normalize(ROW, mission, "spherex_dr1", "source"))

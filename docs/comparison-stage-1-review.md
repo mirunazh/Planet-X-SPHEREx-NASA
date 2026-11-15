@@ -39,7 +39,7 @@ The SPHEREx-only revision also received independent review. Its unit tests confi
 
 The subsequent Docker-enabled check supersedes the runtime limitations above: both images now build and both containers run successfully. There were two web servers on port 3000: Docker on IPv4 and an existing Next.js dev server on IPv6. The browser's `localhost` reached the dev server, whose default inventory URL could not reach the unpublished Python container. Compose now publishes the Python service on `127.0.0.1:8000`; health checks through `localhost:3000`, `[::1]:3000`, and `127.0.0.1:3000` all return 200.
 
-Live IRSA discovery was then exercised for all four missions at the screenshot's position (210.86253°, 54.35504°, 10 arcmin). Queries received archive HTTP 502 errors or timeouts. A minimal 2MASS query returned a real VOTable row twice; the same query subsequently returned 502, so a trailing-slash URL variant was not adopted as a fix. An official-style AllWISE sample query and a minimal TAP catalog query also returned 502. Inventory availability is therefore still unverified as a reliable complete flow. The UI now distinguishes local connectivity, service timeout/invalid response, and archive failures; it does not attribute every error to Docker being stopped. Malformed JSON and invalid successful inventory contracts are rejected at the proxy boundary.
+Live SPHEREx discovery at the screenshot's position (210.86253°, 54.35504°, 10 arcmin) received archive HTTP 502 errors or timeouts. The UI distinguishes local connectivity, service timeout/invalid response and archive failures. Malformed JSON and invalid successful inventory contracts are rejected at the proxy boundary.
 
 From the project directory:
 

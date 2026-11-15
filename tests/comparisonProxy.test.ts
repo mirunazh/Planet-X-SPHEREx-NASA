@@ -8,7 +8,7 @@ describe('comparison same-origin API', () => {
     vi.stubGlobal('fetch', fetcher);
     expect((await comparisonProxy(new Request('http://localhost/api/comparison/inventory'), 'inventory')).status).toBe(200);
     expect((fetcher.mock.calls[0][0] as URL).searchParams.get('mission')).toBe('spherex');
-    for (const mission of ['wise', 'twomass', 'spitzer']) {
+    for (const mission of ['unsupported', 'unknown_survey', 'invalid_mission']) {
       const response = await comparisonProxy(new Request(`http://localhost/api/comparison/inventory?mission=${mission}`), 'inventory');
       expect(response.status).toBe(400);
       expect((await response.json()).detail).toContain('Only SPHEREx');
@@ -74,7 +74,7 @@ describe('background search API boundary', () => {
     expect(response.status).toBe(202);
     expect(JSON.parse(fetcher.mock.calls[0][1].body)).toEqual({ ra: 0, dec: 0, size: 10, mission: 'spherex' });
     expect((await comparisonProxy(post('{bad'), 'searches')).status).toBe(400);
-    expect((await comparisonProxy(post('{"mission":"wise"}'), 'searches')).status).toBe(400);
+    expect((await comparisonProxy(post('{"mission":"unsupported"}'), 'searches')).status).toBe(400);
     expect((await comparisonProxy(new Request('http://localhost/api/comparison/searches/abc'), 'searches/abc')).status).toBe(202);
     expect((await comparisonProxy(new Request('http://localhost/api/comparison/searches/abc?url=evil'), 'searches/abc')).status).toBe(400);
   });

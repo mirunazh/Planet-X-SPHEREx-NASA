@@ -25,8 +25,8 @@ export const allskyUrl = (survey: Survey, frame: number) =>
 /**
  * Tile pixel orientation. Inside a HEALPix cell, (ne, nw) ∈ [0, 1]² are measured
  * from the south corner. In the tile image, x (left → right) follows nw and
- * y (top → bottom) follows ne. Verified with 2MASS stars on SPHEREx and 2MASS
- * tiles by scripts/verify-hips-orientation.mjs (16/16 stars in both surveys).
+ * y (top → bottom) follows ne. The tile and Allsky corner transforms share
+ * this SPHEREx orientation and are covered by the addressing tests.
  */
 export function cellToImage(ne: number, nw: number): { x: number; y: number } {
   return { x: nw, y: ne };

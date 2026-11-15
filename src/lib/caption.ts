@@ -27,12 +27,6 @@ const NEAR_FOV_FRACTION = 0.25;
 /** Galactic latitude band, either side of the plane, described as "along the Milky Way". */
 const MILKY_WAY_HALF_WIDTH_DEG = 10;
 
-/**
- * 'NASA' is said only for NASA missions. 2MASS was a joint project of the University of
- * Massachusetts and IPAC/Caltech, funded by NASA and the NSF, so it keeps its own name.
- */
-const NASA_MISSION: Record<SurveyId, boolean> = { spherex: true, twomass: false, allwise: true };
-
 /** '2025-04-24 → 2026-05-14' → '2025–2026'; '1997–2001' stays as it is. Full dates remain in the credits. */
 function epochYears(epoch: string): string {
   const years = epoch.match(/\d{4}/g);
@@ -60,7 +54,7 @@ function placeName(center: Vec3, fov: number, targets: readonly Pin[]): string {
 
 function telescopeName(surveyId: SurveyId): string {
   const survey = SURVEYS[surveyId];
-  return `${NASA_MISSION[surveyId] ? 'NASA ' : ''}${survey.shortName} · infrared, ${epochYears(survey.epoch)}`;
+  return `NASA ${survey.shortName} · infrared, ${epochYears(survey.epoch)}`;
 }
 
 /** Describes the view in plain words, for example "Andromeda Galaxy (M31)" and "NASA SPHEREx · infrared, 2025–2026". */

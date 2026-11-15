@@ -13,12 +13,10 @@ describe('HiPS addressing', () => {
       'https://irsa.ipac.caltech.edu/data/hips/SPHEREx/spherex_allsky_cube/Norder5/Dir10000/Npix12345_46.png',
     );
     expect(tileUrl(SURVEYS.spherex, 3, 7, 0)).toMatch(/Norder3\/Dir0\/Npix7\.png$/);
-    expect(tileUrl(SURVEYS.twomass, 9, 1234567, 3)).toMatch(/2MASS\/Color\/Norder9\/Dir1230000\/Npix1234567\.jpg$/);
   });
 
   it('builds Allsky URLs', () => {
     expect(allskyUrl(SURVEYS.spherex, 10)).toMatch(/Norder3\/Allsky_10\.png$/);
-    expect(allskyUrl(SURVEYS.allwise, 0)).toMatch(/AllWISE\/RGB-W4-W2-W1\/Norder3\/Allsky\.jpg$/);
   });
 
   it('maps cell corners to image corners (x = nw, y = ne, verified orientation)', () => {

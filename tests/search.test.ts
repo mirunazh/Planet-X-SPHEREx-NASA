@@ -40,7 +40,7 @@ describe('demonstration search flow', () => {
     expect(searchIntent('400, 10', targets, []).kind).toBe('error');
     expect(searchIntent('', targets, []).kind).toBe('error');
     expect(searchIntent('x', targets, []).kind).toBe('error');
-    expect(searchIntent('2MASS J12345', targets, []).kind).toBe('name');
+    expect(searchIntent('NGC 12345', targets, []).kind).toBe('name');
   });
 
   it('creates a sourced pin from a valid NED response', async () => {

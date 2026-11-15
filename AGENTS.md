@@ -19,7 +19,6 @@ Use Node.js 20.9 or newer and install dependencies with `npm ci`.
 - `npm run typecheck`: run TypeScript checks without emitting files.
 - `npm test`: run the Vitest suite once.
 - `npm run data`: regenerate `public/data/*.json` from NASA services with provenance.
-- `npm run verify:hips`: validate tile orientation against NASA data; requires network access.
 
 ## Coding Style & Naming Conventions
 

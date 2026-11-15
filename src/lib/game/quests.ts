@@ -2,7 +2,7 @@
  * Sky quests: three small goals that each teach one idea. Completion rules live
  * in applyEvent (src/lib/game/store.ts); this file holds only the words.
  */
-export type QuestId = 'galaxy' | 'dust' | 'planets';
+export type QuestId = 'galaxy' | 'dust' | 'deep-field';
 
 export interface Quest {
   title: string;
@@ -12,7 +12,7 @@ export interface Quest {
   takeaway: string;
 }
 
-export const QUEST_ORDER: QuestId[] = ['galaxy', 'dust', 'planets'];
+export const QUEST_ORDER: QuestId[] = ['galaxy', 'dust', 'deep-field'];
 
 export const QUESTS: Record<QuestId, Quest> = {
   galaxy: {
@@ -21,13 +21,13 @@ export const QUESTS: Record<QuestId, Quest> = {
     takeaway: 'Galaxies like Andromeda are millions of light-years away, far beyond the stars of our own galaxy.',
   },
   dust: {
-    title: 'See the sky with two telescopes',
-    task: 'Switch to another telescope with the Telescope figurine.',
-    takeaway: 'Each telescope sees different infrared colors, so the same sky shows different details.',
+    title: 'Explore another SPHEREx color',
+    task: 'Choose another infrared color in the Telescope panel.',
+    takeaway: 'SPHEREx sees different infrared wavelengths, revealing different details in the same sky.',
   },
-  planets: {
-    title: 'Find a star with planets',
-    task: 'Tap an orange dot on the sky.',
-    takeaway: 'Orange dots mark stars with known planets. Most of those planets were detected indirectly, not photographed.',
+  'deep-field': {
+    title: 'Visit a SPHEREx deep field',
+    task: 'Visit a SPHEREx deep field from Places.',
+    takeaway: 'SPHEREx observes its deep fields repeatedly, building up more coverage of those regions.',
   },
 };

@@ -48,7 +48,7 @@ describe('equatorial vectors', () => {
   });
 });
 
-describe('galactic frame (Hipparcos definition)', () => {
+describe('galactic frame (standard ICRS definition)', () => {
   it('puts the galactic centre at l = 0, b = 0', () => {
     const { l, b } = radecToGalactic(266.40499, -28.93617);
     expect(Math.min(l, 360 - l)).toBeLessThan(2e-4);

@@ -2,7 +2,7 @@
   "name": "spherex-sky-navigator",
   "version": "0.1.0",
   "private": true,
-  "description": "Find My-style 3D navigator for the infrared sky, built only on NASA data (SPHEREx, 2MASS, WISE via NASA/IPAC IRSA).",
+  "description": "Explore the infrared sky using NASA SPHEREx data from NASA/IPAC IRSA.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -12,8 +12,7 @@
     "benchmark": "vitest bench --run",
     "test:production": "node scripts/test-production.mjs",
     "data": "node scripts/fetch-nasa-data.mjs",
-    "data:intro": "node scripts/build-intro-imagery.mjs",
-    "verify:hips": "node scripts/verify-hips-orientation.mjs"
+    "data:intro": "node scripts/build-intro-imagery.mjs"
   },
   "dependencies": {
     "@hscmap/healpix": "1.4.12",

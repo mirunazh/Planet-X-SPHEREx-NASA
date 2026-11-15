@@ -56,17 +56,11 @@ describe('describeView place', () => {
 });
 
 describe('describeView telescope', () => {
-  const telescope = (surveyId: 'spherex' | 'twomass' | 'allwise') =>
+  const telescope = (surveyId: 'spherex') =>
     describeView({ center: galactic(0, 0), fov: 60, surveyId, targets: [] }).telescope;
 
   it('names each survey in plain words, with the years it observed', () => {
     expect(telescope('spherex')).toBe('NASA SPHEREx · infrared, 2025–2026');
-    expect(telescope('twomass')).toBe('2MASS · infrared, 1997–2001');
-    expect(telescope('allwise')).toBe('NASA AllWISE · infrared, 2010–2011');
-  });
-
-  it('does not credit 2MASS to NASA alone', () => {
-    expect(telescope('twomass')).not.toMatch(/NASA/);
   });
 
   it('covers every registered survey with its short name', () => {

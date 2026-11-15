@@ -30,7 +30,7 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
             app.state.coordinator = coordinator
             try:
                 async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
-                    bad = await client.post('/searches', json={"ra": 0, "dec": 0, "size": 10, "mission": "wise"})
+                    bad = await client.post('/searches', json={"ra": 0, "dec": 0, "size": 10, "mission": "unsupported"})
                     self.assertEqual(bad.status_code, 400)
                     self.assertEqual((await client.post('/searches', json={"ra": 0, "dec": 0, "size": 10, "extra": True})).status_code, 422)
                     self.assertEqual((await client.post('/searches', json={"ra": 0, "dec": 91, "size": 10})).status_code, 400)

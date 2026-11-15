@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useNav } from '@/lib/store';
 import { buildViewUrl } from '@/lib/urlState';
 import { loadUiPreferences, markIntroSeen, shouldShowIntro, useUi } from '@/lib/ui';
-import { SolarSystemIntro } from '@/components/intro/SolarSystemIntro';
+import { SpherexIntro } from '@/components/intro/SpherexIntro';
 import { CoordinateReadout, PositionAnnouncer } from './CoordinateReadout';
 import { SearchBox } from './SearchBox';
 import { LayerPanel } from './LayerPanel';
@@ -102,7 +102,7 @@ export function Hud() {
   return (
     <>
       {expert ? <ExpertHud /> : <SimpleHud onReplayIntro={() => useUi.getState().setIntroOpen(true)} />}
-      {introOpen && <SolarSystemIntro onDone={finishIntro} />}
+      {introOpen && <SpherexIntro onDone={finishIntro} />}
     </>
   );
 }

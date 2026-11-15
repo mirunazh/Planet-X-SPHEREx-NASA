@@ -1,13 +1,12 @@
 // Builds the static data the navigator ships with, from NASA services only.
 // Every file records its provenance: service, query, URL and retrieval time.
 //
-//   public/data/exoplanet-hosts.json  NASA Exoplanet Archive (pscomppars)
 //   public/data/targets.json          NED positions, IRSA SPHEREx deep fields,
 //                                     IAU-defined reference points
 //
 // Run: npm run data
 
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile, readFile } from 'node:fs/promises';
 
 const OUT = new URL('../public/data/', import.meta.url);
 const HEADERS = { 'User-Agent': 'spherex-sky-navigator/0.1 (build-time data snapshot)' };
@@ -26,56 +25,6 @@ async function get(url, { timeoutMs = 120000, as = 'json' } = {}) {
 }
 
 const round = (v, d) => (v == null || Number.isNaN(Number(v)) ? null : Number(Number(v).toFixed(d)));
-
-// --- 1. Exoplanet host stars --------------------------------------------------
-const EA_TAP = 'https://exoplanetarchive.ipac.caltech.edu/TAP/sync';
-const EA_QUERY = 'select pl_name,hostname,ra,dec,sy_dist,sy_pnum,sy_kmag,disc_year,disc_facility from pscomppars';
-
-async function exoplanetHosts() {
-  const url = `${EA_TAP}?query=${encodeURIComponent(EA_QUERY)}&format=json`;
-  const rows = await get(url, { timeoutMs: 240000 });
-  const byHost = new Map();
-  for (const r of rows) {
-    if (r.ra == null || r.dec == null) continue;
-    let h = byHost.get(r.hostname);
-    if (!h) {
-      h = {
-        name: r.hostname,
-        ra: round(r.ra, 6),
-        dec: round(r.dec, 6),
-        distPc: round(r.sy_dist, 2),
-        planetCount: r.sy_pnum ?? null,
-        kmag: round(r.sy_kmag, 2),
-        planets: [],
-        firstDiscovery: r.disc_year ?? null,
-        facilities: new Set(),
-      };
-      byHost.set(r.hostname, h);
-    }
-    h.planets.push(r.pl_name);
-    if (r.disc_year && (!h.firstDiscovery || r.disc_year < h.firstDiscovery)) h.firstDiscovery = r.disc_year;
-    if (r.disc_facility) h.facilities.add(r.disc_facility);
-  }
-  const hosts = [...byHost.values()]
-    .map((h) => ({ ...h, planets: h.planets.sort(), facilities: [...h.facilities].sort() }))
-    .sort((a, b) => a.name.localeCompare(b.name));
-  return {
-    rows,
-    file: {
-      provenance: {
-        service: 'NASA Exoplanet Archive (NExScI / IPAC)',
-        endpoint: EA_TAP,
-        table: 'pscomppars',
-        query: EA_QUERY,
-        retrievedAt,
-        planetRows: rows.length,
-        hostCount: hosts.length,
-        note: 'One entry per host star; positions are the archive composite system positions (ICRS, degrees).',
-      },
-      hosts,
-    },
-  };
-}
 
 // --- 2. Featured targets ------------------------------------------------------
 const NED = 'https://ned.ipac.caltech.edu/srs/ObjectLookup';
@@ -148,8 +97,8 @@ function referencePoints() {
       ra: 266.40499,
       dec: -28.93617,
       fov: 10,
-      description: 'Origin of galactic coordinates (l = 0°, b = 0°), Hipparcos definition.',
-      source: { ...iau, note: 'Galactic frame, ESA Hipparcos catalogue Vol. 1 §1.5.3' },
+      description: 'Origin of galactic coordinates (l = 0°, b = 0°), standard ICRS galactic frame.',
+      source: { ...iau, note: 'Standard ICRS-to-galactic coordinate rotation.' },
     },
     {
       id: 'north-ecliptic-pole',
@@ -174,37 +123,8 @@ function referencePoints() {
   ];
 }
 
-function starTargets(planetRows) {
-  const pick = (pattern) => planetRows.find((r) => pattern.test(r.hostname));
-  const specs = [
-    { pattern: /^Teegarden/i, id: 'teegardens-star', fov: 0.3, description: 'A small red star 12.5 light-years away, with Earth-sized planets. It moves fast across the sky, so its marker (where it was around 2015) sits a little beside it in older and newer photos.' },
-    { pattern: /^Barnard/i, id: 'barnards-star', fov: 0.3, description: 'The star that moves fastest across our sky. Its marker shows where it was around 2015, so the star sits clearly beside it in older and newer photos.' },
-  ];
-  const out = [];
-  for (const s of specs) {
-    const r = pick(s.pattern);
-    if (!r) continue;
-    out.push({
-      id: s.id,
-      name: r.hostname,
-      kind: 'star',
-      ra: round(r.ra, 6),
-      dec: round(r.dec, 6),
-      fov: s.fov,
-      description: s.description,
-      source: { service: 'NASA Exoplanet Archive (pscomppars)', url: EA_TAP, retrievedAt },
-    });
-  }
-  return out;
-}
-
 async function main() {
   await mkdir(OUT, { recursive: true });
-
-  console.log('NASA Exoplanet Archive: host stars...');
-  const { rows, file: hostsFile } = await exoplanetHosts();
-  await writeFile(new URL('exoplanet-hosts.json', OUT), JSON.stringify(hostsFile));
-  console.log(`  ${hostsFile.provenance.planetRows} planets, ${hostsFile.provenance.hostCount} host stars`);
 
   console.log('NED: featured galaxies...');
   const galaxies = await nedTargets();
@@ -214,7 +134,10 @@ async function main() {
   const deep = await spherexDeepFields();
   console.log(`  ${deep.length} fields`);
 
-  const targets = [...referencePoints(), ...deep, ...galaxies, ...starTargets(rows)];
+  // Preserve the named-star reference positions and their recorded provenance.
+  const previous = JSON.parse(await readFile(new URL('targets.json', OUT), 'utf8'));
+  const existingStars = previous.targets.filter((target) => target.kind === 'star');
+  const targets = [...referencePoints(), ...deep, ...galaxies, ...existingStars];
   await writeFile(
     new URL('targets.json', OUT),
     JSON.stringify(
@@ -229,7 +152,7 @@ async function main() {
       2,
     ),
   );
-  console.log(`Wrote ${targets.length} targets and ${hostsFile.hosts.length} host stars to public/data/`);
+  console.log(`Wrote ${targets.length} targets to public/data/`);
 }
 
 main().catch((err) => {

@@ -2,8 +2,7 @@
 
 /**
  * Field guide: the sky passport, then one card per place the player visited,
- * newest first, with plain facts from the NASA data snapshot and the telescopes
- * it was seen with.
+ * newest first, with plain facts from the NASA data snapshot and their SPHEREx observations.
  */
 import { useMemo } from 'react';
 import { Sheet } from '@/components/ui/Sheet';
