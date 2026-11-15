@@ -2,6 +2,30 @@
 
 Run from `Planet-X-SPHEREx-NASA` with Node ≥20.9. This app streams images from NASA/IPAC IRSA and resolves remote names through NED; it needs connectivity for uncached imagery and lookups.
 
+## Before judging (simple layout, 15 Nov 2026)
+
+The default interface is now the **simple navigator**, and a first visit opens the **Solar System intro**. The five-minute table further down was written for the original interface: switch to it with **Settings → Expert layout** before running that table, or use this mapping.
+
+| Checklist step (Expert layout) | Same action in the simple layout |
+| --- | --- |
+| Explore a place | 🧭 **Places**, or **Choose a place** on the next-step card |
+| Layers / wavelength | 🔭 **Telescope** |
+| Lock target, Copy target link | **Settings → Map and target** |
+| Share view | **Settings → Copy link to this view** |
+| Help / Sources | **Settings → Keyboard and help / Data sources and credits** |
+| Compare images → Find images | **Compare its photos →** on the next-step card (step 2) |
+
+Recommended order before presenting:
+
+1. Demo from a production build (`npm run build && npm start`). In dev mode, the first visit to Compare compiles the page and can take 15–35 s.
+2. Restart the comparison service so it runs the current code: bounded IRSA timeouts and the new challenge wording.
+3. Open `/compare?challenge=weekly` and wait until it shows 12/12 images. This path does not depend on IRSA at demo time.
+4. Run **Compare its photos** once for each target you will show (for example M31 and M101). Finished searches stay cached for 24 hours, so the live demo does not wait on IRSA.
+5. Open the app with `/?intro=1`: a browser that has seen the intro skips it otherwise.
+6. Run `npm run verify:hips` in the morning. Today IRSA's TAP service timed out, so the orientation check is pending, not failed.
+
+Reliable story for the video: intro → **Look out from Earth with SPHEREx** → search **M101** → **Compare its photos →**, or **Places → Weekly sky challenge**. When explaining Compare, say that SPHEREx sees each spot at a slightly different infrared color in every photo, so the flipbook shows color and contrast differences as well as time.
+
 ## Prepare the production build
 
 ```bash

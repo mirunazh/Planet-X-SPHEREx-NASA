@@ -4,6 +4,8 @@
 **Purpose:** record which images we use, why we chose them, how we filter them and how we process them. This document is the source material for the project presentation.
 **Companion:** [plan-sky-navigator.md](plan-sky-navigator.md), which covers how the user chooses a target.
 
+> **Status (15 Nov 2026): sections 3–5 are the plan, not this build.** The Compare page shows SPHEREx exposures of one square of sky, aligned north-up, with honest captions. It does not yet compute the wavelength at the target, subtract zodiacal light, propagate Gaia positions, label asteroids or check detectability. Talking points 3–6 in section 7 depend on that roadmap.
+
 ---
 
 ## 1. Principle: one NASA hub
@@ -197,13 +199,16 @@ The intro shows NASA pictures only, so the first screen looks like the data that
 Science choices:
 
 - **The backdrop is the sky in the real direction.** The orrery looks down from the north ecliptic pole, so the stars behind the Sun are those around the south ecliptic pole. The script reprojects SPHEREx tiles stereographically around that pole, with ecliptic longitude 0° to the right as in the orrery. The Large and Small Magellanic Clouds and the Milky Way therefore appear where they really are. Only the angular scale is a display choice.
-- **One known gap, documented.** The DR1 all-sky HiPS has no data within about 2.2° of the south ecliptic pole, the core of the SPHEREx deep field. Those pixels show the local median sky level, with no invented stars, and sit behind the Sun's glare.
+- **One known gap, documented.** The DR1 all-sky HiPS has no data within about 2.2° of the south ecliptic pole. This is not the deep field, which SPHEREx placed 6.4° from the pole to avoid the Magellanic Clouds. Those pixels show the local median sky level, with no invented stars, and sit behind the Sun's glare.
+- **Dates.** For the mission photos, `sources.json` records the NASA Image Library's publication date (`published`), not when the photo was taken. Only the SDO and EPIC images carry an observation time (`taken`).
 - **Lighting follows the Sun.** Seen from above, every planet is half lit, so each photo is shaded on the side facing away from the Sun.
 - **Saturn's rings are open.** From above the ecliptic, the rings appear almost face-on, because Saturn's axis is tilted 26.7°. The Cassini view chosen (PIA21046) has open rings for that reason.
 
 ---
 
 ## 7. Presentation talking points
+
+Points 3–6 describe the roadmap in sections 3–5; present them as next steps, not as features of this build.
 
 1. **One NASA hub.** "Every pixel comes from NASA's Infrared Science Archive. One archive, one set of standards, full traceability."
 2. **Four missions, 25 years, one sky.** "2MASS (1997–2001), WISE (2010), NEOWISE (2013–2024), SPHEREx (2025–2026)."

@@ -282,9 +282,10 @@ async function buildSky() {
     }
   }
 
-  // The DR1 all-sky HiPS has no data in a small disc at the south ecliptic pole (the core of the
-  // SPHEREx deep field). It sits behind the Sun in the intro; show it as plain sky at the local
-  // median level rather than as a black hole. No stars are invented.
+  // The DR1 all-sky HiPS has no data in a small disc at the south ecliptic pole. (It is not the
+  // deep field: SPHEREx's southern deep field sits 6.4° away, clear of the Magellanic Clouds.) It is
+  // behind the Sun in the intro; show it as plain sky at the local median level rather than as a
+  // black hole. No stars are invented.
   const gaps = [];
   for (let i = 0; i < N * N; i++) if (Number.isNaN(value[i])) gaps.push(i);
   const R = 48;
@@ -336,7 +337,7 @@ async function buildSky() {
         `${N}×${N} px, ${SKY.edgeDeg}° from the centre to the middle of each edge, ${ss}×${ss} samples per pixel`,
         `Display stretch: black point at the 35th percentile (${black.toFixed(1)}), white at the 99.95th (${white.toFixed(1)}), gamma 0.9`,
         ...(gaps.length
-          ? [`${gaps.length} pixels have no data in the HiPS (a disc of about ${gapRadiusDeg.toFixed(1)}° radius at the pole, the deep-field core); they show the local median sky level and sit behind the Sun`]
+          ? [`${gaps.length} pixels have no data in the DR1 all-sky HiPS (a disc of about ${gapRadiusDeg.toFixed(1)}° radius at the pole); they show the local median sky level and sit behind the Sun`]
           : []),
       ],
       projection: { type: 'stereographic', centre: 'south ecliptic pole', size: N, edgeDeg: SKY.edgeDeg, pxPerUnitRadius: Number(scale.toFixed(4)) },
@@ -366,7 +367,9 @@ async function buildPhoto({ body, id, mission, size, region, rings }) {
     credit: meta.credit,
     source,
     page: `https://images.nasa.gov/details/${id}`,
-    taken: meta.date,
+    // The library's date_created is when NASA published the image, often years after the photo
+    // (Mariner 10 imaged Venus in 1974; PIA23791 was published in 2020).
+    published: meta.date,
     retrievedAt,
   };
 

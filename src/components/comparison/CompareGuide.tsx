@@ -2,10 +2,8 @@
 
 /* Step 3 in plain words: how many photos, when they were taken, what to press and what a
    one-photo dot may mean. The color line says which detector the flipbook shows and why. */
-import { useEffect, useId, useRef, useState } from 'react';
-import { TourOverlay } from '@/components/help/TourOverlay';
-import { WhatYoureSeeing } from '@/components/help/WhatYoureSeeing';
-import { HELP, type HelpScreenId } from '@/content/help';
+import { useId } from 'react';
+import { WhatYoureSeeingButton } from '@/components/help/WhatYoureSeeingButton';
 import type { ImageProduct, InventoryPage } from '@/lib/comparison/types';
 import styles from './CompareGuide.module.css';
 
@@ -63,33 +61,6 @@ const COLOR_TEXT: Record<ColorMode, string> = {
   fallback: `No ${DEFAULT_BAND} (${DEFAULT_RANGE}) photos of this square were found, so all detectors are shown. A photo can look different just because it was taken in another color.`,
   all: 'Showing all 6 detectors. A photo can look different just because it was taken in another color.',
 };
-
-/**
- * "What you're seeing" for a comparison screen: the help sheet, and its guided tour once the
- * visitor asks for it. Focus comes back to this button when either one closes.
- */
-export function WhatYoureSeeingButton({ screen, contextLine }: { screen: HelpScreenId; contextLine?: string }) {
-  const [open, setOpen] = useState(false);
-  const [touring, setTouring] = useState(false);
-  const button = useRef<HTMLButtonElement>(null);
-  const returnFocus = useRef(false);
-  // Runs after the sheet or the tour has left the page (and after the tour's own focus cleanup).
-  useEffect(() => {
-    if (open || touring || !returnFocus.current) return;
-    returnFocus.current = false;
-    button.current?.focus();
-  }, [open, touring]);
-  return <>
-    <button ref={button} type="button" className={styles.help} aria-haspopup="dialog" aria-expanded={open}
-      onClick={() => setOpen((value) => !value)}>
-      <span className={styles.helpIcon} aria-hidden="true">i</span>What you’re seeing
-    </button>
-    <WhatYoureSeeing screen={screen} open={open} contextLine={open ? contextLine : undefined}
-      onClose={() => { returnFocus.current = true; setOpen(false); }}
-      onStartTour={() => { setOpen(false); setTouring(true); }} />
-    <TourOverlay steps={HELP[screen].steps} open={touring} onClose={() => { returnFocus.current = true; setTouring(false); }} />
-  </>;
-}
 
 interface Props {
   size: number;

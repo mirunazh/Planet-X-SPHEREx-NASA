@@ -139,6 +139,18 @@
   z-index: 1;
 }
 
+/* The help sheet opens from the top bar and must paint above the caption panel. */
+.top {
+  z-index: 2;
+}
+
+.topActions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+
 .slot {
   grid-area: slot;
   min-width: 0;

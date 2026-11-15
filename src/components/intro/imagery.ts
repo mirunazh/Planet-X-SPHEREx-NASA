@@ -48,8 +48,9 @@ export const SKY_BACKDROP = {
   /** Half-width of the picture as an angle from the pole, degrees. */
   edgeDeg: 70,
   /**
-   * Radius, image px, of the disc around the pole that has no data in the SPHEREx DR1 all-sky HiPS
-   * (about 2.2°, the deep-field core). It shows the local median sky; the Sun's glare covers it.
+   * Radius, image px, of the disc around the pole (about 2.2°) that has no data in the SPHEREx DR1
+   * all-sky map. It is not the deep field: SPHEREx's southern deep field sits 6.4° from the pole,
+   * away from the Magellanic Clouds. It shows the local median sky; the Sun's glare covers it.
    */
   holeRadiusPx: 28,
 };

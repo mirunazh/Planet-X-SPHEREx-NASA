@@ -8,13 +8,20 @@ Built for the NASA Space Apps Challenge 2026.
 
 > NASA does not endorse this project. NASA data is used under NASA's data and media guidelines. See **Data & credits** in the app.
 
+## What a visitor sees
+
+1. **Solar System intro** (first visit, or `/?intro=1`): the planets at today's positions from JPL elements, shown with real NASA photos (SDO, MESSENGER, Mariner 10, DSCOVR EPIC, Viking, Cassini, Voyager 2) in front of the SPHEREx sky behind the Sun. `npm run data:intro` rebuilds the images; `public/intro/sources.json` records their provenance.
+2. **Simple navigator** (the default): one next step at a time (choose a place, look closer, compare its photos), a dock of tools, the Places, Telescope and Settings sheets, "What you're seeing" help with a guided tour, and a light game layer (figurines, quests, field guide). The original full interface is **Settings → Expert layout**.
+3. **Compare**: every SPHEREx exposure of a small square of sky, aligned north-up, as a flipbook. Searches query IRSA live and can take a minute when the archive is slow.
+4. **Weekly sky challenge**: the same square around M101, with up to 12 photos prepared in advance. This is the reliable demo path when IRSA is slow.
+
 ## What it does
 
 - **Panoramic navigation.** Opens at a 60° field of view, north up and east left, with the grid hidden. Drag to pan; scroll, pinch or use +/− to zoom. Home (or R) resets the view; Esc stops motion. Legacy globe links retain their sky direction and open in the panorama.
 - **Coordinate deduction.** RA/Dec (ICRS), galactic l/b and field of view are computed live from the camera direction. The number of digits follows the real uncertainty: the larger of one screen pixel and one survey pixel.
 - **NASA surveys**, streamed as HiPS tiles from NASA/IPAC IRSA:
 
-  | Survey | Bands | Years | Native pixel |
+  | Survey | Bands | Years | Map pixel (HiPS) |
   |---|---|---|---|
   | SPHEREx DR1 all-sky spectral cube | 102 channels, 0.75–5.0 µm, with a wavelength slider | 2025–2026 | 12.9″ |
   | 2MASS colour | J, H, Ks | 1997–2001 | 0.8″ |
@@ -59,7 +66,16 @@ npm run build && npm start
 npm run test:production # exercise the latest build locally; NED responses simulated
 ```
 
-Docker (production, Next.js standalone output):
+Compare and the weekly challenge need the Python comparison service on port 8000. On Windows (PowerShell), from the repository root, with its virtual environment in `services/comparison/.venv`:
+
+```powershell
+$env:COMPARISON_DB = "$PWD\.comparison-data\inventory.sqlite3"
+services\comparison\.venv\Scripts\python.exe -m uvicorn app:app --app-dir services/comparison --host 127.0.0.1 --port 8000
+```
+
+Use `python -m uvicorn`: the venv's `uvicorn.exe` launcher breaks if the folder is moved. Restart the service after pulling changes to `services/comparison`.
+
+Docker (production, Next.js standalone output). `docker build`/`docker run` start only the web app, so Compare will not work; use `docker compose up --build` to run both services:
 
 ```bash
 docker build -t sky-navigator .
@@ -101,7 +117,7 @@ The full acknowledgement texts are in the app under **Data & credits**. The rati
 
 ## Known limitations
 
-- SPHEREx HiPS tiles stop at 12.9″ pixels. Deeper zoom magnifies them, and the readout says so. Switch to 2MASS for 0.8″ detail.
+- SPHEREx HiPS tiles stop at 12.9″ map pixels (the camera's own pixels are 6.2″). Deeper zoom magnifies them, and the readout says so. Switch to 2MASS for finer detail: its map pixels are 0.8″, though its images are only as sharp as the 2–3″ seeing.
 - The PNG tiles use a fixed asinh display stretch (0–40 MJy/sr). They are for display, not photometry.
 - The SPHEREx cube's blank channels (frames 50 and 51) are skipped by the wavelength slider.
 

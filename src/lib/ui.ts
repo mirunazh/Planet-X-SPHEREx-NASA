@@ -57,12 +57,19 @@ export function loadUiPreferences(): void {
 }
 
 const INTRO_KEY = 'skynav.introSeen.v1';
+/** Set (for this tab only) while the intro is on screen, cleared when it ends. */
+const INTRO_PENDING_KEY = 'skynav.introPending.v1';
 
-/** First visit, or a link with ?intro=1. Deep links into a specific view skip the intro. */
+/**
+ * First visit, a link with ?intro=1, or a reload while the intro was still showing. Deep links into
+ * a specific view skip the intro. The pending flag matters because the sky page writes its start
+ * view into the address bar at once, so any reload looks like a deep link.
+ */
 export function shouldShowIntro(): boolean {
   try {
     const params = new URLSearchParams(window.location.search);
     if (params.get('intro') === '1') return true;
+    if (readPending()) return true;
     if (params.has('ra') || params.has('dec')) return false;
     return window.localStorage.getItem(INTRO_KEY) !== '1';
   } catch {
@@ -70,7 +77,28 @@ export function shouldShowIntro(): boolean {
   }
 }
 
+function readPending(): boolean {
+  try {
+    return window.sessionStorage.getItem(INTRO_PENDING_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export function markIntroPending(): void {
+  try {
+    window.sessionStorage.setItem(INTRO_PENDING_KEY, '1');
+  } catch {
+    // Without session storage a reload during the intro skips it; that is acceptable.
+  }
+}
+
 export function markIntroSeen(): void {
+  try {
+    window.sessionStorage.removeItem(INTRO_PENDING_KEY);
+  } catch {
+    // Nothing to clear.
+  }
   try {
     window.localStorage.setItem(INTRO_KEY, '1');
   } catch {

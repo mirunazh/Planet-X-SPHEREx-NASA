@@ -2,6 +2,8 @@
 
 Acest ghid explică ce face proiectul, cum îl pornești pe calculator și cum îl poți prezenta unei persoane care îl vede pentru prima dată. Comenzile sunt pentru versiunea din acest repository.
 
+> **Notă (15 noiembrie 2026):** interfața implicită este acum navigatorul simplu, iar prima vizită deschide introducerea despre Sistemul Solar (o poți relua cu `/?intro=1`). Pașii din acest ghid descriu interfața completă: activeaz-o din **Settings → Expert layout**. Traseul demo recomandat și corespondența butoanelor sunt în [demo-checklist.md](demo-checklist.md#before-judging-simple-layout-15-nov-2026).
+
 ## 1. Ce face proiectul
 
 Aplicația permite explorarea cerului în infraroșu și vizualizarea observațiilor SPHEREx pentru o regiune aleasă.

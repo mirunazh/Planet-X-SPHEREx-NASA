@@ -14,7 +14,7 @@
         "Black space made transparent; the corona fades out at 0.86–0.99 of the half-width"
       ],
       "discFraction": 0.8,
-      "retrievedAt": "2026-11-15T06:57:22.854Z"
+      "retrievedAt": "2026-11-15T07:52:41.396Z"
     },
     "earth.jpg": {
       "subject": "Earth",
@@ -30,7 +30,7 @@
       "processing": [
         "Square crop to the disc, resized to 1024 px"
       ],
-      "retrievedAt": "2026-11-15T06:57:22.854Z"
+      "retrievedAt": "2026-11-15T07:52:41.396Z"
     },
     "mercury.jpg": {
       "subject": "Mercury",
@@ -39,8 +39,8 @@
       "credit": "NASA/Johns Hopkins University Applied Physics Laboratory/Carnegie Institution of Washington",
       "source": "https://images-assets.nasa.gov/image/PIA15160/PIA15160~orig.jpg",
       "page": "https://images.nasa.gov/details/PIA15160",
-      "taken": "2011-11-29",
-      "retrievedAt": "2026-11-15T06:57:22.854Z",
+      "published": "2011-11-29",
+      "retrievedAt": "2026-11-15T07:52:41.396Z",
       "processing": [
         "Square crop to the planet's disc, resized to 160 px"
       ]
@@ -52,8 +52,8 @@
       "credit": "NASA/JPL-Caltech",
       "source": "https://images-assets.nasa.gov/image/PIA23791/PIA23791~orig.jpg",
       "page": "https://images.nasa.gov/details/PIA23791",
-      "taken": "2020-06-08",
-      "retrievedAt": "2026-11-15T06:57:22.854Z",
+      "published": "2020-06-08",
+      "retrievedAt": "2026-11-15T07:52:41.396Z",
       "processing": [
         "Square crop to the planet's disc (left panel), resized to 160 px"
       ]
@@ -65,8 +65,8 @@
       "credit": "NASA/JPL/USGS",
       "source": "https://images-assets.nasa.gov/image/PIA00407/PIA00407~orig.jpg",
       "page": "https://images.nasa.gov/details/PIA00407",
-      "taken": "1998-06-08",
-      "retrievedAt": "2026-11-15T06:57:22.854Z",
+      "published": "1998-06-08",
+      "retrievedAt": "2026-11-15T07:52:41.396Z",
       "processing": [
         "Square crop to the planet's disc, resized to 160 px"
       ]
@@ -78,8 +78,8 @@
       "credit": "NASA/JPL/University of Arizona",
       "source": "https://images-assets.nasa.gov/image/PIA02873/PIA02873~orig.jpg",
       "page": "https://images.nasa.gov/details/PIA02873",
-      "taken": "2001-01-30",
-      "retrievedAt": "2026-11-15T06:57:22.854Z",
+      "published": "2001-01-30",
+      "retrievedAt": "2026-11-15T07:52:41.396Z",
       "processing": [
         "Square crop to the planet's disc, resized to 192 px"
       ]
@@ -91,8 +91,8 @@
       "credit": "NASA/JPL-Caltech/Space Science Institute",
       "source": "https://images-assets.nasa.gov/image/PIA21046/PIA21046~orig.jpg",
       "page": "https://images.nasa.gov/details/PIA21046",
-      "taken": "2016-09-15",
-      "retrievedAt": "2026-11-15T06:57:22.854Z",
+      "published": "2016-09-15",
+      "retrievedAt": "2026-11-15T07:52:41.396Z",
       "processing": [
         "Square crop around the rings (A ring outer edge = 2.269 × equatorial radius), resized to 320 px",
         "Black space made transparent; the planet's disc stays opaque"
@@ -106,8 +106,8 @@
       "credit": "NASA/JPL-Caltech",
       "source": "https://images-assets.nasa.gov/image/PIA18182/PIA18182~orig.jpg",
       "page": "https://images.nasa.gov/details/PIA18182",
-      "taken": "1986-12-18",
-      "retrievedAt": "2026-11-15T06:57:22.854Z",
+      "published": "1986-12-18",
+      "retrievedAt": "2026-11-15T07:52:41.396Z",
       "processing": [
         "Square crop to the planet's disc, resized to 160 px"
       ]
@@ -119,8 +119,8 @@
       "credit": "NASA/JPL",
       "source": "https://images-assets.nasa.gov/image/PIA00046/PIA00046~orig.jpg",
       "page": "https://images.nasa.gov/details/PIA00046",
-      "taken": "1996-01-29",
-      "retrievedAt": "2026-11-15T06:57:22.854Z",
+      "published": "1996-01-29",
+      "retrievedAt": "2026-11-15T07:52:41.396Z",
       "processing": [
         "Square crop to the planet's disc, resized to 160 px"
       ]
@@ -136,7 +136,7 @@
         "Ecliptic longitude 0° (March equinox) to the right, 90° up: the orientation of the intro orrery",
         "2048×2048 px, 70° from the centre to the middle of each edge, 3×3 samples per pixel",
         "Display stretch: black point at the 35th percentile (3.9), white at the 99.95th (189.2), gamma 0.9",
-        "2400 pixels have no data in the HiPS (a disc of about 2.2° radius at the pole, the deep-field core); they show the local median sky level and sit behind the Sun"
+        "2400 pixels have no data in the DR1 all-sky HiPS (a disc of about 2.2° radius at the pole); they show the local median sky level and sit behind the Sun"
       ],
       "projection": {
         "type": "stereographic",
@@ -145,7 +145,7 @@
         "edgeDeg": 70,
         "pxPerUnitRadius": 731.2118
       },
-      "retrievedAt": "2026-11-15T06:58:06.390Z"
+      "retrievedAt": "2026-11-15T07:52:41.396Z"
     }
   }
 }

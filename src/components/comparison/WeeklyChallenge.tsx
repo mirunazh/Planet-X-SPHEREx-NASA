@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { isWeeklyChallenge, type WeeklyChallenge as Challenge } from '@/lib/comparison/types';
-import { WhatYoureSeeingButton } from './CompareGuide';
+import { WhatYoureSeeingButton } from '@/components/help/WhatYoureSeeingButton';
 import { Slideshow } from './Slideshow';
 import styles from './CompareGuide.module.css';
 

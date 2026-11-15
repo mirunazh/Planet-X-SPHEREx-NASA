@@ -2,6 +2,8 @@
 
 import { type KeyboardEvent, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ELEMENTS_VALID_YEARS, PLANETS, PLANET_ORDER, eclipticLongitudeDeg, type PlanetId } from '@/lib/sky/planets';
+import { WhatYoureSeeingButton } from '@/components/help/WhatYoureSeeingButton';
+import { markIntroPending } from '@/lib/ui';
 import { usePageHidden, useReducedMotion } from './hooks';
 import { BODY_IMAGES, INTRO_CREDIT_LINE, SKY_BACKDROP } from './imagery';
 import { type Circle, type OrreryLayout, type Rect, backdropSize, computeLayout, orbitPoint, placeLabels } from './orrery';
@@ -163,6 +165,12 @@ export function SolarSystemIntro({ onDone }: { onDone: () => void }) {
   useLayoutEffect(() => {
     startMs.current = Date.now();
     simMs.current = startMs.current;
+  }, []);
+
+  // A reload before the intro ends must show it again, even though the sky page has already
+  // written its start view (a "deep link") into the address bar.
+  useEffect(() => {
+    markIntroPending();
   }, []);
 
   // Measure the overlay and the free slot the drawing is centred in.
@@ -432,9 +440,12 @@ export function SolarSystemIntro({ onDone }: { onDone: () => void }) {
         <h2 id={titleId} className={styles.title}>
           Our Solar System
         </h2>
-        <button type="button" className={styles.skip} onClick={finish}>
-          Skip intro
-        </button>
+        <div className={styles.topActions}>
+          <WhatYoureSeeingButton screen="intro" compact />
+          <button type="button" className={styles.skip} onClick={finish}>
+            Skip intro
+          </button>
+        </div>
       </div>
 
       <div className={`${styles.clock} ${styles.fade}`}>
@@ -494,7 +505,7 @@ export function SolarSystemIntro({ onDone }: { onDone: () => void }) {
         </div>
         <p className={styles.bridge}>
           Next, look out from Earth. NASA&apos;s SPHEREx telescope orbits Earth and maps the whole sky in infrared light.
-          You start at the center of our Milky Way.
+          You start looking toward the center of our Milky Way.
         </p>
         <button ref={ctaRef} type="button" className={styles.cta} data-tour="intro-cta" onClick={lookOut}>
           Look out from Earth with SPHEREx
