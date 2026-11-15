@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import * as healpix from '@hscmap/healpix';
 import { allskyUrl, allskyUv, tileUrl, tileUv } from '@/lib/sky/hips';
-import { SPHEREX_FRAMES, SURVEYS, nearestUsableFrame } from '@/lib/sky/surveys';
+import { SPHEREX_FRAMES, SURVEYS, SURVEY_ORDER, isSurveyId, nearestUsableFrame } from '@/lib/sky/surveys';
 import { buildSkyTarget } from '@/lib/sky/target';
 import { radecToVec } from '@/lib/sky/coords';
 import { flyPath } from '@/lib/sky/flyto';
@@ -13,12 +13,11 @@ describe('HiPS addressing', () => {
       'https://irsa.ipac.caltech.edu/data/hips/SPHEREx/spherex_allsky_cube/Norder5/Dir10000/Npix12345_46.png',
     );
     expect(tileUrl(SURVEYS.spherex, 3, 7, 0)).toMatch(/Norder3\/Dir0\/Npix7\.png$/);
-    expect(tileUrl(SURVEYS.twomass, 9, 1234567, 3)).toMatch(/2MASS\/Color\/Norder9\/Dir1230000\/Npix1234567\.jpg$/);
   });
 
   it('builds Allsky URLs', () => {
     expect(allskyUrl(SURVEYS.spherex, 10)).toMatch(/Norder3\/Allsky_10\.png$/);
-    expect(allskyUrl(SURVEYS.allwise, 0)).toMatch(/AllWISE\/RGB-W4-W2-W1\/Norder3\/Allsky\.jpg$/);
+    expect(allskyUrl(SURVEYS.spherex, 0)).toMatch(/SPHEREx\/spherex_allsky_cube\/Norder3\/Allsky\.png$/);
   });
 
   it('maps cell corners to image corners (x = nw, y = ne, verified orientation)', () => {
@@ -32,6 +31,19 @@ describe('HiPS addressing', () => {
     const [u, v] = allskyUv(28, 0.5, 0.5, 1728, 1856);
     expect(u * 1728).toBeCloseTo(64 + 32, 9);
     expect(v * 1856).toBeCloseTo(64 + 32, 9);
+  });
+});
+
+describe('survey registry', () => {
+  it('holds SPHEREx only, the project scope', () => {
+    expect(SURVEY_ORDER).toEqual(['spherex']);
+    expect(Object.keys(SURVEYS)).toEqual(['spherex']);
+    expect(Object.values(SURVEYS).every((s) => s.baseUrl.includes('/SPHEREx/'))).toBe(true);
+  });
+
+  it('rejects the surveys that were removed, so old links and saves fall back to SPHEREx', () => {
+    expect(isSurveyId('spherex')).toBe(true);
+    for (const removed of ['twomass', 'allwise', 'wise', '', null, undefined]) expect(isSurveyId(removed)).toBe(false);
   });
 });
 

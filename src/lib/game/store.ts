@@ -129,12 +129,8 @@ function recordPin(d: Draft, pin: Pin, id: SurveyId, now: string): void {
   d.current = pin.id;
 }
 
-/** Rules that depend on totals: a second survey finds the field guide and the telescope quest; three quests find the challenge. */
+/** Rule that depends on totals: three quests find the challenge. */
 function settle(d: Draft): void {
-  if (d.surveysUsed.length >= 2) {
-    unlock(d, 'guide');
-    complete(d, 'dust');
-  }
   if (QUEST_ORDER.every((id) => d.quests[id])) unlock(d, 'challenge');
 }
 
@@ -169,7 +165,8 @@ function finish(state: GameProgress, d: Draft): GameProgress {
  *
  * - places    <- lookedAround
  * - telescope <- visitedPlace, or selectedPin of a target
- * - guide     <- a second distinct survey, or changedColor
+ * - guide     <- changedColor, which also finishes the dust quest (SPHEREx is the
+ *                only telescope, so a new infrared color is the "other view")
  * - compare   <- zoomedClose
  * - challenge <- all three quests done
  */
@@ -197,6 +194,7 @@ export function applyEvent(state: GameProgress, event: GameEvent, now: string): 
       break;
     case 'changedColor':
       unlock(d, 'guide');
+      complete(d, 'dust');
       break;
     case 'zoomedClose':
       unlock(d, 'compare');

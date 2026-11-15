@@ -58,7 +58,7 @@ export function orbitFraction(a: number): number {
  * far below one pixel at this scale.
  */
 export function dotRadius(radiusKm: number, drawingRadius: number): number {
-  // Slightly larger than a plain dot would need, so the mission photos stay recognisable.
+  // Slightly larger than a plain dot would need, so each planet's colour reads at a glance.
   const k = clamp(drawingRadius * 0.011, 1.8, 4.6);
   return 1.4 + k * Math.sqrt(radiusKm / PLANETS.earth.radiusKm);
 }

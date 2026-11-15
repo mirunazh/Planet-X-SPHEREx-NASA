@@ -3,6 +3,8 @@
 Acest ghid explică ce face proiectul, cum îl pornești pe calculator și cum îl poți prezenta unei persoane care îl vede pentru prima dată. Comenzile sunt pentru versiunea din acest repository.
 
 > **Notă (15 noiembrie 2026):** interfața implicită este acum navigatorul simplu, iar prima vizită deschide introducerea despre Sistemul Solar (o poți relua cu `/?intro=1`). Pașii din acest ghid descriu interfața completă: activeaz-o din **Settings → Expert layout**. Traseul demo recomandat și corespondența butoanelor sunt în [demo-checklist.md](demo-checklist.md#before-judging-simple-layout-15-nov-2026).
+>
+> **Doar SPHEREx (15 noiembrie 2026):** scopul proiectului este exclusiv misiunea NASA SPHEREx. Straturile 2MASS și AllWISE au fost scoase din aplicație; cerul se vede numai în cele 102 culori infraroșii SPHEREx.
 
 ## 1. Ce face proiectul
 
@@ -12,7 +14,7 @@ Are trei funcții principale:
 
 | Funcție | Ce poți face |
 | --- | --- |
-| Navigatorul cerului | Deplasezi harta, faci zoom, cauți obiecte sau coordonate și schimbi straturile SPHEREx, 2MASS și WISE. |
+| Navigatorul cerului | Deplasezi harta, faci zoom, cauți obiecte sau coordonate și schimbi culoarea în infraroșu (lungimea de undă) SPHEREx. |
 | Slideshow SPHEREx | Alegi o zonă, cauți expunerile disponibile în arhiva IRSA și răsfoiești imaginile direct în aplicație. |
 | Challenge săptămânal | Revizitezi aceeași zonă din jurul galaxiei M101, cu până la 12 imagini pregătite în cache și un contor al produselor nou găsite în arhivă. |
 

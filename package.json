@@ -2,7 +2,7 @@
   "name": "spherex-sky-navigator",
   "version": "0.1.0",
   "private": true,
-  "description": "Find My-style 3D navigator for the infrared sky, built only on NASA data (SPHEREx, 2MASS, WISE via NASA/IPAC IRSA).",
+  "description": "Find My-style 3D navigator for the infrared sky, built only on NASA data (SPHEREx via NASA/IPAC IRSA).",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

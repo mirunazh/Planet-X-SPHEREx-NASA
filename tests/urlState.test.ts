@@ -29,7 +29,8 @@ describe('panoramic deep links', () => {
       expect(s.fov).toBe(INITIAL_VIEW.fov);
       expect(angularDistance(s.center, radecToVec(10.68479, 41.26907))).toBeLessThan(1e-6);
       expect(s.origin).toBe('deeplink');
-      expect(s.surveyId).toBe('allwise');
+      // AllWISE is no longer offered (SPHEREx-only scope): old links that name it open SPHEREx.
+      expect(s.surveyId).toBe('spherex');
     },
   );
 
@@ -98,17 +99,26 @@ describe('panoramic deep links', () => {
 });
 
 describe('shareable demonstration views', () => {
-  it.each(['spherex', 'twomass', 'allwise'] as const)('round trips position, zoom and the selected %s layer without waiting for address-bar sync', async (surveyId) => {
+  it('round trips position, zoom and the selected SPHEREx channel without waiting for address-bar sync', async () => {
     const { buildViewUrl } = await import('@/lib/urlState');
-    useNav.setState({ center: radecToVec(12.34567, -56.78901), fov: 0.05, surveyId, frame: 90 });
+    useNav.setState({ center: radecToVec(12.34567, -56.78901), fov: 0.05, surveyId: 'spherex', frame: 90 });
     const shared = new URL(buildViewUrl(useNav.getState(), 'https://example.com/explore?old=value#outdated'));
     expect(shared.pathname).toBe('/explore'); expect(shared.hash).toBe(''); expect(shared.searchParams.get('old')).toBeNull();
-    expect(shared.searchParams.get('f')).toBe(surveyId === 'spherex' ? '90' : null);
+    expect(shared.searchParams.get('survey')).toBe('spherex');
+    expect(shared.searchParams.get('f')).toBe('90');
     useNav.setState({ ...useNav.getInitialState(), anim: [] }); location(shared.search); applyUrlState();
     const restored = useNav.getState();
     expect(angularDistance(restored.center, radecToVec(12.34567, -56.78901))).toBeLessThan(0.00001);
-    expect(restored.fov).toBe(0.05); expect(restored.surveyId).toBe(surveyId);
-    if (surveyId === 'spherex') expect(restored.frame).toBe(90);
+    expect(restored.fov).toBe(0.05); expect(restored.surveyId).toBe('spherex'); expect(restored.frame).toBe(90);
+  });
+
+  it.each(['twomass', 'allwise'])('opens an old %s link on SPHEREx, keeping position and zoom', (survey) => {
+    location(`?ra=12.34567&dec=-56.78901&fov=0.5&survey=${survey}`);
+    applyUrlState();
+    const s = useNav.getState();
+    expect(s.surveyId).toBe('spherex');
+    expect(s.fov).toBe(0.5);
+    expect(angularDistance(s.center, radecToVec(12.34567, -56.78901))).toBeLessThan(0.00001);
   });
 
   it('normalizes rounded RA at the 360-degree boundary', async () => {
@@ -123,7 +133,7 @@ describe('shareable demonstration views', () => {
     const { buildTargetUrl } = await import('@/lib/urlState');
     const { buildSkyTarget } = await import('@/lib/sky/target');
     const target = buildSkyTarget({ center: radecToVec(10.68, 41.27), fovDeg: 0.5, uncertaintyArcsec: 13, survey: 'spherex', hipsUrl: 'https://irsa.ipac.caltech.edu/', frames: [46], origin: 'pin' });
-    useNav.setState({ center: radecToVec(200, -20), fov: 10, surveyId: 'allwise' });
+    useNav.setState({ center: radecToVec(200, -20), fov: 10, frame: 90 });
     const url = new URL(buildTargetUrl(target, 'https://example.com/explore'));
     location(url.search); applyUrlState();
     expect(angularDistance(useNav.getState().center, radecToVec(target.ra, target.dec))).toBeLessThan(0.00001);

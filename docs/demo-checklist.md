@@ -49,15 +49,15 @@ If any automated check fails, record its output before demonstrating. A network/
 | Open the app with no query string | Panorama, 60° FOV, grid off. A preview appears first; finer details follow where the zoom requires them. |
 | Drag, scroll both directions, press Home | Panorama remains active. FOV stays within 0.05°–100°. Home restores the initial view; Escape stops a flight. |
 | Choose **Pinwheel Galaxy (M101)** under Explore a place | The sky flies to the target, FOV becomes 0.6°, Details opens with its position source. |
-| Change SPHEREx wavelength quickly, then choose 2MASS and AllWISE | The previous complete layer stays visible until the selected preview is ready. Final image, displayed-layer text and image source agree. |
-| Return to SPHEREx and wait; use **Lock target** | Lock becomes available after motion ends and the requested layer is ready. Coordinates, wavelength and JSON describe that displayed layer. |
+| Change SPHEREx wavelength quickly several times, finishing on a different preset | The previous complete layer stays visible until the selected preview is ready. Final image, displayed-layer text and image source agree. |
+| Wait; use **Lock target** | Lock becomes available after motion ends and the requested layer is ready. Coordinates, wavelength and JSON describe that displayed layer. |
 | Use **Share view**, immediately open the copied URL in another tab | Same sky direction, FOV and requested layer. Lock, brightness and open panels are not part of the URL. |
 | Lock, pan elsewhere, use **Copy target link** | The target link opens the locked position/layer, independent of the later pan. |
 | Search `10.68, +41.27`, then invalid `10.68, +100` | The first navigates; the second explains the invalid coordinates without a name lookup. |
 | Search a remote name such as `NGC 253`, then choose a place before lookup completes | A late lookup must not pull the view away from the chosen place. If NED is unavailable, an actionable error appears. |
 | Open Help/Sources and close with Escape | Keyboard focus stays in the modal and returns to the opener; the sky does not move behind it. |
 
-For visual registration, inspect the M31 nucleus in SPHEREx and 2MASS after the same coordinate search, and check Galactic Centre/deep-field targets. This human inspection complements the live-star script; do not claim a new orientation check until it has actually run successfully.
+For visual registration, inspect the M31 nucleus in SPHEREx after a coordinate search, and check Galactic Centre/deep-field targets. This human inspection complements the live-star script; do not claim a new orientation check until it has actually run successfully.
 
 ## Interruptions and recovery
 

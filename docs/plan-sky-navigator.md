@@ -4,6 +4,8 @@
 **Scope:** how users pick a sky position by navigating instead of typing coordinates.
 **Constraint:** imagery and catalogues come from NASA sources only. Section 3.4 covers the edge cases.
 
+> **Scope update (15 Nov 2026):** the navigator shows NASA SPHEREx only. The 2MASS and AllWISE layers planned below were removed from the app; the plan is kept as a record.
+
 ---
 
 ## 1. Goal

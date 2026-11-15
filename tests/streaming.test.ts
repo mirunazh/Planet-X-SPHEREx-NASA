@@ -23,11 +23,9 @@ describe('streaming policy', () => {
     expect(renderDpr(1600, 900, 2, 0.65)).toBeCloseTo(renderDpr(1600, 900, 2) * 0.65);
   });
 
-  it('skips blank channels and never wraps or prefetches another survey', () => {
+  it('skips blank channels and never wraps past the last channel', () => {
     expect(adjacentLayer({ surveyId: 'spherex', frame: 49 })).toEqual({ surveyId: 'spherex', frame: 52 });
     expect(adjacentLayer({ surveyId: 'spherex', frame: 101 })).toEqual({ surveyId: 'spherex', frame: 100 });
-    expect(adjacentLayer({ surveyId: 'twomass', frame: 0 })).toBeNull();
-    expect(adjacentLayer({ surveyId: 'allwise', frame: 0 })).toBeNull();
   });
 
   it('respects data saving and very slow connections', () => {

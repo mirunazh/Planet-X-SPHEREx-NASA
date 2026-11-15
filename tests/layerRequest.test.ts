@@ -14,7 +14,7 @@ function deferred<T>() {
 
 const a: SkyLayer = { surveyId: 'spherex', frame: 46 };
 const b: SkyLayer = { surveyId: 'spherex', frame: 90 };
-const c: SkyLayer = { surveyId: 'twomass', frame: 0 };
+const c: SkyLayer = { surveyId: 'spherex', frame: 22 };
 const flush = async () => { await Promise.resolve(); await Promise.resolve(); };
 
 beforeEach(() => useNav.setState({ ...useNav.getInitialState(), anim: [] }));
@@ -56,12 +56,12 @@ describe('layer request ordering', () => {
   it('ignores successes and failures that arrive after the final selection', async () => {
     const h = harness();
     h.select(a); h.select(b); h.select(c);
-    h.loads[2].resolve('2MASS');
+    h.loads[2].resolve('band C');
     await flush();
     h.loads[0].resolve('band A');
     h.loads[1].reject(new Error('late failure'));
     await flush();
-    expect(h.shown()).toBe('2MASS');
+    expect(h.shown()).toBe('band C');
     expect(h.commit).toHaveBeenCalledTimes(1);
     expect(h.error).not.toHaveBeenCalled();
     expect(h.status()).toBe('ready');
@@ -123,9 +123,9 @@ describe('layer request ordering', () => {
 });
 
 describe('requested versus displayed state', () => {
-  it('normalizes blank cube channels and non-cube identities', () => {
+  it('normalizes blank cube channels', () => {
     expect(requestedLayer({ surveyId: 'spherex', frame: 50 }).frame).toBe(49);
-    expect(layerKey(requestedLayer({ surveyId: 'twomass', frame: 90 }))).toBe('twomass|0|');
+    expect(layerKey(requestedLayer({ surveyId: 'spherex', frame: 51 }))).toBe('spherex|52|');
   });
 
   it('keeps displayed metadata while a new selection loads and resets old locks', () => {
@@ -155,13 +155,10 @@ describe('requested versus displayed state', () => {
     expect(useNav.getState().displayedLayer).toEqual(a);
   });
 
-  it('does not reload a colour survey when the remembered cube frame changes', () => {
-    useNav.setState({ surveyId: 'twomass', displayedLayer: c, allskyStatus: 'ready' });
-    useNav.getState().setFrame(90);
-    expect(useNav.getState().frame).toBe(90);
-    expect(useNav.getState().allskyStatus).toBe('ready');
+  it('does not reload when the requested channel is already on screen', () => {
+    useNav.setState({ displayedLayer: a, allskyStatus: 'ready', layerRevision: 0 });
     useNav.getState().setSurvey('spherex');
-    expect(useNav.getState().allskyStatus).toBe('loading');
-    expect(useNav.getState().displayedLayer).toEqual(c);
+    useNav.getState().setFrame(a.frame);
+    expect(useNav.getState()).toMatchObject({ allskyStatus: 'ready', layerRevision: 0, displayedLayer: a });
   });
 });

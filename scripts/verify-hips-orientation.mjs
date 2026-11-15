@@ -1,10 +1,11 @@
 // Verifies how HiPS tile pixels map onto HEALPix cells, using NASA data only.
 //
 // Method: bright stars from the 2MASS Point Source Catalog (IRSA table fp_psc)
-// are located in SPHEREx DR1 and 2MASS HiPS tiles served by IRSA under each of
-// the 8 possible pixel orientations. The correct orientation is the one that puts
-// every star on a bright pixel. The same test is repeated on the low-resolution
-// Allsky image used for the first paint of the panorama.
+// are located in SPHEREx DR1 HiPS tiles served by IRSA under each of the 8
+// possible pixel orientations. The correct orientation is the one that puts every
+// star on a bright pixel. The same test is repeated on the low-resolution Allsky
+// image used for the first paint of the panorama. The catalogue is only an
+// independent position reference: the app itself displays SPHEREx only.
 //
 // Run: npm run verify:hips
 
@@ -18,7 +19,6 @@ const EXPECTED = 'x=nw,y=ne';
 
 const SURVEYS = [
   { id: 'SPHEREx DR1 cube, frame 46 (2.19 um)', base: `${HIPS}/SPHEREx/spherex_allsky_cube`, ext: 'png', order: 5, suffix: '_46' },
-  { id: '2MASS colour', base: `${HIPS}/CDS/2MASS/Color`, ext: 'jpg', order: 6, suffix: '' },
 ];
 
 // Test fields spread over the north cap, equatorial belt and south cap faces.

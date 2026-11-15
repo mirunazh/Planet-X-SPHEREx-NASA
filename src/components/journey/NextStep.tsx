@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useNav } from '@/lib/store';
 import { describeView } from '@/lib/caption';
 import { cropPixels, initialCropSize } from '@/lib/comparison/region';
-import { JourneyBar, type JourneyStep } from './JourneyBar';
+import { JOURNEY_STEPS, JourneyBar, type JourneyStep } from './JourneyBar';
 import styles from './NextStep.module.css';
 
 /** Zoomed in this far (degrees of sky on screen), a view counts as "looking closer". */
@@ -50,6 +50,33 @@ export function useJourney(): { step: 1 | 2; place: string | null; flying: boole
   return { step, place: flying ? null : nearest, flying, destination: toPlace ? selectedName : null };
 }
 
+const GUIDE_HIDDEN_KEY = 'skynav.guideHidden.v1';
+
+/**
+ * Whether the visitor folded the step card away. Remembered across visits (onboarding must stay
+ * dismissed once dismissed); storage can be blocked, so every access is guarded.
+ */
+export function useGuideHidden(): [boolean, (hidden: boolean) => void] {
+  const [hidden, setHidden] = useState(false);
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem(GUIDE_HIDDEN_KEY) === '1') setHidden(true);
+    } catch {
+      // Storage blocked: the card simply starts open on each visit.
+    }
+  }, []);
+  const set = (next: boolean) => {
+    setHidden(next);
+    try {
+      if (next) window.localStorage.setItem(GUIDE_HIDDEN_KEY, '1');
+      else window.localStorage.removeItem(GUIDE_HIDDEN_KEY);
+    } catch {
+      // Remembered for this visit only.
+    }
+  };
+  return [hidden, set];
+}
+
 /** Size of the square that "Compare its photos" will use for the current view, in arcminutes. */
 export function compareSize(): number {
   const { fov, viewport } = useNav.getState();
@@ -74,7 +101,8 @@ export function CompareArea() {
 
 /**
  * The one thing to do next, always in the same place: the journey bar, one sentence
- * and one primary button (plus a quieter alternative).
+ * and one primary button (plus a quieter alternative). The visitor can fold it into a
+ * small pill that still shows the current step and opens it again.
  */
 export function NextStep({ step, place, flying = false, opening = false, destination = null, onChoosePlace, onCompare, onTelescope, onAdjust }: {
   step: 1 | 2;
@@ -93,8 +121,26 @@ export function NextStep({ step, place, flying = false, opening = false, destina
       if (!flying && !opening) onCompare();
     } else onChoosePlace();
   };
+  const [hidden, setHidden] = useGuideHidden();
+  const title = JOURNEY_STEPS[step - 1].title;
+
+  if (hidden) {
+    return (
+      <button type="button" className={styles.pill} data-tour="next-step" aria-expanded={false}
+        onClick={() => setHidden(false)} title="Show the steps">
+        <span className={styles.pillDot} aria-hidden="true">{step}</span>
+        <span>Step {step} of 3 · <strong>{title}</strong></span>
+        <span className={styles.pillAction}>Show</span>
+      </button>
+    );
+  }
+
   return (
     <section className={styles.card} aria-label={`Step ${step} of 3`} data-tour="next-step">
+      <button type="button" className={styles.hide} aria-label="Hide the steps" aria-expanded={true}
+        title="Hide the steps" onClick={() => setHidden(true)}>
+        <span aria-hidden="true">×</span>
+      </button>
       <JourneyBar step={step} onSelect={onSelect} />
       {step === 1 ? (
         <div className={styles.row}>
@@ -112,11 +158,11 @@ export function NextStep({ step, place, flying = false, opening = false, destina
               ? destination ? <>Flying to <strong>{destination}</strong>…</> : <>Flying there…</>
               : opening
                 ? <>Opening the photos of <strong>{place ?? 'this spot'}</strong>…</>
-                : <><strong>{place ?? 'This spot'}</strong> is inside the square. Look around, try other telescopes, then compare its photos.</>}
+                : <><strong>{place ?? 'This spot'}</strong> is in the square. Try other infrared colors, then compare its photos.</>}
           </p>
           <div className={styles.actions}>
             <button type="button" className={styles.secondary} onClick={onTelescope}>
-              <span className={styles.emoji} aria-hidden="true">🔭</span> Other telescopes
+              <span className={styles.emoji} aria-hidden="true">🌈</span> Other colors
             </button>
             <button type="button" className={styles.primary} onClick={onCompare} disabled={flying || opening} aria-busy={opening || undefined}>
               <span className={styles.emoji} aria-hidden="true">🎞️</span> {flying ? 'Flying there…' : opening ? 'Opening photos…' : 'Compare its photos →'}

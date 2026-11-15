@@ -25,8 +25,10 @@ export const allskyUrl = (survey: Survey, frame: number) =>
 /**
  * Tile pixel orientation. Inside a HEALPix cell, (ne, nw) ∈ [0, 1]² are measured
  * from the south corner. In the tile image, x (left → right) follows nw and
- * y (top → bottom) follows ne. Verified with 2MASS stars on SPHEREx and 2MASS
- * tiles by scripts/verify-hips-orientation.mjs (16/16 stars in both surveys).
+ * y (top → bottom) follows ne. Verified on SPHEREx tiles by
+ * scripts/verify-hips-orientation.mjs. Its bright-star positions come from the
+ * 2MASS Point Source Catalog (IRSA fp_psc), used only as an independent test
+ * reference; the app itself shows SPHEREx only.
  */
 export function cellToImage(ne: number, nw: number): { x: number; y: number } {
   return { x: nw, y: ne };

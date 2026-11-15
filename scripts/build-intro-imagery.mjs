@@ -7,14 +7,13 @@
 //       seen from the north ecliptic pole, so the stars behind the Sun are those around the
 //       south ecliptic pole (with the Magellanic Clouds). Reprojected from the SPHEREx DR1 HiPS
 //       at IRSA, frame 46 (2.19 µm): the same tiles the sky map opens on.
-//   public/intro/sun.png        SDO/AIA 171 Å full-disc image, transparent outside the corona.
-//   public/intro/<planet>.jpg   Mission photographs cropped to the planet's disc.
-//   public/intro/saturn.png     Cassini photograph with the rings, transparent around them.
 //
-// Run: npm run data:intro            (everything)
-//      npm run data:intro -- sky     (only the sky backdrop; or: photos)
+// The project's scope is SPHEREx only, so this is the intro's only picture: the Sun and the
+// planets are drawn as simple discs, not photographs from other missions.
+//
+// Run: npm run data:intro
 
-import { mkdir, writeFile, readFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { PNG } from 'pngjs';
 import jpeg from 'jpeg-js';
 import * as hp from '@hscmap/healpix';
@@ -27,8 +26,6 @@ const DEG = Math.PI / 180;
 // --- Sources ------------------------------------------------------------------------------------
 
 const IRSA_HIPS = 'https://irsa.ipac.caltech.edu/data/hips';
-const NASA_IMAGES_API = 'https://images-api.nasa.gov/search';
-const NASA_ASSETS = 'https://images-assets.nasa.gov/image';
 
 /** Mean obliquity of the ecliptic at J2000.0 (IAU 1976), degrees: the frame of src/lib/sky/planets.ts. */
 const OBLIQUITY_J2000 = 23.4392911;
@@ -45,27 +42,6 @@ const SKY = {
   edgeDeg: 70,
   supersample: 3,
 };
-
-/** Photographs from the NASA Image and Video Library; credits are read from its metadata. */
-const PHOTOS = [
-  { body: 'mercury', id: 'PIA15160', mission: 'MESSENGER', size: 160 },
-  // Two panels side by side; the left one has colours close to what the eye would see.
-  { body: 'venus', id: 'PIA23791', mission: 'Mariner 10', size: 160, region: [0, 0, 0.46, 1] },
-  { body: 'mars', id: 'PIA00407', mission: 'Viking Orbiter', size: 160 },
-  { body: 'jupiter', id: 'PIA02873', mission: 'Cassini', size: 192 },
-  { body: 'saturn', id: 'PIA21046', mission: 'Cassini', size: 320, rings: true },
-  { body: 'uranus', id: 'PIA18182', mission: 'Voyager 2', size: 160 },
-  { body: 'neptune', id: 'PIA00046', mission: 'Voyager 2', size: 160 },
-];
-
-/** DSCOVR EPIC natural-colour image (Africa and Europe in view). */
-const EARTH = { body: 'earth', image: 'epic_1b_20261112105645', date: '2026-11-12', size: 1024 };
-
-/** SDO/AIA 171 Å browse image of 15 Nov 2026, 06:26:22 UT. */
-const SUN = { stamp: '20261115_062622', channel: '0171', size: 256 };
-
-/** Saturn's A ring outer edge over its equatorial radius (136 775 km / 60 268 km, NASA fact sheet). */
-const SATURN_RING_TO_GLOBE = 136775 / 60268;
 
 // --- Network ------------------------------------------------------------------------------------
 
@@ -114,108 +90,7 @@ function decode(buf) {
 
 const encodeJpeg = (img, quality) => jpeg.encode({ data: img.data, width: img.w, height: img.h }, quality).data;
 
-function encodePng(img) {
-  const png = new PNG({ width: img.w, height: img.h });
-  png.data = Buffer.from(img.data.buffer, img.data.byteOffset, img.data.byteLength);
-  return PNG.sync.write(png, { colorType: 6 });
-}
-
-const luma = (d, i) => 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
 const clamp01 = (v) => Math.min(1, Math.max(0, v));
-
-/**
- * Bounding box of the bright object on a dark background, inside `region` (fractions of the
- * image). Rows and columns need a few bright pixels to count, so stray noise is ignored.
- */
-function findObject(img, { region = [0, 0, 1, 1], threshold = 40 } = {}) {
-  const [fx, fy, fw, fh] = region;
-  const x0 = Math.floor(fx * img.w);
-  const y0 = Math.floor(fy * img.h);
-  const x1 = Math.ceil((fx + fw) * img.w);
-  const y1 = Math.ceil((fy + fh) * img.h);
-  const cols = new Uint32Array(img.w);
-  const rows = new Uint32Array(img.h);
-  for (let y = y0; y < y1; y++) {
-    for (let x = x0; x < x1; x++) {
-      if (luma(img.data, (y * img.w + x) * 4) > threshold) {
-        cols[x]++;
-        rows[y]++;
-      }
-    }
-  }
-  const min = Math.max(3, 0.01 * Math.min(x1 - x0, y1 - y0));
-  const first = (a, lo, hi) => { for (let i = lo; i < hi; i++) if (a[i] >= min) return i; return -1; };
-  const last = (a, lo, hi) => { for (let i = hi - 1; i >= lo; i--) if (a[i] >= min) return i; return -1; };
-  const left = first(cols, x0, x1);
-  const right = last(cols, x0, x1);
-  const top = first(rows, y0, y1);
-  const bottom = last(rows, y0, y1);
-  if (left < 0 || top < 0) throw new Error('No object found above the threshold');
-  return { cx: (left + right + 1) / 2, cy: (top + bottom + 1) / 2, rx: (right - left + 1) / 2, ry: (bottom - top + 1) / 2 };
-}
-
-/** Adds the bilinear sample at (x, y) (pixel centres at i + 0.5) to acc; outside the image is black. */
-function addSample(img, x, y, acc) {
-  if (x < 0 || y < 0 || x >= img.w || y >= img.h) return;
-  const fx = Math.min(Math.max(x - 0.5, 0), img.w - 1);
-  const fy = Math.min(Math.max(y - 0.5, 0), img.h - 1);
-  const ix = Math.floor(fx);
-  const iy = Math.floor(fy);
-  const ax = fx - ix;
-  const ay = fy - iy;
-  const ix1 = Math.min(ix + 1, img.w - 1);
-  const iy1 = Math.min(iy + 1, img.h - 1);
-  const d = img.data;
-  const i00 = (iy * img.w + ix) * 4;
-  const i10 = (iy * img.w + ix1) * 4;
-  const i01 = (iy1 * img.w + ix) * 4;
-  const i11 = (iy1 * img.w + ix1) * 4;
-  for (let c = 0; c < 3; c++) {
-    acc[c] += (d[i00 + c] * (1 - ax) + d[i10 + c] * ax) * (1 - ay) + (d[i01 + c] * (1 - ax) + d[i11 + c] * ax) * ay;
-  }
-}
-
-/** Square crop centred on (cx, cy) with half-width `half`, area-averaged down to size × size. */
-function cropSquare(img, cx, cy, half, size) {
-  const out = { w: size, h: size, data: new Uint8ClampedArray(size * size * 4) };
-  const step = (2 * half) / size;
-  const n = Math.max(1, Math.ceil(step));
-  const acc = new Float64Array(3);
-  for (let j = 0; j < size; j++) {
-    for (let i = 0; i < size; i++) {
-      acc.fill(0);
-      for (let b = 0; b < n; b++) {
-        for (let a = 0; a < n; a++) {
-          addSample(img, cx - half + (i + (a + 0.5) / n) * step, cy - half + (j + (b + 0.5) / n) * step, acc);
-        }
-      }
-      const o = (j * size + i) * 4;
-      out.data[o] = acc[0] / (n * n);
-      out.data[o + 1] = acc[1] / (n * n);
-      out.data[o + 2] = acc[2] / (n * n);
-      out.data[o + 3] = 255;
-    }
-  }
-  return out;
-}
-
-/**
- * Turns black space into transparency: opacity rises with brightness between `lo` and `hi`,
- * colour is un-premultiplied so the image composited over black is unchanged. `solid(x, y)`
- * marks pixels that stay opaque (a planet's or the Sun's disc); `fade(x, y)` scales opacity.
- */
-function keyOutBlack(img, { lo, hi, solid = () => false, fade = () => 1 }) {
-  const d = img.data;
-  for (let y = 0; y < img.h; y++) {
-    for (let x = 0; x < img.w; x++) {
-      const i = (y * img.w + x) * 4;
-      const a = solid(x + 0.5, y + 0.5) ? 1 : clamp01((luma(d, i) - lo) / (hi - lo)) * clamp01(fade(x + 0.5, y + 0.5));
-      for (let c = 0; c < 3; c++) d[i + c] = a > 0 ? Math.min(255, d[i + c] / a) : 0;
-      d[i + 3] = Math.round(a * 255);
-    }
-  }
-  return img;
-}
 
 // --- Sky backdrop -------------------------------------------------------------------------------
 
@@ -346,177 +221,14 @@ async function buildSky() {
   };
 }
 
-// --- Photographs --------------------------------------------------------------------------------
-
-async function libraryMetadata(id) {
-  const json = await get(`${NASA_IMAGES_API}?nasa_id=${id}`, { as: 'json' });
-  const data = json.collection?.items?.[0]?.data?.[0];
-  if (!data) throw new Error(`${id} not found in the NASA Image and Video Library`);
-  return { title: data.title, credit: data.secondary_creator || data.photographer || data.center, date: data.date_created?.slice(0, 10) };
-}
-
-async function buildPhoto({ body, id, mission, size, region, rings }) {
-  const meta = await libraryMetadata(id);
-  const source = `${NASA_ASSETS}/${id}/${id}~orig.jpg`;
-  const img = decode(await get(source));
-  const found = findObject(img, { region, threshold: rings ? 24 : 40 });
-  const entry = {
-    subject: body[0].toUpperCase() + body.slice(1),
-    mission,
-    title: `${id}: ${meta.title}`,
-    credit: meta.credit,
-    source,
-    page: `https://images.nasa.gov/details/${id}`,
-    // The library's date_created is when NASA published the image, often years after the photo
-    // (Mariner 10 imaged Venus in 1974; PIA23791 was published in 2020).
-    published: meta.date,
-    retrievedAt,
-  };
-
-  if (rings) {
-    // The rings' long axis is not foreshortened, so its half-width is the A ring's outer radius.
-    const half = found.rx * 1.03;
-    const out = cropSquare(img, found.cx, found.cy, half, size);
-    const globe = (found.rx / SATURN_RING_TO_GLOBE / half) * (size / 2);
-    keyOutBlack(out, { lo: 6, hi: 48, solid: (x, y) => Math.hypot(x - size / 2, y - size / 2) < globe * 0.85 });
-    const file = `${body}.png`;
-    const bytes = encodePng(out);
-    await writeFile(new URL(file, OUT), bytes);
-    console.log(`  ${file}: ${size}×${size}, ${(bytes.length / 1024).toFixed(0)} KB`);
-    const globeFraction = Number((globe / (size / 2)).toFixed(4));
-    return {
-      [file]: {
-        ...entry,
-        processing: [
-          `Square crop around the rings (A ring outer edge = ${SATURN_RING_TO_GLOBE.toFixed(3)} × equatorial radius), resized to ${size} px`,
-          'Black space made transparent; the planet\'s disc stays opaque',
-        ],
-        globeFraction,
-      },
-    };
-  }
-
-  const half = Math.max(found.rx, found.ry);
-  const out = cropSquare(img, found.cx, found.cy, half, size);
-  const file = `${body}.jpg`;
-  const bytes = encodeJpeg(out, 88);
-  await writeFile(new URL(file, OUT), bytes);
-  console.log(`  ${file}: ${size}×${size}, ${(bytes.length / 1024).toFixed(0)} KB`);
-  return {
-    [file]: {
-      ...entry,
-      processing: [`Square crop to the planet's disc${region ? ' (left panel)' : ''}, resized to ${size} px`],
-    },
-  };
-}
-
-async function buildEarth() {
-  const [y, m, d] = EARTH.date.split('-');
-  const list = await get(`https://epic.gsfc.nasa.gov/api/natural/date/${EARTH.date}`, { as: 'json' });
-  const meta = list.find((x) => x.image === EARTH.image);
-  if (!meta) throw new Error(`EPIC image ${EARTH.image} not listed for ${EARTH.date}`);
-  const source = `https://epic.gsfc.nasa.gov/archive/natural/${y}/${m}/${d}/png/${EARTH.image}.png`;
-  const img = decode(await get(source));
-  const found = findObject(img, { threshold: 30 });
-  const out = cropSquare(img, found.cx, found.cy, Math.max(found.rx, found.ry), EARTH.size);
-  const file = 'earth.jpg';
-  const bytes = encodeJpeg(out, 86);
-  await writeFile(new URL(file, OUT), bytes);
-  console.log(`  ${file}: ${EARTH.size}×${EARTH.size}, ${(bytes.length / 1024).toFixed(0)} KB`);
-  return {
-    [file]: {
-      subject: 'Earth',
-      mission: 'DSCOVR EPIC (Earth Polychromatic Imaging Camera), from 1.5 million km',
-      credit: 'NASA EPIC Team',
-      source,
-      page: 'https://epic.gsfc.nasa.gov/',
-      taken: `${meta.date} UTC`,
-      centroid: meta.centroid_coordinates,
-      processing: [`Square crop to the disc, resized to ${EARTH.size} px`],
-      retrievedAt,
-    },
-  };
-}
-
-async function buildSun() {
-  const [y, m, d] = [SUN.stamp.slice(0, 4), SUN.stamp.slice(4, 6), SUN.stamp.slice(6, 8)];
-  const source = `https://sdo.gsfc.nasa.gov/assets/img/browse/${y}/${m}/${d}/${SUN.stamp}_1024_${SUN.channel}.jpg`;
-  const img = decode(await get(source));
-  // SDO browse images are centred on the Sun. The limb is where the mean brightness of thin rings
-  // around the centre falls fastest.
-  const c = img.w / 2;
-  const profile = [];
-  for (let r = 0; r < img.w / 2; r++) {
-    let sum = 0;
-    let n = 0;
-    for (let k = 0; k < 360; k++) {
-      const x = Math.round(c + r * Math.cos(k * DEG));
-      const yy = Math.round(c + r * Math.sin(k * DEG));
-      sum += luma(img.data, (yy * img.w + x) * 4);
-      n++;
-    }
-    profile.push(sum / n);
-  }
-  let limb = 0;
-  let steepest = 0;
-  for (let r = Math.floor(img.w * 0.3); r < img.w * 0.48; r++) {
-    const drop = profile[r - 2] - profile[r + 2];
-    if (drop > steepest) {
-      steepest = drop;
-      limb = r;
-    }
-  }
-  const half = limb * 1.25;
-  const out = cropSquare(img, c, c, half, SUN.size);
-  const disc = (limb / half) * (SUN.size / 2);
-  const mid = SUN.size / 2;
-  keyOutBlack(out, {
-    lo: 4,
-    hi: 110,
-    solid: (x, yy) => Math.hypot(x - mid, yy - mid) < disc,
-    // The corona fades out before the frame's corners (and the caption printed there).
-    fade: (x, yy) => 1 - clamp01((Math.hypot(x - mid, yy - mid) / mid - 0.86) / 0.13),
-  });
-  const file = 'sun.png';
-  const bytes = encodePng(out);
-  await writeFile(new URL(file, OUT), bytes);
-  console.log(`  ${file}: ${SUN.size}×${SUN.size}, ${(bytes.length / 1024).toFixed(0)} KB (limb at ${limb} px of ${img.w})`);
-  return {
-    [file]: {
-      subject: 'The Sun in extreme ultraviolet (171 Å)',
-      mission: 'Solar Dynamics Observatory, Atmospheric Imaging Assembly',
-      credit: 'NASA/SDO and the AIA science team',
-      source,
-      page: 'https://sdo.gsfc.nasa.gov/',
-      taken: `${y}-${m}-${d} ${SUN.stamp.slice(9, 11)}:${SUN.stamp.slice(11, 13)}:${SUN.stamp.slice(13, 15)} UT`,
-      processing: [`Square crop of ${(2 * half).toFixed(0)} px around the Sun, resized to ${SUN.size} px`, 'Black space made transparent; the corona fades out at 0.86–0.99 of the half-width'],
-      discFraction: Number((disc / mid).toFixed(4)),
-      retrievedAt,
-    },
-  };
-}
-
 // --- Main ---------------------------------------------------------------------------------------
 
 async function main() {
-  const only = process.argv[2];
   await mkdir(OUT, { recursive: true });
   const manifestUrl = new URL('sources.json', OUT);
-  let previous = {};
-  try {
-    previous = JSON.parse(await readFile(manifestUrl, 'utf8')).files ?? {};
-  } catch {
-    // First run.
-  }
-  const files = { ...previous };
-  if (!only || only === 'sky') Object.assign(files, await buildSky());
-  if (!only || only === 'photos') {
-    console.log('Photographs...');
-    Object.assign(files, await buildSun(), await buildEarth());
-    for (const photo of PHOTOS) Object.assign(files, await buildPhoto(photo));
-  }
+  const files = await buildSky();
   const manifest = {
-    description: 'Real NASA imagery for the Solar System intro. Rebuild with: npm run data:intro',
+    description: 'SPHEREx imagery for the Solar System intro. Rebuild with: npm run data:intro',
     policy: 'NASA sources only. NASA imagery is generally not subject to copyright in the United States; credits follow NASA media usage guidelines.',
     files,
   };

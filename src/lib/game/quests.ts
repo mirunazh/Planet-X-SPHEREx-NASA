@@ -21,9 +21,9 @@ export const QUESTS: Record<QuestId, Quest> = {
     takeaway: 'Galaxies like Andromeda are millions of light-years away, far beyond the stars of our own galaxy.',
   },
   dust: {
-    title: 'See the sky with two telescopes',
-    task: 'Switch to another telescope with the Telescope figurine.',
-    takeaway: 'Each telescope sees different infrared colors, so the same sky shows different details.',
+    title: 'See through the dust',
+    task: 'Pick another infrared color with the Telescope figurine.',
+    takeaway: 'Each SPHEREx color shows different details. Longer colors see through more of the dust.',
   },
   planets: {
     title: 'Find a star with planets',

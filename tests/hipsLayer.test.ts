@@ -242,15 +242,11 @@ describe('HiPS band swaps', () => {
     expect(disposeAllskyGeometries).toHaveBeenCalledTimes(geometries + 1);
   });
 
-  it.each(['band', 'survey'])('settles after a batched A → B → A %s selection', async (kind) => {
+  it('settles after a batched A → B → A band selection', async () => {
     const group = render();
     loads.get(url(46))!.resolve(asset(url(46)));
     await flush();
-    if (kind === 'band') {
-      useNav.getState().setFrame(90); useNav.getState().setFrame(46);
-    } else {
-      useNav.getState().setSurvey('twomass'); useNav.getState().setSurvey('spherex');
-    }
+    useNav.getState().setFrame(90); useNav.getState().setFrame(46);
     render();
     loads.get(url(46))!.resolve(asset(url(46)));
     await flush();

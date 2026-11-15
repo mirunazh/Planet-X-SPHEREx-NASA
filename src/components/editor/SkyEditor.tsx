@@ -8,14 +8,12 @@ import { SURVEYS } from '@/lib/sky/surveys';
 import { ColorTool } from './ColorTool';
 import { LayersTool } from './LayersTool';
 import { LightTool } from './LightTool';
-import { TelescopeTool } from './TelescopeTool';
 import styles from './SkyEditor.module.css';
 
-export type EditorTool = 'telescope' | 'color' | 'light' | 'layers';
+export type EditorTool = 'color' | 'light' | 'layers';
 
 /** Same round button for every tool; the emoji tells them apart (as in the figurine dock). */
 const TOOLS: { id: EditorTool; label: string; emoji: string; Panel: () => ReactNode }[] = [
-  { id: 'telescope', label: 'Telescope', emoji: '🔭', Panel: TelescopeTool },
   { id: 'color', label: 'Color', emoji: '🌈', Panel: ColorTool },
   { id: 'light', label: 'Light', emoji: '🔆', Panel: LightTool },
   { id: 'layers', label: 'Layers', emoji: '🗺️', Panel: LayersTool },
@@ -24,9 +22,10 @@ const TOOLS: { id: EditorTool; label: string; emoji: string; Panel: () => ReactN
 /**
  * The friendly Telescope sheet: the same information and controls as the expert
  * LayerPanel, organised like the iOS Photos editor. A row of round tools on top and,
- * below it, only the selected tool's control.
+ * below it, only the selected tool's control. The telescope is always SPHEREx (the
+ * project's scope), so there is no telescope picker and the sheet opens on its colors.
  */
-export function SkyEditor({ open, onClose, initialTool = 'telescope' }: { open: boolean; onClose: () => void; initialTool?: EditorTool }) {
+export function SkyEditor({ open, onClose, initialTool = 'color' }: { open: boolean; onClose: () => void; initialTool?: EditorTool }) {
   const [tool, setTool] = useState<EditorTool>(initialTool);
   const [opened, setOpened] = useState({ open, initialTool });
 

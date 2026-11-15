@@ -10,7 +10,10 @@ import { LOCK_MAX_FOV } from '@/lib/sky/view';
 import { type GameEvent, useGame } from './store';
 import { withPlanetData } from './fieldGuide';
 
-/** Deep links and first-frame setup move the view by themselves; ignore that as "looking around". */
+/**
+ * Deep links and first-frame setup move the view and set the color by themselves;
+ * ignore that as "looking around" or "picking a color" (which finishes a quest).
+ */
 const SETTLE_MS = 1500;
 
 /** Layout effect in the browser so saved progress is in place before the first paint. */
@@ -39,7 +42,7 @@ export function useGameEvents(): void {
         }
       }
       if (s.surveyId !== prev.surveyId) record({ type: 'usedSurvey', surveyId: s.surveyId });
-      if (s.frame !== prev.frame) record({ type: 'changedColor' });
+      if (s.frame !== prev.frame && performance.now() >= settledAt) record({ type: 'changedColor' });
       if (s.fov !== prev.fov && s.fov <= LOCK_MAX_FOV) record({ type: 'zoomedClose' });
     });
 

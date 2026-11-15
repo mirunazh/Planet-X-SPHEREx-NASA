@@ -4,6 +4,8 @@
 **Purpose:** record which images we use, why we chose them, how we filter them and how we process them. This document is the source material for the project presentation.
 **Companion:** [plan-sky-navigator.md](plan-sky-navigator.md), which covers how the user chooses a target.
 
+> **Scope (15 Nov 2026): SPHEREx only.** The team limited the project to NASA SPHEREx. The app shows no 2MASS, WISE/NEOWISE, Gaia or other telescope images, and the 2MASS and AllWISE sky layers were removed. The multi-mission parts below (other missions' epochs, cross-matches, the "four missions, 25 years" story) are kept only as a record of the earlier plan and are out of scope.
+>
 > **Status (15 Nov 2026): sections 3–5 are the plan, not this build.** The Compare page shows SPHEREx exposures of one square of sky, aligned north-up, with honest captions. It does not yet compute the wavelength at the target, subtract zodiacal light, propagate Gaia positions, label asteroids or check detectability. Talking points 3–6 in section 7 depend on that roadmap.
 
 ---

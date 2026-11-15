@@ -10,7 +10,7 @@ Built for the NASA Space Apps Challenge 2026.
 
 ## What a visitor sees
 
-1. **Solar System intro** (first visit, or `/?intro=1`): the planets at today's positions from JPL elements, shown with real NASA photos (SDO, MESSENGER, Mariner 10, DSCOVR EPIC, Viking, Cassini, Voyager 2) in front of the SPHEREx sky behind the Sun. `npm run data:intro` rebuilds the images; `public/intro/sources.json` records their provenance.
+1. **Solar System intro** (first visit, or `/?intro=1`): the planets at today's positions from JPL elements, drawn as simple discs (no other mission's photos: the scope is SPHEREx only) in front of the SPHEREx sky behind the Sun. `npm run data:intro` rebuilds that sky backdrop; `public/intro/sources.json` records its provenance.
 2. **Simple navigator** (the default): one next step at a time (choose a place, look closer, compare its photos), a dock of tools, the Places, Telescope and Settings sheets, "What you're seeing" help with a guided tour, and a light game layer (figurines, quests, field guide). The original full interface is **Settings → Expert layout**.
 3. **Compare**: every SPHEREx exposure of a small square of sky, aligned north-up, as a flipbook. Searches query IRSA live and can take a minute when the archive is slow.
 4. **Weekly sky challenge**: the same square around M101, with up to 12 photos prepared in advance. This is the reliable demo path when IRSA is slow.
@@ -19,13 +19,11 @@ Built for the NASA Space Apps Challenge 2026.
 
 - **Panoramic navigation.** Opens at a 60° field of view, north up and east left, with the grid hidden. Drag to pan; scroll, pinch or use +/− to zoom. Home (or R) resets the view; Esc stops motion. Legacy globe links retain their sky direction and open in the panorama.
 - **Coordinate deduction.** RA/Dec (ICRS), galactic l/b and field of view are computed live from the camera direction. The number of digits follows the real uncertainty: the larger of one screen pixel and one survey pixel.
-- **NASA surveys**, streamed as HiPS tiles from NASA/IPAC IRSA:
+- **NASA SPHEREx only**, streamed as HiPS tiles from NASA/IPAC IRSA. The project's scope is SPHEREx, so the sky shows no other telescope's images:
 
   | Survey | Bands | Years | Map pixel (HiPS) |
   |---|---|---|---|
   | SPHEREx DR1 all-sky spectral cube | 102 channels, 0.75–5.0 µm, with a wavelength slider | 2025–2026 | 12.9″ |
-  | 2MASS colour | J, H, Ks | 1997–2001 | 0.8″ |
-  | AllWISE colour | W1, W2, W4 | 2010–2011 | 1.6″ |
 
 - **Pins.**
   - 4,862 exoplanet host stars from the NASA Exoplanet Archive.
@@ -38,10 +36,10 @@ Built for the NASA Space Apps Challenge 2026.
 
 No coordinate is looked up. The camera sits at the centre of a unit sphere aligned with the ICRS frame. The view direction `(x, y, z)` converts to `RA = atan2(y, x)` and `Dec = asin(z)`. NASA's HiPS images are already registered to the same frame, and each tile's file name is its HEALPix sky address, so every image lands where it belongs.
 
-The tile pixel orientation was **verified with NASA data, not assumed**. `npm run verify:hips` places 16 bright stars from the 2MASS Point Source Catalogue (IRSA `fp_psc`) on SPHEREx and 2MASS tiles under all 8 possible orientations. The correct orientation hits 16/16 stars in both surveys; the next-best manages 10/16.
+The tile pixel orientation was **verified with NASA data, not assumed**. `npm run verify:hips` places 16 bright stars on SPHEREx tiles under all 8 possible orientations; the correct orientation hit 16/16 stars (run of 2026-11-14). The star positions come from the 2MASS Point Source Catalogue (IRSA `fp_psc`), used only as an independent test reference; the app displays SPHEREx only.
 
 Further validation:
-- The NED position of M31 lands on its nucleus in both SPHEREx and 2MASS.
+- The NED position of M31 lands on its nucleus in SPHEREx.
 - The IAU Galactic Centre lands on the SPHEREx bulge.
 - The Kepler field's exoplanet hosts appear in Cygnus/Lyra.
 
@@ -107,8 +105,7 @@ Design notes:
 ## Data and credits
 
 - **SPHEREx:** Jet Propulsion Laboratory / Caltech, funded by NASA. DR1 all-sky cube DOI `10.26131/IRSA679`.
-- **2MASS:** University of Massachusetts and IPAC/Caltech, funded by NASA and NSF.
-- **WISE / NEOWISE:** UCLA and JPL/Caltech, funded by NASA.
+- **2MASS Point Source Catalog** (only in `npm run verify:hips`, never shown in the app): University of Massachusetts and IPAC/Caltech, funded by NASA and NSF.
 - **Archives:** NASA/IPAC Infrared Science Archive (IRSA), NASA Exoplanet Archive, NASA/IPAC Extragalactic Database (NED).
 - **Standards:** HEALPix (Górski et al. 2005) and IVOA HiPS 1.0.
 - **Software:** Next.js, React, three.js, React Three Fiber, @hscmap/healpix, zustand (all MIT licensed).
@@ -117,7 +114,7 @@ The full acknowledgement texts are in the app under **Data & credits**. The rati
 
 ## Known limitations
 
-- SPHEREx HiPS tiles stop at 12.9″ map pixels (the camera's own pixels are 6.2″). Deeper zoom magnifies them, and the readout says so. Switch to 2MASS for finer detail: its map pixels are 0.8″, though its images are only as sharp as the 2–3″ seeing.
+- SPHEREx HiPS tiles stop at 12.9″ map pixels (the camera's own pixels are 6.2″). Deeper zoom magnifies them, and the readout says so.
 - The PNG tiles use a fixed asinh display stretch (0–40 MJy/sr). They are for display, not photometry.
 - The SPHEREx cube's blank channels (frames 50 and 51) are skipped by the wavelength slider.
 

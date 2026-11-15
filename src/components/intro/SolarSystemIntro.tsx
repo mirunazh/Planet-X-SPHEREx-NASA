@@ -5,7 +5,7 @@ import { ELEMENTS_VALID_YEARS, PLANETS, PLANET_ORDER, eclipticLongitudeDeg, type
 import { WhatYoureSeeingButton } from '@/components/help/WhatYoureSeeingButton';
 import { markIntroPending } from '@/lib/ui';
 import { usePageHidden, useReducedMotion } from './hooks';
-import { BODY_IMAGES, INTRO_CREDIT_LINE, SKY_BACKDROP } from './imagery';
+import { BODY_SHAPES, INTRO_CREDIT_LINE, SATURN_RINGS, SATURN_RINGS_INNER, SKY_BACKDROP } from './imagery';
 import { type Circle, type OrreryLayout, type Rect, backdropSize, computeLayout, orbitPoint, placeLabels } from './orrery';
 import styles from './SolarSystemIntro.module.css';
 
@@ -18,7 +18,7 @@ const ZOOM_MS = 1200;
 const VALID_UNTIL_MS = Date.UTC(ELEMENTS_VALID_YEARS.to, 0, 1);
 
 const CAPTIONS = [
-  'The Sun and planets in real NASA photos, where they are today.',
+  'The Sun and planets, where they are today.',
   'Behind them is the real sky, mapped by SPHEREx. The planets move; distant stars stay put.',
   'Thousands more planets circle other stars. In the sky map, orange dots mark those stars.',
 ];
@@ -64,9 +64,10 @@ const RAD_TO_DEG = 180 / Math.PI;
 /**
  * About 20 seconds of context before the sky map: a top-down orrery with the planets at today's
  * real heliocentric longitudes (JPL approximate elements), then a 1 s = 20 days time-lapse, and a
- * zoom into Earth — the vantage point of SPHEREx — before handing over. Everything pictured is NASA
- * data: mission photos of the Sun and planets, each lit from the Sun's side, in front of the SPHEREx
- * sky that lies behind the Sun in this view (see ./imagery). Decides nothing about when it shows;
+ * zoom into Earth — the vantage point of SPHEREx — before handing over. The only picture is SPHEREx
+ * data: the sky that lies behind the Sun in this view (see ./imagery). The Sun and planets are drawn
+ * as coloured discs, each lit from the Sun's side (the project's scope is SPHEREx only, so no other
+ * mission's photos). Decides nothing about when it shows;
  * `onDone` fires once, on skip, Escape or the end of the zoom.
  */
 export function SolarSystemIntro({ onDone }: { onDone: () => void }) {
@@ -122,14 +123,14 @@ export function SolarSystemIntro({ onDone }: { onDone: () => void }) {
     const L = layoutRef.current;
     if (!L) return;
     const date = new Date(ms);
-    const circles = { sun: { x: L.cx, y: L.cy, r: L.sunRadius * BODY_IMAGES.sun.reach } } as Record<LabelId, Circle>;
+    const circles = { sun: { x: L.cx, y: L.cy, r: L.sunRadius * BODY_SHAPES.sun.reach } } as Record<LabelId, Circle>;
     const directions = { sun: { ux: 0, uy: 1 } } as Record<LabelId, { ux: number; uy: number }>;
     for (const id of PLANET_ORDER) {
       const p = orbitPoint(L, id, eclipticLongitudeDeg(id, date));
       planetEls.current[id]?.setAttribute('transform', `translate(${p.x.toFixed(2)} ${p.y.toFixed(2)})`);
       // Night side away from the Sun: seen from above, every planet is half lit.
       nightEls.current[id]?.setAttribute('transform', `rotate(${(Math.atan2(p.uy, p.ux) * RAD_TO_DEG).toFixed(1)})`);
-      circles[id] = { x: p.x, y: p.y, r: id === 'earth' ? L.earthRing : L.dot[id] * BODY_IMAGES[id].reach };
+      circles[id] = { x: p.x, y: p.y, r: id === 'earth' ? L.earthRing : L.dot[id] * BODY_SHAPES[id].reach };
       directions[id] = { ux: p.ux, uy: p.uy };
     }
     earthAt.current = { x: circles.earth.x, y: circles.earth.y };
@@ -290,7 +291,6 @@ export function SolarSystemIntro({ onDone }: { onDone: () => void }) {
   };
 
   const skySize = layout ? backdropSize(layout) : 0;
-  const sunR = layout ? layout.sunRadius * BODY_IMAGES.sun.extent : 0;
   /** Soft glare around the Sun, wide enough to cover the backdrop's no-data disc behind it. */
   const glareR = layout ? Math.max(3.4 * layout.sunRadius, (1.6 * SKY_BACKDROP.holeRadiusPx * skySize) / SKY_BACKDROP.size) : 0;
 
@@ -348,14 +348,11 @@ export function SolarSystemIntro({ onDone }: { onDone: () => void }) {
         className={styles.drawing}
         viewBox={layout ? `0 0 ${layout.width} ${layout.height}` : undefined}
         role="img"
-        aria-label="Top-down view of the Sun and the eight planets in NASA photographs, at their positions on the date shown, with Earth highlighted, in front of the real sky in that direction. Sizes enlarged, distances compressed, not to scale."
+        aria-label="Top-down diagram of the Sun and the eight planets, at their positions on the date shown, with Earth highlighted, in front of the real sky in that direction. Sizes enlarged, distances compressed, not to scale."
       >
         {layout && (
           <>
             <defs>
-              <clipPath id={`${svgId}-round`} clipPathUnits="objectBoundingBox">
-                <circle cx="0.5" cy="0.5" r="0.5" />
-              </clipPath>
               {/* Lit towards the Sun (left of the gradient), dark away from it; rotated per planet. */}
               <linearGradient id={`${svgId}-night`}>
                 <stop offset="0.36" stopColor="#000" stopOpacity="0" />
@@ -382,13 +379,10 @@ export function SolarSystemIntro({ onDone }: { onDone: () => void }) {
                 ))}
               </g>
               <circle cx={layout.cx} cy={layout.cy} r={glareR} fill={`url(#${svgId}-glare)`} />
-              {/* Flat shapes stay underneath as the fallback while the photos load. */}
-              <circle className={styles.sun} cx={layout.cx} cy={layout.cy} r={layout.sunRadius * 0.96} />
-              <image href={BODY_IMAGES.sun.src} x={layout.cx - sunR} y={layout.cy - sunR} width={2 * sunR} height={2 * sunR} />
+              {/* Drawn discs, not photographs: the only picture in the intro is the SPHEREx sky. */}
+              <circle className={styles.sun} cx={layout.cx} cy={layout.cy} r={layout.sunRadius} />
               {PLANET_ORDER.map((id) => {
                 const r = layout.dot[id];
-                const photo = BODY_IMAGES[id];
-                const R = r * photo.extent;
                 return (
                   <g
                     key={id}
@@ -397,15 +391,16 @@ export function SolarSystemIntro({ onDone }: { onDone: () => void }) {
                     }}
                   >
                     {id === 'earth' && <circle className={styles.earthRing} r={layout.earthRing} />}
-                    <circle className={id === 'earth' ? styles.earthDot : undefined} r={r * 0.96} fill={id === 'earth' ? undefined : PLANETS[id].color} />
-                    <image
-                      href={photo.src}
-                      x={-R}
-                      y={-R}
-                      width={2 * R}
-                      height={2 * R}
-                      clipPath={photo.round ? `url(#${svgId}-round)` : undefined}
-                    />
+                    {id === 'saturn' && (
+                      // Rings seen from above: C ring inner edge to A ring outer edge.
+                      <circle
+                        className={styles.rings}
+                        r={(r * (SATURN_RINGS + SATURN_RINGS_INNER)) / 2}
+                        strokeWidth={r * (SATURN_RINGS - SATURN_RINGS_INNER)}
+                        stroke={PLANETS.saturn.color}
+                      />
+                    )}
+                    <circle className={id === 'earth' ? styles.earthDot : undefined} r={r} fill={id === 'earth' ? undefined : PLANETS[id].color} />
                     <circle
                       ref={(el) => {
                         nightEls.current[id] = el;

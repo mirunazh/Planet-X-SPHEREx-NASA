@@ -1,6 +1,6 @@
 /*
- * Solar System intro: full-screen modal over the sky map. Pictures are NASA data (mission photos
- * and the SPHEREx sky, see imagery.ts); the drawn parts are diagram aids: orbits, labels, the Earth marker.
+ * Solar System intro: full-screen modal over the sky map. The only picture is the SPHEREx sky
+ * (see imagery.ts); everything else is a drawn diagram: Sun, planets, orbits, labels, the Earth marker.
  */
 
 .root {
@@ -86,7 +86,7 @@
   vector-effect: non-scaling-stroke;
 }
 
-/* Orbits are thin guides, like those of JPL orbit diagrams, so the photos and the sky lead. */
+/* Orbits are thin guides, like those of JPL orbit diagrams, so the planets and the sky lead. */
 .orbit {
   stroke: rgba(205, 218, 242, 0.3);
   stroke-width: 1;
@@ -100,6 +100,12 @@
 
 .sun {
   fill: var(--sun);
+}
+
+/* Saturn's rings from above: a faint band in the planet's colour. */
+.rings {
+  fill: none;
+  stroke-opacity: 0.5;
 }
 
 .earthDot {

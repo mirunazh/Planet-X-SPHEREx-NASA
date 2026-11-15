@@ -1,9 +1,10 @@
 /**
- * Registry of the NASA sky surveys the navigator can display. All of them are
- * HiPS tile sets served by the NASA/IPAC Infrared Science Archive (IRSA).
- * Values were read from each survey's `properties` file on 2026-11-14.
+ * The sky survey the navigator displays. The project's scope is NASA SPHEREx only,
+ * so the registry holds one entry: the SPHEREx DR1 HiPS cube served by the
+ * NASA/IPAC Infrared Science Archive (IRSA). Values were read from its
+ * `properties` file on 2026-11-14.
  */
-export type SurveyId = 'spherex' | 'twomass' | 'allwise';
+export type SurveyId = 'spherex';
 
 export interface Credit {
   label: string;
@@ -61,19 +62,15 @@ export const SPHEREX_FRAMES: SpherexFrame[] = SPHEREX_WAVELENGTHS_UM.map((wavele
 
 export const SPHEREX_PRESETS: { frame: number; label: string; hint: string }[] = [
   { frame: 0, label: '0.75 µm', hint: 'Shortest SPHEREx wavelength' },
-  { frame: 22, label: '1.25 µm', hint: 'Close to the 2MASS J band' },
-  { frame: 46, label: '2.19 µm', hint: 'Close to the 2MASS Ks band' },
+  { frame: 22, label: '1.25 µm', hint: 'Near-infrared J band; mostly starlight' },
+  { frame: 46, label: '2.19 µm', hint: 'Near-infrared K band; sees through much of the dust' },
   { frame: 62, label: '3.29 µm', hint: 'PAH emission and methane absorption' },
   { frame: 80, label: '4.26 µm', hint: 'CO₂ ice absorption band' },
-  { frame: 90, label: '4.60 µm', hint: 'Close to the WISE W2 band' },
+  { frame: 90, label: '4.60 µm', hint: 'Starlight and hot dust' },
 ];
 
 const SPHEREX_ACK =
   'This publication makes use of data products from the Spectro-Photometer for the History of the Universe, Epoch of Reionization and Ices Explorer (SPHEREx), which is a joint project of the Jet Propulsion Laboratory and the California Institute of Technology, and is funded by the National Aeronautics and Space Administration.';
-const TWOMASS_ACK =
-  'This publication makes use of data products from the Two Micron All Sky Survey, which is a joint project of the University of Massachusetts and the Infrared Processing and Analysis Center/California Institute of Technology, funded by the National Aeronautics and Space Administration and the National Science Foundation.';
-const WISE_ACK =
-  'This Progressive Survey distribution makes use of data products from the Wide-field Infrared Survey Explorer, which is a joint project of the University of California, Los Angeles, and the Jet Propulsion Laboratory/California Institute of Technology, and NEOWISE, which is a project of the Jet Propulsion Laboratory/California Institute of Technology. WISE and NEOWISE are funded by the National Aeronautics and Space Administration.';
 
 const IRSA_HIPS = 'https://irsa.ipac.caltech.edu/data/hips';
 
@@ -105,53 +102,9 @@ export const SURVEYS: Record<SurveyId, Survey> = {
       },
     ],
   },
-  twomass: {
-    id: 'twomass',
-    name: '2MASS colour (J, H, Ks)',
-    shortName: '2MASS',
-    mission: '2MASS (NASA / NSF)',
-    baseUrl: `${IRSA_HIPS}/CDS/2MASS/Color`,
-    ext: 'jpg',
-    maxOrder: 9,
-    pixelScaleArcsec: 0.805,
-    wavelength: '1.24 / 1.66 / 2.16 µm',
-    epoch: '1997–2001',
-    isCube: false,
-    defaultFrame: 0,
-    credits: [
-      { label: '2MASS', text: TWOMASS_ACK, url: 'https://irsa.ipac.caltech.edu/Missions/2mass.html' },
-      {
-        label: '2MASS HiPS',
-        text: 'HiPS built by CDS (CNRS/Unistra) from 2MASS images, served by IRSA.',
-        url: `${IRSA_HIPS}/CDS/2MASS/Color/properties`,
-      },
-    ],
-  },
-  allwise: {
-    id: 'allwise',
-    name: 'AllWISE colour (W1, W2, W4)',
-    shortName: 'AllWISE',
-    mission: 'WISE / NEOWISE (NASA)',
-    baseUrl: `${IRSA_HIPS}/CDS/AllWISE/RGB-W4-W2-W1`,
-    ext: 'jpg',
-    maxOrder: 8,
-    pixelScaleArcsec: 1.61,
-    wavelength: '3.4 / 4.6 / 22 µm',
-    epoch: '2010–2011',
-    isCube: false,
-    defaultFrame: 0,
-    credits: [
-      { label: 'WISE / NEOWISE', text: WISE_ACK, url: 'https://irsa.ipac.caltech.edu/Missions/wise.html' },
-      {
-        label: 'AllWISE HiPS',
-        text: 'HiPS built by CDS (CNRS/Unistra) from AllWISE Atlas images, served by IRSA.',
-        url: `${IRSA_HIPS}/CDS/AllWISE/RGB-W4-W2-W1/properties`,
-      },
-    ],
-  },
 };
 
-export const SURVEY_ORDER: SurveyId[] = ['spherex', 'twomass', 'allwise'];
+export const SURVEY_ORDER: SurveyId[] = ['spherex'];
 
 export const PLATFORM_CREDITS: Credit[] = [
   {
@@ -176,8 +129,9 @@ export const PLATFORM_CREDITS: Credit[] = [
   },
 ];
 
+/** Only SPHEREx is valid; old links and saves that name a removed survey fall back to it. */
 export function isSurveyId(value: string | null | undefined): value is SurveyId {
-  return value === 'spherex' || value === 'twomass' || value === 'allwise';
+  return value === 'spherex';
 }
 
 export function nearestUsableFrame(frame: number): number {

@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { BODY_IMAGES, INTRO_IMAGE_SOURCES, SKY_BACKDROP } from '@/components/intro/imagery';
+import { BODY_SHAPES, INTRO_CREDIT_LINE, INTRO_IMAGE_SOURCES, SATURN_RINGS, SATURN_RINGS_INNER, SKY_BACKDROP } from '@/components/intro/imagery';
 import { backdropSize, computeLayout } from '@/components/intro/orrery';
 import { PLANET_ORDER } from '@/lib/sky/planets';
 
@@ -12,8 +12,7 @@ interface ManifestEntry {
   source: string;
   page: string;
   processing: string[];
-  globeFraction?: number;
-  discFraction?: number;
+  mission?: string;
   projection?: { size: number; edgeDeg: number; pxPerUnitRadius: number };
 }
 
@@ -21,12 +20,18 @@ const manifest = JSON.parse(readFileSync(`${PUBLIC}/intro/sources.json`, 'utf8')
 const fileName = (src: string) => src.replace('/intro/', '');
 
 describe('intro imagery', () => {
-  it('has a picture for the Sun and every planet', () => {
-    expect(Object.keys(BODY_IMAGES).sort()).toEqual(['sun', ...PLANET_ORDER].sort());
+  it('draws a shape for the Sun and every planet, with the rings of Saturn outside its globe', () => {
+    expect(Object.keys(BODY_SHAPES).sort()).toEqual(['sun', ...PLANET_ORDER].sort());
+    expect(SATURN_RINGS_INNER).toBeGreaterThan(1);
+    expect(SATURN_RINGS).toBeGreaterThan(SATURN_RINGS_INNER);
+    expect(BODY_SHAPES.saturn.reach).toBe(SATURN_RINGS);
   });
 
-  it('ships every picture it draws, each with provenance from a NASA source', () => {
-    for (const src of [...Object.values(BODY_IMAGES).map((b) => b.src), SKY_BACKDROP.src]) {
+  it('ships only SPHEREx imagery (the project scope), with provenance', () => {
+    expect(Object.values(manifest.files).map((f) => f.mission)).toEqual(['SPHEREx']);
+    expect(INTRO_CREDIT_LINE).toMatch(/SPHEREx/);
+    expect(INTRO_CREDIT_LINE).not.toMatch(/SDO|Cassini|Voyager|MESSENGER|Mariner|DSCOVR|Viking/);
+    for (const src of [SKY_BACKDROP.src]) {
       expect(existsSync(`${PUBLIC}${src}`), src).toBe(true);
       const entry = manifest.files[fileName(src)];
       expect(entry, src).toBeDefined();
@@ -37,8 +42,6 @@ describe('intro imagery', () => {
   });
 
   it('matches the geometry the build script measured', () => {
-    expect(1 / BODY_IMAGES.sun.extent).toBeCloseTo(manifest.files['sun.png'].discFraction ?? NaN, 3);
-    expect(1 / BODY_IMAGES.saturn.extent).toBeCloseTo(manifest.files['saturn.png'].globeFraction ?? NaN, 3);
     const sky = manifest.files[fileName(SKY_BACKDROP.src)].projection;
     expect(sky?.size).toBe(SKY_BACKDROP.size);
     expect(sky?.edgeDeg).toBe(SKY_BACKDROP.edgeDeg);

@@ -13,11 +13,11 @@ export interface ColorStop {
 
 export const COLOR_STOPS: ColorStop[] = [
   { frame: 0, name: 'Near red', detail: 'Just beyond red light; mostly starlight' },
-  { frame: 22, name: 'Starlight', detail: 'Close to the 2MASS J band' },
-  { frame: 46, name: 'Through dust', detail: 'Starlight that gets through much of the dust; close to 2MASS Ks' },
+  { frame: 22, name: 'Starlight', detail: 'Mostly starlight; thick dust still dims it' },
+  { frame: 46, name: 'Through dust', detail: 'Starlight that gets through much of the dust' },
   { frame: 62, name: 'Glowing dust', detail: 'Carbon-rich dust molecules (PAHs) glow here' },
   { frame: 80, name: 'CO₂ ice', detail: 'Where carbon dioxide ice absorbs light' },
-  { frame: 90, name: 'Hot dust', detail: 'Starlight and hot dust; close to the WISE W2 band' },
+  { frame: 90, name: 'Hot dust', detail: 'Starlight and hot dust' },
 ];
 
 function wavelengthAt(frame: number): number {
