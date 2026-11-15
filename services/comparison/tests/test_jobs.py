@@ -161,12 +161,14 @@ class JobTests(unittest.IsolatedAsyncioTestCase):
             if request.url.params.get("COLLECTION") != "spherex_dr1":
                 await asyncio.sleep(10)
             return httpx.Response(200, content=votable([ROW]))
-        coordinator = self.setup(handler, queue_budget=.01, execution_budget=.05)
+        # Budgets well above Windows' ~16 ms timer step and a synchronous SQLite commit, so the
+        # fast collection always finishes inside the execution budget and the slow one never does.
+        coordinator = self.setup(handler, queue_budget=.05, execution_budget=.4)
         start = time.monotonic()
         first = coordinator.start(Search(0, 0, 10))
         second = coordinator.start(Search(1, 0, 10))
         await self.finish()
-        self.assertLess(time.monotonic() - start, .5)
+        self.assertLess(time.monotonic() - start, 2)
         job = self.store.get(first["id"])
         self.assertEqual(job["total"], 1)
         self.assertEqual(job["state"], "timed_out")

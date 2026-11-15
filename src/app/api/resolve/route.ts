@@ -34,15 +34,21 @@ interface NedLookup {
 const cache = new Map<string, { at: number; status: number; body: ResolveBody }>();
 const buckets = new Map<string, { tokens: number; at: number }>();
 
-function rateLimited(client: string): boolean {
+/** Key of the bucket every lookup also draws from: about one NED request per second in total. */
+const ALL_CLIENTS = '*';
+const GLOBAL_CAPACITY = 60;
+const GLOBAL_REFILL_PER_SEC = 1;
+
+function rateLimited(client: string, capacity = RATE_CAPACITY, refillPerSec = RATE_REFILL_PER_SEC): boolean {
   const now = Date.now();
-  const b = buckets.get(client) ?? { tokens: RATE_CAPACITY, at: now };
-  b.tokens = Math.min(RATE_CAPACITY, b.tokens + ((now - b.at) / 1000) * RATE_REFILL_PER_SEC);
+  const b = buckets.get(client) ?? { tokens: capacity, at: now };
+  b.tokens = Math.min(capacity, b.tokens + ((now - b.at) / 1000) * refillPerSec);
   b.at = now;
   const limited = b.tokens < 1;
   if (!limited) b.tokens -= 1;
   buckets.set(client, b);
-  if (buckets.size > 5000) buckets.clear();
+  // Forget idle client buckets, never the shared one.
+  if (buckets.size > 5000) for (const [k, v] of buckets) if (k !== ALL_CLIENTS && v.tokens >= RATE_CAPACITY - 1) buckets.delete(k);
   return limited;
 }
 
@@ -60,15 +66,19 @@ export async function GET(req: NextRequest) {
   if (!NAME_PATTERN.test(name)) {
     return reply({ ok: false, message: 'Enter an object name of 1 to 64 characters.' }, 400);
   }
-  // Only used as an in-memory rate-limit key; never logged or stored.
-  const client = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'local';
-  if (rateLimited(client)) {
-    return reply({ ok: false, message: 'Too many lookups. Please wait a moment.' }, 429);
-  }
-
+  // Cached answers cost NED nothing, so they are served before any limit applies.
   const key = name.toLowerCase();
   const hit = cache.get(key);
   if (hit && Date.now() - hit.at < CACHE_TTL_MS) return reply(hit.body, hit.status);
+
+  // Only used as an in-memory rate-limit key; never logged or stored. The right-most hop is the one
+  // the nearest reverse proxy appended; the left-most is whatever the client chose to send. The
+  // shared bucket caps NED traffic even when keys are spoofed.
+  const hops = req.headers.get('x-forwarded-for')?.split(',').map((hop) => hop.trim()).filter(Boolean);
+  const client = hops?.length ? hops[hops.length - 1] : 'local';
+  if (rateLimited(client) || rateLimited(ALL_CLIENTS, GLOBAL_CAPACITY, GLOBAL_REFILL_PER_SEC)) {
+    return reply({ ok: false, message: 'Too many lookups. Please wait a moment.' }, 429);
+  }
 
   try {
     const res = await fetch(`${NED_LOOKUP}?name=${encodeURIComponent(name)}`, {

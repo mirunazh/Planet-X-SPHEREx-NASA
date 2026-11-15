@@ -55,11 +55,23 @@ describe('NED route stability', () => {
     expect((await GET(request('absent'))).status).toBe(404);
     const now = Date.now();
     vi.spyOn(Date, 'now').mockReturnValue(now);
-    for (let i = 0; i < 20; i++) expect((await GET(request('M31', 'rate-client'))).status).toBe(200);
-    const limited = await GET(request('M31', 'rate-client'));
+    // Distinct names, so each one costs a NED request (cached answers are free, see below).
+    for (let i = 0; i < 20; i++) expect((await GET(request(`NGC ${i + 1}`, 'rate-client'))).status).toBe(200);
+    const limited = await GET(request('NGC 999', 'rate-client'));
     expect(limited.status).toBe(429);
     expect(limited.headers.get('cache-control')).toBe('no-store');
+    // A name already looked up is served from the cache even while the client is limited.
+    expect((await GET(request('NGC 1', 'rate-client'))).status).toBe(200);
     vi.mocked(Date.now).mockReturnValue(now + 4000);
-    expect((await GET(request('M31', 'rate-client'))).status).toBe(200);
+    expect((await GET(request('NGC 1000', 'rate-client'))).status).toBe(200);
+  });
+
+  it('keys clients on the hop the nearest proxy added, not on what the client sends', async () => {
+    const now = Date.now();
+    vi.spyOn(Date, 'now').mockReturnValue(now);
+    // A client rotating its own left-most value still shares the proxy-added right-most hop.
+    for (let i = 0; i < 20; i++) expect((await GET(request(`IC ${i + 1}`, `10.0.0.${i}, 198.51.100.9`))).status).toBe(200);
+    expect((await GET(request('IC 999', '10.9.9.9, 198.51.100.9'))).status).toBe(429);
+    expect((await GET(request('IC 998', '198.51.100.10'))).status).toBe(200);
   });
 });

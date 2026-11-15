@@ -14,6 +14,8 @@ from inventory import MAX_BYTES, parse_votable, safe_irsa_url
 
 log = logging.getLogger("comparison.requests")
 TRANSIENT = {429, 502, 503, 504}
+# Upper bound on an archive's Retry-After: the IRSA slots and workers are shared by every visitor.
+MAX_RETRY_AFTER_SECONDS = 30
 
 
 class Suspended(Exception):
@@ -115,7 +117,7 @@ class ArchiveClient:
                         event = {"jobId": job_id, "endpoint": endpoint, "attempt": attempt, "durationMs": round((time.monotonic() - started) * 1000), "httpStatus": status or (200 if reason is None else None), "error": reason, "resultCount": count}
                         self.record(event)
                         log.info("archive_request %s", event)
-            delay = retry_after if retry_after is not None else 2 ** (attempt - 1) + self.jitter()
+            delay = min(retry_after, MAX_RETRY_AFTER_SECONDS) if retry_after is not None else 2 ** (attempt - 1) + self.jitter()
             if deadline is not None and delay >= deadline - time.monotonic():
                 raise TimeoutError("Retry delay exceeds execution budget")
             progress(state="retrying", error=reason)

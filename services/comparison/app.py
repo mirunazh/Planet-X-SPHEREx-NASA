@@ -28,11 +28,15 @@ def timeout_setting(name, default):
 async def lifespan(app):
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
     logging.getLogger("httpx").setLevel(logging.WARNING)
+    # Pruning recomputes the cache size on the event loop; at 256 MiB that blocked every request for
+    # about 34 s, at 32 MiB it takes a few seconds at worst.
     store = Store(os.environ.get("COMPARISON_DB", "/data/inventory.sqlite3"),
-        limit=int(os.environ.get("METADATA_CACHE_BYTES", str(256 * 1024 * 1024))))
-    request_timeout = timeout_setting("IRSA_REQUEST_TIMEOUT_SECONDS", 25)
-    execution_timeout = timeout_setting("SEARCH_EXECUTION_TIMEOUT_SECONDS", 120)
-    queue_timeout = timeout_setting("SEARCH_QUEUE_TIMEOUT_SECONDS", 30)
+        limit=int(os.environ.get("METADATA_CACHE_BYTES", str(32 * 1024 * 1024))))
+    # IRSA's SIA often needs about 25 s and sometimes much longer, so a 25 s attempt limit failed half
+    # the searches. These limits still stop one stuck request from holding the workers for good.
+    request_timeout = timeout_setting("IRSA_REQUEST_TIMEOUT_SECONDS", 60)
+    execution_timeout = timeout_setting("SEARCH_EXECUTION_TIMEOUT_SECONDS", 180)
+    queue_timeout = timeout_setting("SEARCH_QUEUE_TIMEOUT_SECONDS", 60)
     archive = ArchiveClient(record=store.record, attempt_timeout=request_timeout)
     archive.last = store.last_archive()
     app.state.coordinator = Coordinator(store, archive, queue_budget=queue_timeout, execution_budget=execution_timeout)

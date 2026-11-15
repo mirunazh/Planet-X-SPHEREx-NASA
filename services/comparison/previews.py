@@ -18,6 +18,7 @@ from astropy.io import fits
 from astropy.wcs import WCS
 
 from inventory import Search, safe_irsa_url
+from transport import MAX_RETRY_AFTER_SECONDS
 
 RENDER_VERSION = "spherex-png-1"
 MAX_FITS_BYTES = 64 * 1024 * 1024
@@ -176,7 +177,8 @@ class PreviewManager:
                         delay = max(delay, float(error.response.headers.get("retry-after", delay)))
                     except ValueError:
                         pass
-                await self.sleep(delay)
+                # The image worker is shared: never let an archive's Retry-After stall it for long.
+                await self.sleep(min(delay, MAX_RETRY_AFTER_SECONDS))
 
     async def download_once(self, url):
         async with self.archive.slots:
