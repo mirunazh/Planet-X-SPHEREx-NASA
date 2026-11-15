@@ -12,9 +12,14 @@ import type { SkyTarget } from './sky/target';
 const finite = (v: string | null) => (v !== null && v.trim() !== '' && Number.isFinite(Number(v)) ? Number(v) : null);
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
-export function applyUrlState(): void {
+/**
+ * Applies a deep link to the view. Pass the search params of the route being rendered: during a
+ * client-side navigation (for example back from Compare), Next updates the address bar only after
+ * the new page commits, so `window.location` still holds the previous page while this one renders.
+ */
+export function applyUrlState(search?: string | URLSearchParams): void {
   if (typeof window === 'undefined') return;
-  const p = new URLSearchParams(window.location.search);
+  const p = new URLSearchParams(search ?? window.location.search);
   const patch: Partial<ReturnType<typeof useNav.getState>> = { mode: 'sky', fov: INITIAL_VIEW.fov };
 
   const ra = finite(p.get('ra'));
@@ -67,6 +72,9 @@ export function buildTargetUrl(target: SkyTarget, baseUrl: string): string {
 }
 
 function writeUrl(): void {
+  // Only the sky page mirrors its view. A debounced write that fires just after leaving it (for
+  // Compare) must not replace that page's own query.
+  if (window.location.pathname !== '/') return;
   window.history.replaceState(window.history.state, '', `${window.location.pathname}?${viewQuery(useNav.getState())}`);
 }
 

@@ -35,6 +35,8 @@ export interface Pin {
 }
 
 export interface AnimStep {
+  /** 'flight' moves the view to a chosen place; 'inertia' is the spin after a flick. */
+  kind?: 'flight' | 'inertia';
   duration: number;
   start?: number;
   init?: () => void;

@@ -80,6 +80,7 @@ export function runAnimations(now: number): void {
 function skyFlight(goal: Vec3, fovGoal: number): AnimStep {
   let path: FlyPath | null = null;
   const step: AnimStep = {
+    kind: 'flight',
     duration: 1000,
     init: () => {
       const st = useNav.getState();
@@ -152,6 +153,7 @@ export function startInertia(axis: Vec3, omegaRadPerSec: number): void {
   let applied = 0;
   enqueue([
     {
+      kind: 'inertia',
       duration: total * 1000,
       update: (t) => {
         const swept = omegaRadPerSec * tau * (1 - Math.exp(-(t * total) / tau));

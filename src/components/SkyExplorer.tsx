@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Canvas } from '@react-three/fiber';
 import { HipsLayer } from './sky/HipsLayer';
 import { GridLayer } from './sky/GridLayer';
@@ -24,9 +25,11 @@ function NoWebGL() {
 
 export default function SkyExplorer() {
   const stageRef = useRef<HTMLDivElement>(null);
-  // Apply a deep link before the first frame renders.
+  // Apply a deep link before the first frame renders. The router's params, not window.location:
+  // coming back from Compare, the address bar still shows /compare while this page renders.
+  const searchParams = useSearchParams();
   useState(() => {
-    applyUrlState();
+    applyUrlState(searchParams.toString());
     return true;
   });
   useSkyControls(stageRef);

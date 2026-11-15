@@ -12,9 +12,12 @@ export const LOOK_CLOSER_FOV = 5;
 
 const UNNAMED = new Set(['Along the Milky Way', 'Away from the Milky Way']);
 
-/** True while a fly-to runs: the square is not on its target yet, so comparing must wait. */
+/**
+ * True while a fly-to runs: the square is not on its target yet, so comparing must wait. The spin
+ * that continues after a flick shares the animation queue but is not a flight.
+ */
 export function isFlying(): boolean {
-  return useNav.getState().anim.length > 0;
+  return useNav.getState().anim.some((step) => step.kind === 'flight');
 }
 
 /**
@@ -23,6 +26,8 @@ export function isFlying(): boolean {
  */
 export function useJourney(): { step: 1 | 2; place: string | null; flying: boolean; destination: string | null } {
   const selectedName = useNav((s) => s.selected?.name ?? null);
+  /** Only a place picked from the list or search is "the destination"; other flights keep an old selection. */
+  const toPlace = useNav((s) => s.origin === 'pin');
   const zoomed = useNav((s) => s.fov <= LOOK_CLOSER_FOV);
   const [nearest, setNearest] = useState<string | null>(null);
   const [flying, setFlying] = useState(false);
@@ -34,7 +39,7 @@ export function useJourney(): { step: 1 | 2; place: string | null; flying: boole
       const named = UNNAMED.has(place) ? null : place;
       setNearest((previous) => (previous === named ? previous : named));
       // The animation queue is mutated in place (never rendered), so it is polled here.
-      setFlying(s.anim.length > 0);
+      setFlying(isFlying());
     };
     update();
     const timer = window.setInterval(update, 250);
@@ -42,7 +47,7 @@ export function useJourney(): { step: 1 | 2; place: string | null; flying: boole
   }, []);
 
   const step = selectedName || zoomed ? 2 : 1;
-  return { step, place: flying ? null : nearest, flying, destination: selectedName };
+  return { step, place: flying ? null : nearest, flying, destination: toPlace ? selectedName : null };
 }
 
 /** Size of the square that "Compare its photos" will use for the current view, in arcminutes. */
@@ -71,10 +76,12 @@ export function CompareArea() {
  * The one thing to do next, always in the same place: the journey bar, one sentence
  * and one primary button (plus a quieter alternative).
  */
-export function NextStep({ step, place, flying = false, destination = null, onChoosePlace, onCompare, onTelescope, onAdjust }: {
+export function NextStep({ step, place, flying = false, opening = false, destination = null, onChoosePlace, onCompare, onTelescope, onAdjust }: {
   step: 1 | 2;
   place: string | null;
   flying?: boolean;
+  /** The Compare page is loading. */
+  opening?: boolean;
   destination?: string | null;
   onChoosePlace: () => void;
   onCompare: () => void;
@@ -83,7 +90,7 @@ export function NextStep({ step, place, flying = false, destination = null, onCh
 }) {
   const onSelect = (target: JourneyStep) => {
     if (target === 3 && step === 2) {
-      if (!flying) onCompare();
+      if (!flying && !opening) onCompare();
     } else onChoosePlace();
   };
   return (
@@ -102,15 +109,17 @@ export function NextStep({ step, place, flying = false, destination = null, onCh
         <div className={styles.row}>
           <p className={styles.text} aria-live="polite">
             {flying
-              ? <>Flying to <strong>{destination ?? 'your place'}</strong>…</>
-              : <><strong>{place ?? 'This spot'}</strong> is inside the square. Look around, try other telescopes, then compare its photos.</>}
+              ? destination ? <>Flying to <strong>{destination}</strong>…</> : <>Flying there…</>
+              : opening
+                ? <>Opening the photos of <strong>{place ?? 'this spot'}</strong>…</>
+                : <><strong>{place ?? 'This spot'}</strong> is inside the square. Look around, try other telescopes, then compare its photos.</>}
           </p>
           <div className={styles.actions}>
             <button type="button" className={styles.secondary} onClick={onTelescope}>
               <span className={styles.emoji} aria-hidden="true">🔭</span> Other telescopes
             </button>
-            <button type="button" className={styles.primary} onClick={onCompare} disabled={flying}>
-              <span className={styles.emoji} aria-hidden="true">🎞️</span> {flying ? 'Flying there…' : 'Compare its photos →'}
+            <button type="button" className={styles.primary} onClick={onCompare} disabled={flying || opening} aria-busy={opening || undefined}>
+              <span className={styles.emoji} aria-hidden="true">🎞️</span> {flying ? 'Flying there…' : opening ? 'Opening photos…' : 'Compare its photos →'}
             </button>
           </div>
           <button type="button" className={styles.link} onClick={onAdjust}>Change the square</button>

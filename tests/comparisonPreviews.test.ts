@@ -64,7 +64,7 @@ describe('same-origin preview API', () => {
   it('preserves binary PNG bytes and validates preview JSON', async () => {
     const fetcher = vi.fn().mockResolvedValueOnce(Response.json(queued, { status: 202 })).mockResolvedValueOnce(image());
     vi.stubGlobal('fetch', fetcher);
-    const created = await comparisonProxy(new Request('http://localhost/api/comparison/searches/job/previews', { method: 'POST', body: JSON.stringify({ version: 'v', productId: id }) }), 'searches/job/previews');
+    const created = await comparisonProxy(new Request('http://localhost/api/comparison/searches/job/previews', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ version: 'v', productId: id }) }), 'searches/job/previews');
     expect(created.status).toBe(202);
     expect(JSON.parse(fetcher.mock.calls[0][1].body)).toEqual({ version: 'v', productId: id });
     const png = await comparisonProxy(new Request('http://localhost'), `previews/${id}/image`);
@@ -73,7 +73,7 @@ describe('same-origin preview API', () => {
   });
   it('rejects arbitrary archive URLs, path traversal and malformed image content', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(new Response('html', { headers: { 'Content-Type': 'image/png' } })));
-    expect((await comparisonProxy(new Request('http://localhost', { method: 'POST', body: '{"url":"https://evil.test"}' }), 'searches/job/previews')).status).toBe(400);
+    expect((await comparisonProxy(new Request('http://localhost', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{"url":"https://evil.test"}' }), 'searches/job/previews')).status).toBe(400);
     expect((await comparisonProxy(new Request('http://localhost'), 'previews/../../health/image')).status).toBe(400);
     expect((await comparisonProxy(new Request('http://localhost'), `previews/${id}/image`)).status).toBe(502);
   });

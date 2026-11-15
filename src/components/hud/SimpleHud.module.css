@@ -53,6 +53,29 @@
   min-width: 0;
 }
 
+/*
+ * The search hint and status flow below the field, over the next-step card. Keep them out of its
+ * way: the hint is still read by screen readers (aria-describedby) but not drawn, since the field's
+ * placeholder already gives an example, and the status is drawn only while the search is in use. It
+ * stays in the DOM, so screen readers still hear it, and it never catches clicks meant for the card.
+ */
+.search :global(.search-hint),
+.search:not(:focus-within) :global(.search-status) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.search :global(.search-status) {
+  pointer-events: none;
+}
+
 .actions {
   display: flex;
   gap: 8px;

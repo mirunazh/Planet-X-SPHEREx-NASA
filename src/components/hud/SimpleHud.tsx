@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useNav } from '@/lib/store';
 import { useUi, type SheetId } from '@/lib/ui';
@@ -68,6 +68,8 @@ export function SimpleHud({ onReplayIntro }: { onReplayIntro: () => void }) {
   const locked = useNav((s) => s.locked);
   const ui = useUi.getState();
   const { step, place, flying, destination } = useJourney();
+  /** True from the Compare click until the Compare page is on screen (seconds when the archive is slow). */
+  const [opening, startOpening] = useTransition();
 
   // Step 3 links back here with ?sheet=places to start over at step 1.
   useEffect(() => {
@@ -82,7 +84,7 @@ export function SimpleHud({ onReplayIntro }: { onReplayIntro: () => void }) {
     if (isFlying()) return;
     ui.closeSheet();
     const url = comparisonUrl(useNav.getState(), compareSize());
-    router.push(place ? `${url}&name=${encodeURIComponent(place)}` : url);
+    startOpening(() => router.push(place ? `${url}&name=${encodeURIComponent(place)}` : url));
   };
 
   const openFigurine = (id: FigurineId) => {
@@ -129,8 +131,9 @@ export function SimpleHud({ onReplayIntro }: { onReplayIntro: () => void }) {
       {showDetails && <div className={styles.details}><SidePanel /></div>}
 
       {step === 2 && !cropOpen && <CompareArea />}
-      {!sheet && !tourOpen && !cropOpen && (
-        <NextStep step={step} place={place} flying={flying} destination={destination} onChoosePlace={choosePlace} onCompare={goCompare}
+      {/* Stays up during the guided tour: its "next step" stop points at this card. */}
+      {!sheet && !cropOpen && (
+        <NextStep step={step} place={place} flying={flying} opening={opening} destination={destination} onChoosePlace={choosePlace} onCompare={goCompare}
           onTelescope={() => ui.openSheet('telescope')} onAdjust={() => ui.setCropOpen(true)} />
       )}
 

@@ -71,6 +71,30 @@ describe('panoramic deep links', () => {
       stop();
     }
   });
+
+  it('applies the route being rendered, not a stale address bar (back from Compare)', () => {
+    // While Next renders the sky page, the address bar still shows the Compare page.
+    location('?ra=10.68479&dec=41.26907&size=10&return=x');
+    applyUrlState('ra=210.80227&dec=54.34895&mode=sky&fov=0.6&survey=spherex&f=46');
+    const s = useNav.getState();
+    expect(s.fov).toBe(0.6);
+    expect(angularDistance(s.center, radecToVec(210.80227, 54.34895))).toBeLessThan(0.00001);
+  });
+
+  it('never rewrites another page’s address with a late debounced write', () => {
+    vi.useFakeTimers();
+    location('?ra=10&dec=20&fov=1');
+    const stop = startUrlSync();
+    try {
+      replaceState.mockClear();
+      useNav.getState().setView({ fov: 0.5 });
+      vi.stubGlobal('window', { location: { search: '?ra=10&dec=20&size=10', pathname: '/compare' }, history: { state: null, replaceState } });
+      vi.advanceTimersByTime(450);
+      expect(replaceState).not.toHaveBeenCalled();
+    } finally {
+      stop();
+    }
+  });
 });
 
 describe('shareable demonstration views', () => {
