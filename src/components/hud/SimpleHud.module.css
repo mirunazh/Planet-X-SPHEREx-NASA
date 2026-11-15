@@ -53,6 +53,22 @@
   min-width: 0;
 }
 
+/* The field's placeholder says what to type; the label floating over the sky stays for screen readers only. */
+.search :global(.search > label) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* With the label hidden, the result list opens right under the field (its natural position). */
+.search :global(.search-list) {
+  top: auto;
+}
+
 /*
  * The search hint and status flow below the field, over the next-step card. Keep them out of its
  * way: the hint is still read by screen readers (aria-describedby) but not drawn, since the field's
@@ -146,6 +162,13 @@
 
 .status :global(.layer-status p) {
   margin: 0;
+}
+
+/* In the expert panel the layer status is a section with a rule above it; in this pill it is the only content. */
+.status :global(.layer-status) {
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
 .dockRow {

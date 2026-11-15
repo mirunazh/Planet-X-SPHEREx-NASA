@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useTransition } from 'react';
+import { useEffect, useRef, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useNav } from '@/lib/store';
 import { useUi, type SheetId } from '@/lib/ui';
@@ -106,13 +106,34 @@ export function SimpleHud({ onReplayIntro }: { onReplayIntro: () => void }) {
     ui.setTourOpen(true);
   };
 
+  // The step card sits under the top bar, whose height changes with the screen and the search's
+  // own status line; measure it instead of guessing, so the two never overlap.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const topBarRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const bar = topBarRef.current;
+    const root = rootRef.current;
+    if (!bar || !root) return;
+    // The search field itself, not its status line or result list: those float over the card while typing.
+    const parts = [...bar.children].map((child) => child.querySelector<HTMLElement>('.search-entry') ?? (child as HTMLElement));
+    const update = () => {
+      const bottom = Math.max(...parts.map((part) => part.getBoundingClientRect().bottom));
+      root.style.setProperty('--hud-top', `${Math.ceil(bottom)}px`);
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    for (const part of parts) observer.observe(part);
+    window.addEventListener('resize', update);
+    return () => { observer.disconnect(); window.removeEventListener('resize', update); };
+  }, []);
+
   // The details card would duplicate the Settings sheet's target section and sit under right-hand sheets.
   const showDetails = (selected || locked) && sheet !== 'settings' && sheet !== 'explain' && sheet !== 'guide';
 
   return (
-    <div className={`hud ${styles.root}`}>
+    <div className={`hud ${styles.root}`} ref={rootRef}>
       <SkyLabels /><Reticle /><HoverTooltip />
-      <header className={styles.topBar}>
+      <header className={styles.topBar} ref={topBarRef}>
         <div className={styles.brand}>
           <span className="brand-mark" aria-hidden="true" />
           <h1>SPHEREx Sky Navigator</h1>

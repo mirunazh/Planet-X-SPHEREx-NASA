@@ -1,8 +1,9 @@
-/* The "what to do next" card: always top centre, under the search bar. */
+/* The "what to do next" card: always top centre, under the search bar. --hud-top is the measured
+   bottom edge of the top bar (set by SimpleHud), so the card never covers the search field. */
 .card {
   position: fixed;
   z-index: 29;
-  top: 76px;
+  top: calc(var(--hud-top, 64px) + 10px);
   left: 50%;
   transform: translateX(-50%);
   width: min(600px, calc(100vw - 24px));
@@ -138,7 +139,7 @@
 .pill {
   position: fixed;
   z-index: 29;
-  top: 76px;
+  top: calc(var(--hud-top, 64px) + 10px);
   left: 50%;
   transform: translateX(-50%);
   display: inline-flex;
@@ -210,12 +211,12 @@
 
 @media (max-width: 760px) {
   .card {
-    top: 70px;
+    top: calc(var(--hud-top, 58px) + 8px);
     padding: 8px 42px 10px 10px;
   }
 
   .pill {
-    top: 70px;
+    top: calc(var(--hud-top, 58px) + 8px);
   }
 
   .text {

@@ -256,16 +256,20 @@ function Tour({ steps, onClose }: { steps: HelpStep[]; onClose: () => void }) {
     }
   };
 
-  // Clicks on the dimmed page do nothing and must not steal focus from the callout.
+  // A press on the dimmed page must not steal focus from the callout; a click there ends the tour,
+  // as in standard product tours (Intro.js "exitOnOverlayClick", Shepherd's modal overlay).
   const onMouseDown = (event: ReactMouseEvent<HTMLDivElement>) => {
     if (!cardRef.current?.contains(event.target as Node)) event.preventDefault();
+  };
+  const onBackdropClick = (event: ReactMouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current?.contains(event.target as Node)) onClose();
   };
 
   const centred = !layout || layout.card.placement === 'center';
   const spot = layout?.spot ?? null;
 
   return (
-    <div className={styles.root} data-tour-overlay="" onKeyDown={onKeyDown} onMouseDown={onMouseDown}>
+    <div className={styles.root} data-tour-overlay="" onKeyDown={onKeyDown} onMouseDown={onMouseDown} onClick={onBackdropClick}>
       {spot ? (
         <div
           className={styles.spot}
@@ -290,9 +294,14 @@ function Tour({ steps, onClose }: { steps: HelpStep[]; onClose: () => void }) {
           {step ? (
             <>
               <div aria-live="polite" aria-atomic="true">
-                <p className={styles.count}>
-                  Step {position + 1} of {order.length}
-                </p>
+                <div className={styles.progress}>
+                  <p className={styles.count}>
+                    Step {position + 1} of {order.length}
+                  </p>
+                  <span className={styles.dots} aria-hidden="true">
+                    {order.map((i, n) => <span key={i} className={`${styles.dot} ${n === position ? styles.dotOn : ''}`} />)}
+                  </span>
+                </div>
                 <h2 id={titleId} className={styles.title}>
                   {step.title}
                 </h2>
@@ -301,16 +310,19 @@ function Tour({ steps, onClose }: { steps: HelpStep[]; onClose: () => void }) {
                 </p>
               </div>
               <div className={styles.actions}>
-                <button
-                  type="button"
-                  className={styles.button}
-                  aria-disabled={isFirst || undefined}
-                  onClick={goBack}
-                >
-                  Back
-                </button>
+                {!isLast && (
+                  <button type="button" className={styles.skip} onClick={onClose}>
+                    Skip tour
+                  </button>
+                )}
+                <span className={styles.spacer} />
+                {!isFirst && (
+                  <button type="button" className={styles.button} onClick={goBack}>
+                    Back
+                  </button>
+                )}
                 <button type="button" className={`${styles.button} ${styles.primary}`} onClick={goNext}>
-                  {isLast ? 'Done' : 'Next'}
+                  {isLast ? 'Finish' : 'Next'}
                 </button>
               </div>
               <button type="button" className={styles.close} aria-label="Close the tour" onClick={onClose}>
