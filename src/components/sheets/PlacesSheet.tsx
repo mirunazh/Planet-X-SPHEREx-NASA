@@ -103,7 +103,8 @@ export function PlacesSheet({ open, onClose, onVisited }: { open: boolean; onClo
             Retry places
           </button>
         )}
-        <Link className={styles.challenge} href="/compare?challenge=weekly">
+        {/* Close first: the sheet state outlives the page, so it would be open again on return. */}
+        <Link className={styles.challenge} href="/compare?challenge=weekly" onClick={onClose}>
           <span className={styles.challengeText}>
             <span className={styles.challengeEyebrow}>Challenge</span>
             <span className={styles.challengeTitle}>Weekly sky challenge</span>

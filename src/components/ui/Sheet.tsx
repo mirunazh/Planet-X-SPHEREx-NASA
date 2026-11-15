@@ -31,7 +31,15 @@ export function Sheet({
   });
 
   useEffect(() => {
-    if (open) ref.current?.focus();
+    if (!open) return;
+    const opener = document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : null;
+    ref.current?.focus();
+    return () => {
+      // Closing removes the focused sheet; send focus back to what opened it (for example after
+      // "Fly there"), unless the visitor has already moved it somewhere else.
+      const active = document.activeElement;
+      if (opener?.isConnected && (!active || active === document.body)) opener.focus({ preventScroll: true });
+    };
   }, [open]);
 
   useEffect(() => {

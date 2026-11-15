@@ -85,6 +85,9 @@ export function FigurineDock({ onOpen, active }: { onOpen: (id: FigurineId) => v
   const hintFigurine = hint ? FIGURINES[hint.id] : null;
   // Locked figurines stay out of the dock until found: an unlock adds a new tool instead of crowding the dock.
   const visible = FIGURINE_ORDER.filter((id) => isUnlocked(id, unlocked));
+  // After "Reset my progress" fewer figurines remain; the remembered stop must still land on one,
+  // or none of them could be reached with Tab.
+  const stop = Math.min(tabStop, Math.max(0, visible.length - 1));
 
   return (
     <div className={styles.wrap} ref={wrapRef}>
@@ -101,7 +104,7 @@ export function FigurineDock({ onOpen, active }: { onOpen: (id: FigurineId) => v
               type="button"
               className={`${styles.button} ${open ? '' : styles.locked}`}
               data-tour={`dock-${id}`}
-              tabIndex={index === tabStop ? 0 : -1}
+              tabIndex={index === stop ? 0 : -1}
               aria-label={open ? figurine.label : `${figurine.label}, locked. ${figurine.unlockHint}`}
               aria-pressed={open ? active === id : undefined}
               aria-disabled={open ? undefined : 'true'}

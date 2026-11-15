@@ -62,7 +62,7 @@ export function LayerPanel() {
       {imageSurvey && (
         <div className="image-source small">
           <p>Images: <a href={imageSurvey.credits[0].url} target="_blank" rel="noreferrer">{imageSurvey.shortName}</a> via <a href="https://irsa.ipac.caltech.edu/" target="_blank" rel="noreferrer">NASA/IPAC IRSA</a></p>
-          <p className="muted">Observed {imageSurvey.epoch} · native pixel {imageSurvey.pixelScaleArcsec}″</p>
+          <p className="muted">Observed {imageSurvey.epoch} · map pixel {imageSurvey.pixelScaleArcsec}″</p>
         </div>
       )}
       <details className="display-options">

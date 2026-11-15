@@ -113,10 +113,10 @@ function Help() {
       </ul>
       <h3>Try an exploration</h3>
       <ol>
-        <li>Open <strong>Places</strong> and choose Andromeda, or search for <strong>M31</strong>. On desktop, featured places are in the left rail.</li>
-        <li>Open <strong>Layers</strong> and compare SPHEREx wavelengths, then try the 2MASS or AllWISE colour composites.</li>
+        <li>Open <strong>Places</strong> and choose Andromeda, or search for <strong>M31</strong>. In the Expert layout, featured places are in the left rail.</li>
+        <li>Open <strong>Telescope</strong> (<strong>Layers</strong> in the Expert layout) and compare SPHEREx wavelengths, then try the 2MASS or AllWISE colour composites.</li>
         <li>The loading message names the requested layer and the image still on screen. Image sources follow the layer actually displayed.</li>
-        <li>Use <strong>Share view</strong> to copy the current coordinates, zoom and selected layer. The link reopens the view; it does not restore a target lock.</li>
+        <li>Copy a link to this view from <strong>Settings</strong> (<strong>Share view</strong> in the Expert layout). It keeps the coordinates, zoom and selected layer; it does not restore a target lock.</li>
       </ol>
       <h3>Search formats</h3>
       <p>Search featured places or host stars by name. Other galaxy names use NED. Enter ICRS coordinates as decimal degrees, for example <code>10.68, +41.27</code>, or hours and degrees: <code>00 42 44 +41 16 09</code>.</p>

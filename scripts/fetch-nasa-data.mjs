@@ -82,7 +82,7 @@ const NED = 'https://ned.ipac.caltech.edu/srs/ObjectLookup';
 const NED_TARGETS = [
   { id: 'm31', query: 'M31', name: 'Andromeda Galaxy (M31)', fov: 4, kind: 'galaxy', description: 'The nearest large spiral galaxy.' },
   { id: 'm33', query: 'M33', name: 'Triangulum Galaxy (M33)', fov: 1.5, kind: 'galaxy', description: 'A nearby face-on spiral in the Local Group.' },
-  { id: 'm101', query: 'M101', name: 'Pinwheel Galaxy (M101)', fov: 0.6, kind: 'galaxy', description: 'Used in the IRSA SPHEREx tutorials to map 3.3 µm PAH emission.' },
+  { id: 'm101', query: 'M101', name: 'Pinwheel Galaxy (M101)', fov: 0.6, kind: 'galaxy', description: 'A big spiral galaxy seen face-on, about 21 million light-years away.' },
   { id: 'm81', query: 'M81', name: "Bode's Galaxy (M81)", fov: 0.8, kind: 'galaxy', description: 'Bright spiral galaxy in Ursa Major.' },
   { id: 'm51', query: 'M51', name: 'Whirlpool Galaxy (M51)', fov: 0.4, kind: 'galaxy', description: 'Interacting spiral galaxy pair.' },
   { id: 'lmc', query: 'LMC', name: 'Large Magellanic Cloud', fov: 12, kind: 'galaxy', description: 'Satellite galaxy of the Milky Way, next to the SPHEREx southern deep field.' },
@@ -130,7 +130,7 @@ async function spherexDeepFields() {
       ra: round(ra, 4),
       dec: round(dec, 4),
       fov: 20,
-      description: `Observed by SPHEREx on every orbit; centre of the ${n} DR1 deep-field images.`,
+      description: `SPHEREx looks here on every orbit, so this patch has its deepest coverage: ${Number(n).toLocaleString('en-US')} photos in the first data release.`,
       source: { service: 'IRSA TAP, spherex.obscore (spherex_dr1_deep)', url: IRSA_TAP, query: DEEP_QUERY, retrievedAt },
     };
   });
@@ -177,8 +177,8 @@ function referencePoints() {
 function starTargets(planetRows) {
   const pick = (pattern) => planetRows.find((r) => pattern.test(r.hostname));
   const specs = [
-    { pattern: /^Teegarden/i, id: 'teegardens-star', fov: 0.3, description: 'Nearby red dwarf with planets, moving ~5″ per year. Our calibration target across 2MASS, WISE and SPHEREx.' },
-    { pattern: /^Barnard/i, id: 'barnards-star', fov: 0.3, description: 'The fastest-moving star in the sky (~10″ per year).' },
+    { pattern: /^Teegarden/i, id: 'teegardens-star', fov: 0.3, description: 'A small red star 12.5 light-years away, with Earth-sized planets. It moves fast across the sky, so its marker (where it was around 2015) sits a little beside it in older and newer photos.' },
+    { pattern: /^Barnard/i, id: 'barnards-star', fov: 0.3, description: 'The star that moves fastest across our sky. Its marker shows where it was around 2015, so the star sits clearly beside it in older and newer photos.' },
   ];
   const out = [];
   for (const s of specs) {

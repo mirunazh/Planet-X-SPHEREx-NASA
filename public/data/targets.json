@@ -53,7 +53,7 @@
       "ra": 80.1482,
       "dec": -61.8089,
       "fov": 20,
-      "description": "Observed by SPHEREx on every orbit; centre of the 115679 DR1 deep-field images.",
+      "description": "SPHEREx looks here on every orbit, so this patch has its deepest coverage: 115,679 photos in the first data release.",
       "source": {
         "service": "IRSA TAP, spherex.obscore (spherex_dr1_deep)",
         "url": "https://irsa.ipac.caltech.edu/TAP/sync",
@@ -68,7 +68,7 @@
       "ra": 270.4888,
       "dec": 66.3134,
       "fov": 20,
-      "description": "Observed by SPHEREx on every orbit; centre of the 118002 DR1 deep-field images.",
+      "description": "SPHEREx looks here on every orbit, so this patch has its deepest coverage: 118,002 photos in the first data release.",
       "source": {
         "service": "IRSA TAP, spherex.obscore (spherex_dr1_deep)",
         "url": "https://irsa.ipac.caltech.edu/TAP/sync",
@@ -113,7 +113,7 @@
       "ra": 210.8022671,
       "dec": 54.34895,
       "fov": 0.6,
-      "description": "Used in the IRSA SPHEREx tutorials to map 3.3 µm PAH emission.",
+      "description": "A big spiral galaxy seen face-on, about 21 million light-years away.",
       "source": {
         "service": "NED (NASA/IPAC Extragalactic Database)",
         "url": "https://ned.ipac.caltech.edu/srs/ObjectLookup?name=M101",
@@ -188,7 +188,7 @@
       "ra": 43.269145,
       "dec": 16.864902,
       "fov": 0.3,
-      "description": "Nearby red dwarf with planets, moving ~5″ per year. Our calibration target across 2MASS, WISE and SPHEREx.",
+      "description": "A small red star 12.5 light-years away, with Earth-sized planets. It moves fast across the sky, so its marker (where it was around 2015) sits a little beside it in older and newer photos.",
       "source": {
         "service": "NASA Exoplanet Archive (pscomppars)",
         "url": "https://exoplanetarchive.ipac.caltech.edu/TAP/sync",
@@ -202,7 +202,7 @@
       "ra": 269.448614,
       "dec": 4.737981,
       "fov": 0.3,
-      "description": "The fastest-moving star in the sky (~10″ per year).",
+      "description": "The star that moves fastest across our sky. Its marker shows where it was around 2015, so the star sits clearly beside it in older and newer photos.",
       "source": {
         "service": "NASA Exoplanet Archive (pscomppars)",
         "url": "https://exoplanetarchive.ipac.caltech.edu/TAP/sync",

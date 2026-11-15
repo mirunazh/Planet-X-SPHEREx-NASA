@@ -71,15 +71,15 @@ export function CoordinateReadout() {
         </span>
         <span
           className={`chip ${r.detail === 'magnified' ? 'chip-warn' : ''}`}
-          title={`${r.survey.shortName} native pixel: ${r.survey.pixelScaleArcsec}″`}
+          title={`${r.survey.shortName} map pixel (IRSA HiPS): ${r.survey.pixelScaleArcsec}″`}
         >
           {!r.hasImage
             ? 'Waiting for sky image'
             : r.detail === 'preview'
             ? 'Whole-sky preview'
             : r.detail === 'magnified'
-              ? `Beyond native resolution ×${r.magnification.toFixed(1)}`
-              : 'Native resolution'}
+              ? `Beyond map resolution ×${r.magnification.toFixed(1)}`
+              : 'Full map resolution'}
         </span>
       </div>
       <p className="readout-mode">
