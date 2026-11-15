@@ -12,6 +12,7 @@
     "benchmark": "vitest bench --run",
     "test:production": "node scripts/test-production.mjs",
     "data": "node scripts/fetch-nasa-data.mjs",
+    "data:intro": "node scripts/build-intro-imagery.mjs",
     "verify:hips": "node scripts/verify-hips-orientation.mjs"
   },
   "dependencies": {

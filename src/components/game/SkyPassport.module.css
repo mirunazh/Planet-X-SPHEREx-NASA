@@ -1,0 +1,109 @@
+.passport {
+  padding: 12px 14px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: #111830;
+}
+
+.title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.dots {
+  display: flex;
+  gap: 6px;
+  margin: 8px 0 6px;
+  padding: 0;
+  list-style: none;
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px dashed #5a647c;
+  background: #1a2133;
+}
+
+.found {
+  border: 2px solid var(--accent);
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(127, 227, 255, 0.45);
+}
+
+.rank {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.rank strong {
+  color: var(--text);
+  font-weight: 650;
+}
+
+.questsTitle {
+  margin: 14px 0 8px;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.quests {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quest {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.check {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  color: #ffffff;
+}
+
+.done .check {
+  border-color: #1f9a4a;
+  background: #1f9a4a;
+}
+
+.questTitle {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.questText {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

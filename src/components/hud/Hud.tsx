@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useNav } from '@/lib/store';
 import { buildViewUrl } from '@/lib/urlState';
+import { loadUiPreferences, markIntroSeen, shouldShowIntro, useUi } from '@/lib/ui';
+import { SolarSystemIntro } from '@/components/intro/SolarSystemIntro';
 import { CoordinateReadout, PositionAnnouncer } from './CoordinateReadout';
 import { SearchBox } from './SearchBox';
 import { LayerPanel } from './LayerPanel';
@@ -13,6 +15,7 @@ import { Dock } from './Dock';
 import { SidePanel } from './SidePanel';
 import { HoverTooltip, Reticle, SkyLabels, StatusLine } from './Overlays';
 import { Dialogs } from './Dialogs';
+import { SimpleHud } from './SimpleHud';
 import { CropSelector } from '@/components/comparison/CropSelector';
 
 type MobilePanel = 'layers' | 'places' | 'details';
@@ -31,12 +34,14 @@ function TopBar({ onNavigate }: { onNavigate: () => void }) {
         <CopyButton label="Share view" text={() => buildViewUrl(useNav.getState(), window.location.href)} />
         <button className="btn ghost" onClick={() => setPanel('help')}>Help</button>
         <button className="btn ghost" onClick={() => setPanel('credits')}>Sources</button>
+        <button className="btn" onClick={() => useUi.getState().setExpertLayout(false)}>Simple view</button>
       </nav>
     </header>
   );
 }
 
-export function Hud() {
+/** Dominic's original full layout: every control at once. Reached from Settings → Expert layout. */
+function ExpertHud() {
   const [mobilePanel, setMobilePanel] = useState<MobilePanel | null>(null);
   const selected = useNav((s) => s.selected);
   const locked = useNav((s) => s.locked);
@@ -76,5 +81,28 @@ export function Hud() {
       </nav>
       <StatusLine /><PositionAnnouncer /><Dialogs />
     </div>
+  );
+}
+
+export function Hud() {
+  const expert = useUi((s) => s.expertLayout);
+  const introOpen = useUi((s) => s.introOpen);
+
+  useEffect(() => {
+    loadUiPreferences();
+    if (shouldShowIntro()) useUi.getState().setIntroOpen(true);
+  }, []);
+
+  const finishIntro = () => {
+    markIntroSeen();
+    useUi.getState().setIntroOpen(false);
+    document.querySelector<HTMLElement>('[data-tour="sky"]')?.focus();
+  };
+
+  return (
+    <>
+      {expert ? <ExpertHud /> : <SimpleHud onReplayIntro={() => useUi.getState().setIntroOpen(true)} />}
+      {introOpen && <SolarSystemIntro onDone={finishIntro} />}
+    </>
   );
 }

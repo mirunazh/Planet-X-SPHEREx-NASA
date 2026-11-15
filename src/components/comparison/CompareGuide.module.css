@@ -1,0 +1,216 @@
+/* Comparison screens (step 3 and the weekly challenge): the guide card, the help button,
+   the top row and page-wide touch sizes. Colors come from the global tokens. */
+
+/* Every control on these pages is at least 44px tall; the shared .btn and inputs are shorter. */
+.page :global(.btn),
+.page :global(.comparison-filters) input,
+.page :global(.comparison-filters) select,
+.page :global(.slideshow-speed) select {
+  min-height: 44px;
+}
+
+/* Links styled as buttons are inline, which ignores min-height; the list's record links get the same reach. */
+.page :global(a.btn),
+.page :global(.product-provenance) a,
+.page :global(.challenge-links) a,
+.side .challenge a {
+  display: inline-flex;
+  align-items: center;
+}
+
+.page :global(.product-provenance) a,
+.page :global(.challenge-links) a,
+.side .challenge a {
+  min-height: 44px;
+}
+
+.page summary {
+  min-height: 44px;
+  padding-block: 12px;
+  cursor: pointer;
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 24px;
+  margin-bottom: 4px;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.back:hover {
+  text-decoration: underline;
+}
+
+.side {
+  display: grid;
+  gap: 10px;
+  justify-items: end;
+  text-align: right;
+}
+
+.side .challenge {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0 12px;
+  margin: 0;
+}
+
+.hint {
+  margin: 6px 0 0;
+}
+
+.headActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ---------- Guide card ---------- */
+
+.guide {
+  margin: 0 0 24px;
+  padding: 14px 18px 16px;
+  border: 1px solid rgba(127, 227, 255, 0.3);
+  border-radius: var(--radius);
+  background: #0b1828;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.title {
+  margin: 0;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.text {
+  margin: 6px 0 0;
+  max-width: 82ch;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.color {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.colorText {
+  flex: 0 1 auto;
+  max-width: 82ch;
+  margin: 0;
+  color: var(--text);
+}
+
+/* ---------- Buttons ---------- */
+
+.action,
+.help {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.action {
+  padding: 0 14px;
+}
+
+.help {
+  padding: 0 14px 0 10px;
+  border-color: rgba(127, 227, 255, 0.45);
+  border-radius: 999px;
+  background: rgba(127, 227, 255, 0.08);
+}
+
+.action:hover,
+.help:hover {
+  border-color: rgba(170, 200, 245, 0.6);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.help[aria-expanded='true'] {
+  border-color: var(--accent);
+}
+
+.action:focus-visible,
+.help:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.helpIcon {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 14px;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1;
+}
+
+@media (max-width: 760px) {
+  .side {
+    justify-items: start;
+    text-align: left;
+  }
+
+  .side .challenge {
+    justify-content: flex-start;
+  }
+
+  .guide {
+    padding: 12px 14px 14px;
+  }
+
+  .text {
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .action,
+  .help {
+    transition: background 0.15s, border-color 0.15s;
+  }
+}

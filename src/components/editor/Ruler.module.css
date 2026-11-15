@@ -1,0 +1,126 @@
+/* Ruler-style slider: a native range input over a tick scale. */
+
+.ruler {
+  --thumb-w: 6px;
+  --ruler-h: 56px;
+  position: relative;
+  height: var(--ruler-h);
+  margin-top: 6px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+/* Inset by half the needle so each tick sits exactly under the needle's centre. */
+.scale {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--thumb-w) / 2);
+  right: calc(var(--thumb-w) / 2);
+  pointer-events: none;
+}
+
+.tick {
+  position: absolute;
+  top: 50%;
+  width: 1px;
+  height: 14px;
+  margin-left: -0.5px;
+  translate: 0 -50%;
+  border-radius: 1px;
+  background: var(--muted);
+  opacity: 0.55;
+}
+
+.mid {
+  height: 22px;
+  opacity: 0.8;
+}
+
+.major {
+  width: 2px;
+  height: 32px;
+  margin-left: -1px;
+  background: var(--text);
+  opacity: 1;
+}
+
+/* Blank channels: a short, faint mark, because the slider skips them. */
+.gap {
+  height: 4px;
+  opacity: 0.3;
+}
+
+.input {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: var(--ruler-h);
+  margin: 0;
+  padding: 0;
+  border-radius: 12px;
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: grab;
+}
+
+.input:active {
+  cursor: grabbing;
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.input::-webkit-slider-runnable-track {
+  height: var(--ruler-h);
+  border: 0;
+  background: transparent;
+}
+
+.input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: var(--thumb-w);
+  height: 46px;
+  margin-top: 5px;
+  border: 0;
+  border-radius: 3px;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--panel-solid), 0 0 14px rgba(127, 227, 255, 0.55);
+}
+
+.input::-moz-range-track {
+  height: var(--ruler-h);
+  border: 0;
+  background: transparent;
+}
+
+.input::-moz-range-progress {
+  background: transparent;
+}
+
+.input::-moz-range-thumb {
+  width: var(--thumb-w);
+  height: 46px;
+  border: 0;
+  border-radius: 3px;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--panel-solid), 0 0 14px rgba(127, 227, 255, 0.55);
+}
+
+/* Windows high-contrast mode: fall back to the system slider. */
+@media (forced-colors: active) {
+  .scale {
+    display: none;
+  }
+
+  .input,
+  .input::-webkit-slider-thumb {
+    -webkit-appearance: auto;
+    appearance: auto;
+  }
+}

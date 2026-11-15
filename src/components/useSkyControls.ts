@@ -187,6 +187,8 @@ export function useSkyControls(ref: RefObject<HTMLDivElement | null>): void {
     function onKey(e: KeyboardEvent) {
       const t = e.target as HTMLElement | null;
       if (t && (['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName) || t.isContentEditable)) return;
+      // Keys pressed inside a sheet, the guided tour or the intro belong to that panel, not to the sky.
+      if (t?.closest?.('[role="dialog"], [data-tour-overlay]') && e.key !== 'Escape') return;
       if (t?.tagName === 'BUTTON' && !['Home', 'r', 'Escape'].includes(e.key)) return;
       if (t && ['A', 'SUMMARY'].includes(t.tagName) && e.key !== 'Escape') return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;

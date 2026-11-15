@@ -3,6 +3,8 @@
 import { type ReactNode, useCallback, useEffect, useRef } from 'react';
 import { useNav } from '@/lib/store';
 import { PLATFORM_CREDITS, SURVEYS, SURVEY_ORDER } from '@/lib/sky/surveys';
+import { PLANET_SOURCES } from '@/lib/sky/planets';
+import { INTRO_IMAGE_SOURCES } from '@/components/intro/imagery';
 
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -74,6 +76,15 @@ function Credits() {
         </p>
       ))}
       {retrievedAt && <p className="muted small">Pin data snapshot retrieved {new Date(retrievedAt).toUTCString()}.</p>}
+      <h3>Solar System intro</h3>
+      {[...PLANET_SOURCES, ...INTRO_IMAGE_SOURCES].map((c) => (
+        <p key={c.label}>
+          <strong>{c.label}.</strong> {c.text}{' '}
+          <a href={c.url} target="_blank" rel="noreferrer">
+            Link
+          </a>
+        </p>
+      ))}
       <h3>Software</h3>
       <p className="muted small">Next.js, React, three.js, React Three Fiber, @hscmap/healpix, zustand (all MIT licensed).</p>
       <p className="muted small">NASA does not endorse this project. NASA data is used under NASA&apos;s media and data use guidelines.</p>

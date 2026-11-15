@@ -15,6 +15,8 @@ interface Props {
   onLoadMore: () => Promise<void>;
   loadingMore: boolean;
   onRetrySearch: () => void;
+  /** data-tour ids for the guided tour: the photo and its Previous / Play / Next buttons. */
+  tour?: { viewer: string; controls: string };
 }
 
 function observation(product: ImageProduct) {
@@ -22,7 +24,7 @@ function observation(product: ImageProduct) {
   return date ? new Date(date).toLocaleString(undefined, { timeZone: 'UTC', dateStyle: 'medium', timeStyle: 'medium' }) + ' UTC' : 'Observation time unknown';
 }
 
-export function Slideshow({ page, prepared, searching, status, activeId, onSelect, onLoadMore, loadingMore, onRetrySearch }: Props) {
+export function Slideshow({ page, prepared, searching, status, activeId, onSelect, onLoadMore, loadingMore, onRetrySearch, tour }: Props) {
   const products = useMemo(() => [...(page?.products ?? [])].sort((a, b) =>
     (a.observedStart ?? a.observedEnd ?? '9999').localeCompare(b.observedStart ?? b.observedEnd ?? '9999') || a.id.localeCompare(b.id)), [page?.products]);
   const index = Math.max(0, products.findIndex((p) => p.id === activeId));
@@ -127,8 +129,8 @@ export function Slideshow({ page, prepared, searching, status, activeId, onSelec
   const canNext = !!product && (index < products.length - 1 || !!page?.nextCursor);
 
   return <section className="slideshow" aria-label="SPHEREx image slideshow">
-    <div className="slideshow-heading"><h2>SPHEREx slideshow</h2><span className="small muted">{product ? `${index + 1} / ${products.length} loaded${page?.nextCursor ? ` · ${page.total} found` : ''}` : 'DR1 + QR3 exposures'}</span></div>
-    <div ref={stage} className="slideshow-stage" role="group" aria-label="Image viewer. Use left and right arrow keys or scroll to change images." tabIndex={0}
+    <div className="slideshow-heading"><h2>SPHEREx slideshow</h2><span className="small muted">{product ? `Photo ${index + 1} of ${products.length}${page?.nextCursor ? ` loaded · ${page.total} found` : ''}` : 'DR1 + QR3 exposures'}</span></div>
+    <div ref={stage} className="slideshow-stage" role="group" aria-label="Image viewer. Use left and right arrow keys or scroll to change images." tabIndex={0} data-tour={tour?.viewer}
       onKeyDown={(event) => {
         if (event.key === 'ArrowRight') { event.preventDefault(); setPlaying(false); next(); }
         if (event.key === 'ArrowLeft') { event.preventDefault(); setPlaying(false); previous(); }
@@ -144,10 +146,10 @@ export function Slideshow({ page, prepared, searching, status, activeId, onSelec
       </div>}
     </div>
     <div className="slideshow-controls" aria-label="Slideshow controls">
-      <div className="slideshow-navigation"><button className="btn" disabled={!product || index === 0} onClick={() => { setPlaying(false); previous(); }}>Previous</button>
+      <div className="slideshow-navigation" data-tour={tour?.controls}><button className="btn" disabled={!product || index === 0} onClick={() => { setPlaying(false); previous(); }}>Previous</button>
         <button className="btn primary" disabled={!product || !canNext || !!error} aria-pressed={playing} onClick={() => setPlaying((value) => !value)}>{playing ? 'Pause' : 'Play'}</button>
         <button className="btn" disabled={!canNext || loadingMore} onClick={() => { setPlaying(false); next(); }}>{loadingMore ? 'Loading more…' : 'Next'}</button></div>
-      <label className="slideshow-speed small">Interval <select value={intervalSeconds} onChange={(event) => setIntervalSeconds(event.target.value)}><option value="1">1 second</option><option value="3">3 seconds</option><option value="5">5 seconds</option><option value="10">10 seconds</option></select></label>
+      <label className="slideshow-speed small">Time per photo <select value={intervalSeconds} onChange={(event) => setIntervalSeconds(event.target.value)}><option value="1">1 second</option><option value="3">3 seconds</option><option value="5">5 seconds</option><option value="10">10 seconds</option></select></label>
     </div>
     {product && <div className="slideshow-caption" aria-live="polite"><p><strong>{observation(product)}</strong></p><p className="small muted">{product.collection} · {product.band ?? 'Detector unknown'}{product.wavelengthMin !== null && product.wavelengthMax !== null ? ` · ${product.wavelengthMin.toPrecision(3)}–${product.wavelengthMax.toPrecision(3)} µm detector range` : ''}</p><p className="small muted product-title">{product.title}</p>{loaded && loaded.progress.coverageFraction !== undefined && loaded.progress.coverageFraction < .98 && <p className="small comparison-warning">This exposure covers part of the crop.</p>}</div>}
     {skipped > 0 && <p className="small muted">{skipped} unavailable exposure{skipped === 1 ? ' was' : 's were'} skipped at the start.</p>}

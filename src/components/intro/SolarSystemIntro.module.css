@@ -1,0 +1,542 @@
+/*
+ * Solar System intro: full-screen modal over the sky map. Pictures are NASA data (mission photos
+ * and the SPHEREx sky, see imagery.ts); the drawn parts are diagram aids: orbits, labels, the Earth marker.
+ */
+
+.root {
+  --sun: #ffd27a;
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+  grid-template-areas:
+    'top'
+    'clock'
+    'slot'
+    'scale'
+    'panel';
+  row-gap: 8px;
+  padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+  background: radial-gradient(ellipse at 50% 45%, #0a1226 0%, var(--bg) 70%), var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.45;
+  overflow: hidden;
+  outline: none;
+  isolation: isolate;
+}
+
+.root[data-done='true'] {
+  pointer-events: none;
+}
+
+/* ---------- Real sky behind the Sun (positioned from the layout, fades in once loaded) ---------- */
+
+.sky {
+  position: absolute;
+  z-index: 0;
+  display: block;
+  max-width: none;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.sky[data-loaded='true'] {
+  opacity: 0.78;
+}
+
+/* Darkens the sky under the text so captions and buttons stay readable. */
+.shade {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(3, 5, 11, 0.72) 0%, rgba(3, 5, 11, 0) 16%),
+    linear-gradient(0deg, rgba(3, 5, 11, 0.94) 0%, rgba(3, 5, 11, 0.7) 30%, rgba(3, 5, 11, 0) 50%);
+}
+
+/* ---------- Orrery (covers the whole overlay so the zoom can fill the screen) ---------- */
+
+.drawing {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.world {
+  transform: translate(0px, 0px) scale(1);
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+
+.orbit,
+.earthOrbit {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Orbits are thin guides, like those of JPL orbit diagrams, so the photos and the sky lead. */
+.orbit {
+  stroke: rgba(205, 218, 242, 0.3);
+  stroke-width: 1;
+}
+
+.earthOrbit {
+  stroke: var(--accent);
+  stroke-opacity: 0.5;
+  stroke-width: 1;
+}
+
+.sun {
+  fill: var(--sun);
+}
+
+.earthDot {
+  fill: var(--accent);
+}
+
+.earthRing {
+  fill: none;
+  stroke: var(--accent);
+  stroke-opacity: 0.9;
+  stroke-width: 1.25;
+  vector-effect: non-scaling-stroke;
+}
+
+.label {
+  fill: var(--muted);
+  font-family: var(--font);
+  font-weight: 500;
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.earthLabel {
+  fill: var(--accent);
+  font-weight: 700;
+}
+
+/* ---------- Layout slots ---------- */
+
+.top,
+.clock,
+.notes,
+.panel {
+  position: relative;
+  z-index: 1;
+}
+
+.slot {
+  grid-area: slot;
+  min-width: 0;
+  min-height: 0;
+}
+
+.top {
+  grid-area: top;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.skip {
+  flex: none;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.skip:hover {
+  border-color: var(--muted);
+  background: var(--panel-solid);
+}
+
+/* ---------- Clock ---------- */
+
+.clock {
+  grid-area: clock;
+  justify-self: start;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 6px 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.clockText {
+  display: grid;
+  gap: 1px;
+  min-width: 150px;
+  margin: 0;
+  padding: 2px 0;
+}
+
+.clockLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.date {
+  min-width: 11ch;
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 17px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.speed {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.pause {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pause:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.pause svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+/* ---------- Scale note and image credits ---------- */
+
+.notes {
+  grid-area: scale;
+  justify-self: center;
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  text-align: center;
+}
+
+.scale {
+  margin: 0;
+  padding: 2px 10px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.credit {
+  margin: 0;
+  padding: 0 10px;
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+  opacity: 0.85;
+}
+
+/* ---------- Captions and actions ---------- */
+
+.panel {
+  grid-area: panel;
+  justify-self: center;
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  width: 100%;
+  max-width: 560px;
+  padding-top: 4px;
+  container-type: inline-size;
+}
+
+.captions {
+  display: grid;
+  width: 100%;
+}
+
+.caption {
+  grid-area: 1 / 1;
+  margin: 0;
+  font-size: clamp(18px, 1.4vw + 12px, 24px);
+  font-weight: 560;
+  line-height: 1.35;
+  text-wrap: pretty;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.caption[data-active='true'] {
+  opacity: 1;
+  visibility: visible;
+}
+
+.swatch {
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  margin: 0 0.05em 0 0.3em;
+  border-radius: 50%;
+  background: var(--amber);
+  vertical-align: 0.08em;
+}
+
+.dots {
+  display: flex;
+  margin: -4px 0 -4px -12px;
+}
+
+.dot {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+}
+
+.dot span {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--muted);
+}
+
+.dot:hover span {
+  background: var(--text);
+}
+
+.dot[aria-current='step'] span {
+  width: 24px;
+  background: var(--accent);
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 26px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 28px rgba(127, 227, 255, 0.2);
+}
+
+.cta:hover {
+  filter: brightness(1.08);
+}
+
+.cta:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 3px;
+}
+
+.skip:focus-visible,
+.pause:focus-visible,
+.dot:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Narrow story column (phones, or the side column on small landscape screens). */
+@container (max-width: 380px) {
+  .cta {
+    width: 100%;
+    padding: 0 16px;
+    font-size: 15px;
+  }
+}
+
+/* Short screens (landscape phones): one-line clock, tighter spacing, more room for the orrery. */
+@media (max-height: 520px) {
+  .root {
+    row-gap: 4px;
+    padding-top: max(8px, env(safe-area-inset-top));
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+
+  .clock {
+    padding: 0 4px 0 12px;
+  }
+
+  .clockText {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 8px;
+  }
+
+  .date {
+    font-size: 15px;
+  }
+
+  .caption {
+    font-size: 17px;
+  }
+
+  /* No room for a second note line; the credits stay in Sources. */
+  .credit {
+    display: none;
+  }
+}
+
+/* Wide screens: orrery on the left, story on the right. */
+@media (min-width: 760px) and (min-aspect-ratio: 5/4) {
+  .root {
+    grid-template-columns: minmax(0, 1fr) clamp(300px, 30vw, 420px);
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'top top'
+      'clock panel'
+      'slot panel'
+      'scale panel';
+    column-gap: clamp(16px, 3vw, 48px);
+    padding: max(20px, env(safe-area-inset-top)) max(28px, env(safe-area-inset-right)) max(22px, env(safe-area-inset-bottom))
+      max(28px, env(safe-area-inset-left));
+  }
+
+  .panel {
+    align-self: center;
+    justify-self: stretch;
+    gap: 16px;
+    padding: 0;
+  }
+
+  .shade {
+    background:
+      linear-gradient(180deg, rgba(3, 5, 11, 0.6) 0%, rgba(3, 5, 11, 0) 14%),
+      linear-gradient(270deg, rgba(3, 5, 11, 0.92) 0%, rgba(3, 5, 11, 0.6) 26%, rgba(3, 5, 11, 0) 44%),
+      linear-gradient(0deg, rgba(3, 5, 11, 0.6) 0%, rgba(3, 5, 11, 0) 12%);
+  }
+}
+
+/* Motion only for those who have not asked for less of it. */
+@media (prefers-reduced-motion: no-preference) {
+  .world {
+    transition: transform 1200ms cubic-bezier(0.32, 0, 0.67, 0);
+  }
+
+  .sky {
+    transition: opacity 700ms ease;
+  }
+
+  .caption {
+    transition:
+      opacity 380ms ease,
+      visibility 0s linear 380ms;
+  }
+
+  .caption[data-active='true'] {
+    transition:
+      opacity 380ms ease 100ms,
+      visibility 0s;
+  }
+
+  .dot span {
+    transition:
+      width 220ms ease,
+      background-color 220ms ease;
+  }
+
+  .root[data-zooming='true'] {
+    opacity: 0;
+    transition: opacity 450ms ease-in 750ms;
+  }
+
+  .root[data-zooming='true'] .fade,
+  .root[data-zooming='true'] .labels {
+    opacity: 0;
+    transition: opacity 220ms ease-out;
+  }
+}
+
+/* Reduced motion: every state change is instant (also overrides the global 0.01 ms transitions). */
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .root * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .cta,
+  .skip,
+  .pause {
+    border: 1px solid ButtonText;
+  }
+
+  .dot[aria-current='step'] span {
+    background: Highlight;
+  }
+}
+
+/* Bridge to the sky map: what the next screen is, before the button. */
+.bridge {
+  margin: 4px 0 12px;
+  max-width: 34em;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+}

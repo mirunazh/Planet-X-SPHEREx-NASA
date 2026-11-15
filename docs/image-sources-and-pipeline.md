@@ -181,6 +181,26 @@ Use the acknowledgement text that IRSA publishes for each dataset. Don't paraphr
 | JPL SB-Ident | NASA JPL Solar System Dynamics |
 | NED / NASA Exoplanet Archive | Their published acknowledgements |
 
+### 6.1 Solar System intro imagery
+
+The intro shows NASA pictures only, so the first screen looks like the data that follows. `npm run data:intro` (`scripts/build-intro-imagery.mjs`) rebuilds them into `public/intro/`. `public/intro/sources.json` records each file's source URL, credit, date and processing.
+
+| Picture | Source | Credit |
+|---|---|---|
+| Sky behind the planets | SPHEREx DR1 all-sky HiPS at IRSA, frame 46 (2.19 µm), the same tiles the map opens on | NASA/JPL-Caltech (SPHEREx), Caltech/IPAC |
+| Sun | SDO/AIA 171 Å browse image, 15 Nov 2026 06:26 UT | NASA/SDO and the AIA science team |
+| Earth | DSCOVR EPIC natural colour, 12 Nov 2026 10:51 UTC | NASA EPIC Team |
+| Mercury, Venus, Mars | MESSENGER PIA15160, Mariner 10 PIA23791, Viking PIA00407 | NASA/JHUAPL/CIW; NASA/JPL-Caltech; NASA/JPL/USGS |
+| Jupiter, Saturn | Cassini PIA02873, PIA21046 | NASA/JPL/University of Arizona; NASA/JPL-Caltech/SSI |
+| Uranus, Neptune | Voyager 2 PIA18182, PIA00046 | NASA/JPL-Caltech; NASA/JPL |
+
+Science choices:
+
+- **The backdrop is the sky in the real direction.** The orrery looks down from the north ecliptic pole, so the stars behind the Sun are those around the south ecliptic pole. The script reprojects SPHEREx tiles stereographically around that pole, with ecliptic longitude 0° to the right as in the orrery. The Large and Small Magellanic Clouds and the Milky Way therefore appear where they really are. Only the angular scale is a display choice.
+- **One known gap, documented.** The DR1 all-sky HiPS has no data within about 2.2° of the south ecliptic pole, the core of the SPHEREx deep field. Those pixels show the local median sky level, with no invented stars, and sit behind the Sun's glare.
+- **Lighting follows the Sun.** Seen from above, every planet is half lit, so each photo is shaded on the side facing away from the Sun.
+- **Saturn's rings are open.** From above the ecliptic, the rings appear almost face-on, because Saturn's axis is tilted 26.7°. The Cassini view chosen (PIA21046) has open rings for that reason.
+
 ---
 
 ## 7. Presentation talking points

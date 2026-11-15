@@ -45,6 +45,7 @@ export default function SkyExplorer() {
       <div
         ref={stageRef}
         className="stage"
+        data-tour="sky"
         role="application"
         aria-label="Sky viewer. Drag to rotate, scroll to zoom, double-click to fly. Arrow keys pan, plus and minus zoom, Enter locks the target, Home resets, Escape stops motion."
         tabIndex={0}

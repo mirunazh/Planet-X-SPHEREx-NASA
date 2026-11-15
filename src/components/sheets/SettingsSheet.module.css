@@ -1,0 +1,294 @@
+/*
+ * iOS Settings style: section titles, rounded groups, 48px rows.
+ * Global HUD classes are restyled only inside this sheet. CSS order between globals.css and
+ * modules differs between dev and build, so every override wins on specificity, not order.
+ */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  padding: 4px 0 8px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sectionTitle {
+  margin: 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.note {
+  margin: 0 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.group {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.group > :not(:first-child) {
+  border-top: 1px solid var(--border);
+}
+
+.group > :first-child {
+  border-top-left-radius: 13px;
+  border-top-right-radius: 13px;
+}
+
+.group > :last-child {
+  border-bottom-left-radius: 13px;
+  border-bottom-right-radius: 13px;
+}
+
+.cell {
+  min-width: 0;
+}
+
+/* ---------- Rows ---------- */
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.row:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.rowLabel {
+  flex: 1;
+  min-width: 0;
+}
+
+.chevron {
+  flex: none;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--muted);
+}
+
+.action {
+  color: var(--accent);
+  font-weight: 550;
+}
+
+.danger {
+  color: var(--danger);
+  font-weight: 550;
+}
+
+.danger[data-armed='true'] {
+  background: rgba(255, 139, 139, 0.14);
+  font-weight: 650;
+}
+
+.empty {
+  margin: 0;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---------- Switch ---------- */
+
+.switch {
+  position: relative;
+  flex: none;
+  width: 51px;
+  height: 31px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(200, 215, 240, 0.55);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+.switchRow[aria-checked='true'] .switch {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.switchRow[aria-checked='true'] .switch::after {
+  translate: 20px 0;
+}
+
+/* ---------- Reused HUD components ---------- */
+
+/* Shared: 44px touch targets and copy fallbacks that stay inside the scrolling sheet. */
+.root :global(.btn),
+.root :global(.icon-btn) {
+  min-height: 44px;
+}
+
+.root :global(.icon-btn) {
+  min-width: 44px;
+}
+
+.root :global(.copy-fallback) {
+  position: static;
+  width: auto;
+  max-width: 100%;
+  margin-top: 8px;
+}
+
+/* CoordinateReadout: a flat, left-aligned block; the mobile HUD hides parts of it, the sheet shows all. */
+.readoutGroup :global(.readout.panel) {
+  max-width: none;
+  margin: 0;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.readoutGroup :global(.readout-main) {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.readoutGroup :global(.coord abbr) {
+  min-width: 30px;
+}
+
+.readoutGroup :global(.coord output) {
+  font-size: 18px;
+}
+
+.readoutGroup :global(.readout-sub) {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 8px;
+}
+
+/* Beats `.readout-sub > span:first-child` (0,2,1) in the mobile media query. */
+.group.readoutGroup :global(.readout-sub > span) {
+  display: inline;
+}
+
+.readoutGroup :global(.readout-mode) {
+  display: block;
+  margin-top: 8px;
+}
+
+/* Dock: mini-map full width, zoom and reset, lock; the mobile HUD turns it into a strip without the map. */
+.mapGroup :global(.dock.panel) {
+  display: grid;
+  gap: 10px;
+  width: auto;
+  margin: 0;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  grid-column: auto;
+  grid-row: auto;
+}
+
+.mapGroup :global(.dock .minimap) {
+  display: block;
+}
+
+.mapGroup :global(.minimap canvas) {
+  max-width: 100%;
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* SidePanel: flat inside the group; the mobile HUD hides it outside its own Details tab. */
+.mapGroup :global(.side.panel) {
+  display: block;
+  width: auto;
+  max-height: none;
+  margin: 0;
+  padding: 12px 14px 14px;
+  overflow: visible;
+  border: 0;
+  /* Follows the group's rounded corner, so the locked accent bar stays inside it. */
+  border-radius: inherit;
+  background: transparent;
+  grid-column: auto;
+  grid-row: auto;
+}
+
+.mapGroup :global(.side.panel.locked) {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+/* CopyButton as an action row. */
+.shareGroup :global(.copy-control > .btn) {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 13px;
+  background: transparent;
+  color: var(--accent);
+  font-weight: 550;
+  text-align: left;
+}
+
+.shareGroup :global(.copy-control > .btn:hover) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.shareGroup :global(.copy-control > .btn:focus-visible) {
+  outline-offset: -2px;
+}
+
+.shareGroup :global(.copy-fallback) {
+  margin: 0 12px 12px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .row {
+    transition: background 0.15s;
+  }
+
+  .switch,
+  .switch::after {
+    transition: background 0.18s, border-color 0.18s, translate 0.18s;
+  }
+}

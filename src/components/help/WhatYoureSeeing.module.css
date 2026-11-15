@@ -1,0 +1,245 @@
+.eyebrow {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* iOS-style segmented control: a solid track with a sliding thumb under the selected segment. */
+.segmented {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0 0 16px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: #141b2e;
+}
+
+.segmented::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: #26314d;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.segmented[data-active='steps']::before {
+  transform: translateX(100%);
+}
+
+.segment {
+  position: relative;
+  z-index: 1;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.segment:hover,
+.segment[aria-selected='true'] {
+  color: var(--text);
+}
+
+.segment:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.panel:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.context {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid rgba(127, 227, 255, 0.3);
+  border-radius: 10px;
+  background: #0f2233;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.paragraph {
+  margin: 0 0 12px;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.sectionTitle {
+  margin: 18px 0 2px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sources {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sources li + li {
+  border-top: 1px solid var(--border);
+}
+
+.sourceLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+  padding: 6px 2px;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.sourceLink:hover .sourceLabel {
+  text-decoration: underline;
+}
+
+.sourceLink:focus-visible {
+  outline-offset: 0;
+  border-radius: 6px;
+}
+
+.glossary {
+  margin-top: 18px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #10162a;
+}
+
+.glossary > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  list-style: none;
+  cursor: pointer;
+}
+
+.glossary > summary::-webkit-details-marker {
+  display: none;
+}
+
+.glossary > summary::after {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(45deg);
+}
+
+.glossary[open] > summary::after {
+  margin-top: 4px;
+  transform: rotate(-135deg);
+}
+
+.terms {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 2px 14px 14px;
+}
+
+.terms dt {
+  font-weight: 650;
+}
+
+.terms dd {
+  margin: 2px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.steps {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.number {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #12303d;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.stepTitle {
+  margin: 3px 0 2px;
+  font-weight: 650;
+}
+
+.stepText {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.primary {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary:hover {
+  filter: brightness(1.08);
+}
+
+.primary:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .segmented::before {
+    transition: transform 0.22s cubic-bezier(0.3, 0.7, 0.2, 1);
+  }
+}

@@ -9,7 +9,10 @@ import { parseCoordinates } from '@/lib/sky/parse';
 import { radecToVec } from '@/lib/sky/coords';
 import { formatDec, formatRA } from '@/lib/sky/format';
 
-export function SearchBox({ onNavigate }: { onNavigate?: () => void }) {
+const EXPERT_HINT = 'Name or ICRS RA, Dec in degrees. Other galaxy names use NED.';
+
+/** `hint` lets the simple layout speak plainly; the expert layout keeps the precise wording. */
+export function SearchBox({ onNavigate, hint = EXPERT_HINT }: { onNavigate?: () => void; hint?: string }) {
   const listId = useId();
   const lookup = useRef(new NameLookup());
   const [query, setQuery] = useState('');
@@ -54,7 +57,7 @@ export function SearchBox({ onNavigate }: { onNavigate?: () => void }) {
     cancelAnimations();
     setBusy(true);
     setOpen(false);
-    setStatus('Looking up this name in NED…');
+    setStatus('Checking NASA’s galaxy database (NED)… Press Esc to cancel.');
     const result = await lookup.current.resolve(intent.text);
     if (result.kind === 'cancelled') return;
     setBusy(false);
@@ -100,7 +103,7 @@ export function SearchBox({ onNavigate }: { onNavigate?: () => void }) {
         />
         <button type="submit" className="btn" disabled={busy}>{busy ? 'Finding…' : 'Go'}</button>
       </div>
-      <p className="search-hint" id={`${listId}-hint`}>Name or ICRS RA, Dec in degrees. Other galaxy names use NED.</p>
+      <p className="search-hint" id={`${listId}-hint`}>{hint}</p>
       {showList && (
         <ul id={listId} role="listbox" aria-label="Matching sky objects" className="search-list">
           {suggestions.map((pin, i) => (

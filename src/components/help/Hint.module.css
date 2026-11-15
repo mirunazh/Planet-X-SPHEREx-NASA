@@ -1,0 +1,38 @@
+.tip {
+  position: fixed;
+  z-index: 60;
+  top: 0;
+  left: 0;
+  width: max-content;
+  max-width: min(260px, calc(100vw - 16px));
+  padding: 8px 11px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--panel-solid);
+  color: var(--text);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  overflow-wrap: break-word;
+  pointer-events: auto;
+}
+
+.tip[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tip:not([hidden]) {
+    animation: hint-in 0.12s ease-out;
+  }
+}
+
+@keyframes hint-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
