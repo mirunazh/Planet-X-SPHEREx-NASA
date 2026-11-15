@@ -12,6 +12,8 @@ import { JourneyBar, type JourneyStep } from '@/components/journey/JourneyBar';
 import { navigatorUrl, parseRegion } from '@/lib/comparison/region';
 import { MISSION_NAMES, type ImageProduct } from '@/lib/comparison/types';
 import { InventorySession, type InventoryState } from '@/lib/comparison/session';
+import { hasVerifiedEmptyRegion, nearbyRegionUrl } from '@/lib/comparison/nearby';
+import { NearbyRegions } from './NearbyRegions';
 import { CompareGuide, DEFAULT_BAND, isDefaultBand, type ColorMode } from './CompareGuide';
 import { Slideshow } from './Slideshow';
 import styles from './CompareGuide.module.css';
@@ -59,8 +61,11 @@ export function ComparisonInventory() {
   const name = placeName(params.get('name'));
   const skyUrl = navigatorUrl(new URLSearchParams(params.toString()));
   const bandHint = useId();
-  const [draft, setDraft] = useState<Filters>(defaultFilters);
-  const [filters, setFilters] = useState<Filters>(defaultFilters);
+  const initialFilters = (): Filters => params.get('filters') === '1'
+    ? Object.fromEntries(Object.entries(emptyFilters).map(([key, value]) => [key, params.get(key) ?? value])) as Filters
+    : defaultFilters;
+  const [draft, setDraft] = useState<Filters>(initialFilters);
+  const [filters, setFilters] = useState<Filters>(initialFilters);
   /** True after the page found no default-detector photos and switched itself to all colors. */
   const [fellBack, setFellBack] = useState(false);
   const [state, setState] = useState<InventoryState>(initialState);
@@ -69,6 +74,8 @@ export function ComparisonInventory() {
   const [activeSlide, setActiveSlide] = useState<string | null>(null);
   const loadMore = useCallback(async () => { await session.current?.nextPage(); }, []);
   const retrySearch = useCallback(() => { void session.current?.start(true); }, []);
+
+  useEffect(() => { setFellBack(false); }, [regionKey]);
 
   useEffect(() => {
     setState(initialState);
@@ -86,7 +93,7 @@ export function ComparisonInventory() {
       setState(next);
       const progress = next.progress;
       if (!canFallBack || next.loading || next.error || progress?.state !== 'finished' || progress.total > 0
-        || (progress.status !== 'empty' && progress.status !== 'partial')) return;
+        || progress.status !== 'empty') return;
       canFallBack = false;
       setFellBack(true);
       setFilters({ ...defaultFilters, band: '' });
@@ -114,6 +121,7 @@ export function ComparisonInventory() {
   const products = state.page?.products ?? [];
   const loading = state.loading;
   const progress = state.progress;
+  const confirmedEmpty = hasVerifiedEmptyRegion(state);
   const finished = progress?.collections.filter((c) => ['complete', 'partial', 'error', 'suspended', 'interrupted'].includes(c.state)).length ?? 0;
   const statusLabel = loading ? `${products.length ? 'Partial results · ' : ''}${progress?.state === 'queued' ? 'Waiting to search IRSA' : 'Searching IRSA'}… ${finished}/${progress?.collections.length ?? 2} collections checked`
     : state.error ? 'Search request failed · retained results stay available'
@@ -177,7 +185,11 @@ export function ComparisonInventory() {
       </aside>
       <section className="comparison-results" aria-label="Photos of this square">
         <Slideshow page={state.page} searching={loading} status={statusLabel} activeId={activeSlide} onSelect={setActiveSlide}
-          onLoadMore={loadMore} loadingMore={state.loadingPage} onRetrySearch={retrySearch} tour={COMPARE_TOUR} />
+          onLoadMore={loadMore} loadingMore={state.loadingPage} onRetrySearch={retrySearch} tour={COMPARE_TOUR}
+          emptyTitle={confirmedEmpty ? 'No matching photos for this region' : 'Photo coverage could not be checked'}
+          emptyActions={confirmedEmpty ? <NearbyRegions key={`${regionKey}:${JSON.stringify(filters)}`} region={region} filters={filters}
+            onChoose={(target) => router.push(nearbyRegionUrl(new URLSearchParams(params.toString()), target, filters))} />
+            : <p className="small muted">Retry when the archive responds. An unavailable archive does not mean this region has no photos.</p>} />
         <details className="saved-comparison"><summary>Saved comparison selections (A and B)</summary>
         <div className="comparison-workspace" aria-label="Comparison selections">
           {(['A', 'B'] as const).map((slot) => <section className="comparison-slot panel" key={slot}><h2>Image {slot}</h2>{selection[slot] ? <><p>{MISSION_NAMES[selection[slot]!.mission]} · {spectralLabel(selection[slot]!)}</p><p className="small muted">{dateLabel(selection[slot]!)}</p><a href={selection[slot]!.sourceUrl} target="_blank" rel="noreferrer">View IRSA record ↗</a></> : <p className="muted">Choose an image from the list below.</p>}<p className="small muted">Saved for a later comparison.</p></section>)}

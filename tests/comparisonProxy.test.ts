@@ -67,6 +67,13 @@ describe('background search API boundary', () => {
   const progress = { id: 'abc', state: 'queued', status: 'error', collections: [], updatedAt: '', verifiedAt: null, stale: false, version: null, total: 0, truncated: false, queueMs: null };
   const post = (body: string, headers: Record<string, string> = {}, forwardedFor = '203.0.113.1') =>
     new Request('http://localhost/api/comparison/searches', { method: 'POST', body, headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': forwardedFor, ...headers } });
+  it('forwards bounded-nearby discovery separately from the comparison crop', async () => {
+    const fetcher = vi.fn().mockResolvedValue(Response.json(progress, { status: 202 }));
+    vi.stubGlobal('fetch', fetcher);
+    const response = await comparisonProxy(post(JSON.stringify({ ra: 359.9, dec: 89, size: 2, nearby_radius: 1, band: 'SPHEREx-D3' }), {}, '203.0.113.95'), 'searches');
+    expect(response.status).toBe(202);
+    expect(JSON.parse(fetcher.mock.calls[0][1].body)).toEqual({ ra: 359.9, dec: 89, size: 2, nearby_radius: 1, band: 'SPHEREx-D3', mission: 'spherex' });
+  });
   it('proxies validated SPHEREx-only JSON creation and progress', async () => {
     const fetcher = vi.fn().mockImplementation(() => Promise.resolve(Response.json(progress, { status: 202 })));
     vi.stubGlobal('fetch', fetcher);

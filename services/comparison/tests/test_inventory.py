@@ -6,7 +6,7 @@ from urllib.parse import parse_qs, urlsplit
 from urllib.error import HTTPError, URLError
 from xml.sax.saxutils import escape
 
-from inventory import COLLECTIONS, Search, corners, matches, normalize, parse_votable, safe_irsa_url, sia_params
+from inventory import COLLECTIONS, Search, corners, image_center, nearby_distance, matches, normalize, parse_votable, safe_irsa_url, sia_params, spherex_tap_url
 
 
 def votable(rows, status="OK"):
@@ -22,6 +22,29 @@ ROW = {"access_url": "https://irsa.ipac.caltech.edu/data/test/int.fits", "access
 
 
 class InventoryTests(unittest.TestCase):
+    def test_nearby_radius_and_both_archive_adapters(self):
+        for radius in (0, .5, 5.01, float("nan"), float("inf")):
+            with self.assertRaises(ValueError):
+                Search(0, 0, 10, nearby_radius=radius)
+        search = Search(359.99, 90, 10, nearby_radius=2)
+        self.assertEqual(dict(sia_params(search, "spherex_dr1"))["POS"], "CIRCLE 359.99 90 2.0000000000")
+        query = parse_qs(urlsplit(spherex_tap_url(search)).query)["QUERY"][0]
+        self.assertIn("CIRCLE('ICRS',359.99,90,2)", query)
+
+    def test_centres_across_ra_wrap_poles_and_missing_geometry(self):
+        self.assertEqual(image_center({"s_ra": "1", "s_dec": "90"}), {"ra": 1, "dec": 90})
+        center = image_center({"s_region": "POLYGON ICRS 359.9 -0.1 0.1 -0.1 0.1 0.1 359.9 0.1"})
+        self.assertAlmostEqual(min(center["ra"], 360-center["ra"]), 0)
+        self.assertTrue(0 <= center["ra"] < 360)
+        self.assertAlmostEqual(center["dec"], 0)
+        pole = image_center({"poly": "POLYGON ICRS 0 89 120 89 240 89"})
+        self.assertAlmostEqual(pole["dec"], 90)
+        self.assertEqual(image_center({"s_region": "CIRCLE ICRS 10 20 1"}), {"ra": 10, "dec": 20})
+        for footprint in ("", "POLYGON ICRS NaN 0 1 1 2 2", "POLYGON GALACTIC 0 0 1 1 2 2", "POLYGON 0 100 1 1 2 2"):
+            self.assertIsNone(image_center({"s_region": footprint}))
+        self.assertAlmostEqual(nearby_distance({"center": {"ra": .01, "dec": 0}}, Search(359.99, 0, 10)), .02)
+        self.assertEqual(nearby_distance({"center": None}, Search(0, 0, 10)), math.inf)
+
     def test_only_spherex_is_supported(self):
         self.assertEqual(Search(0, 0, 10).mission, "spherex")
         self.assertEqual(list(COLLECTIONS), ["spherex"])

@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 import hashlib
 import math
+import re
 from urllib.parse import urlencode, urljoin, urlsplit
 import xml.etree.ElementTree as ET
 
@@ -33,6 +34,7 @@ class Search:
     start: str = ""
     end: str = ""
     kind: str = "all"
+    nearby_radius: float | None = None
 
     def __post_init__(self):
         if not all(math.isfinite(v) for v in (self.ra, self.dec, self.size)):
@@ -55,6 +57,8 @@ class Search:
                 datetime.strptime(date, "%Y-%m-%d")
         if self.start and self.end and self.start > self.end:
             raise ValueError("Observation date interval is reversed")
+        if self.nearby_radius is not None and (not math.isfinite(self.nearby_radius) or not 1 <= self.nearby_radius <= 5):
+            raise ValueError("Nearby search radius must be between 1 and 5 degrees")
 
 
 def corners(search: Search) -> list[tuple[float, float]]:
@@ -130,6 +134,52 @@ def observed(value) -> str | None:
         return None
 
 
+def image_center(row: dict) -> dict | None:
+    """Use archive ICRS centres, or a spherical centroid of a convex image footprint."""
+    ra, dec = number(row.get("s_ra")), number(row.get("s_dec"))
+    if ra is not None and dec is not None and 0 <= ra < 360 and -90 <= dec <= 90:
+        return {"ra": ra, "dec": dec}
+    footprint = str(row.get("s_region") or row.get("poly") or "").strip()
+    match = re.fullmatch(r"(POLYGON|CIRCLE)\s+(?:ICRS\s+)?([\d.eE+\-\s]+)", footprint, re.IGNORECASE)
+    if not match:
+        return None
+    try:
+        values = [float(v) for v in match[2].split()]
+    except ValueError:
+        return None
+    if not all(math.isfinite(v) for v in values):
+        return None
+    if match[1].upper() == "CIRCLE":
+        if len(values) == 3 and 0 <= values[0] < 360 and -90 <= values[1] <= 90 and 0 <= values[2] <= 180:
+            return {"ra": values[0], "dec": values[1]}
+        return None
+    if len(values) < 6 or len(values) % 2:
+        return None
+    pairs = list(zip(values[::2], values[1::2]))
+    if any(not 0 <= lon <= 360 or not -90 <= lat <= 90 for lon, lat in pairs):
+        return None
+    if pairs[-1] == pairs[0]:
+        pairs.pop()
+    vectors = [(math.cos(math.radians(lat)) * math.cos(math.radians(lon)),
+                math.cos(math.radians(lat)) * math.sin(math.radians(lon)), math.sin(math.radians(lat))) for lon, lat in pairs]
+    x, y, z = (sum(v[i] for v in vectors) for i in range(3))
+    if math.sqrt(x*x + y*y + z*z) < 1e-10:
+        return None
+    longitude = math.degrees(math.atan2(y, x)) % 360
+    return {"ra": 0 if longitude >= 360 else longitude, "dec": math.degrees(math.atan2(z, math.hypot(x, y)))}
+
+
+def nearby_distance(product: dict, search: Search) -> float:
+    """Angular distance to the image centre, in degrees; unknown centres sort last."""
+    center = product.get("center")
+    if not center:
+        return math.inf
+    a, b = math.radians(search.dec), math.radians(center["dec"])
+    dra = math.radians(center["ra"] - search.ra)
+    h = math.sin((b-a)/2)**2 + math.cos(a)*math.cos(b)*math.sin(dra/2)**2
+    return math.degrees(2 * math.asin(math.sqrt(max(0, min(1, h)))))
+
+
 def normalize(row: dict, mission: str, collection: str, source: str) -> dict | None:
     if mission != "spherex" or collection not in (*COLLECTIONS["spherex"], "spherex_native", "spherex_dr1_deep", "spherex_qr3_deep", "spherex_dr1_cube"):
         return None
@@ -169,6 +219,7 @@ def normalize(row: dict, mission: str, collection: str, source: str) -> dict | N
         "observedEnd": observed(get("t_max", "time_bounds_upper")),
         "kind": kind, "coverage": "Intersects search region; crop coverage checked when displayed",
         "footprint": get("s_region", "poly"), "sourceUrl": source, "accessUrl": url,
+        "center": image_center(row),
     }
 
 
@@ -191,7 +242,7 @@ def matches(product: dict, search: Search) -> bool:
 
 
 def sia_params(search: Search, collection: str) -> list[tuple[str, str]]:
-    radius = math.degrees(math.atan(math.sqrt(2) * math.tan(math.radians(search.size / 120))))
+    radius = search.nearby_radius or math.degrees(math.atan(math.sqrt(2) * math.tan(math.radians(search.size / 120))))
     params = [("COLLECTION", collection), ("POS", f"CIRCLE {search.ra} {search.dec} {radius:.10f}"),
               ("MAXREC", str(MAX_RECORDS + 1)), ("RESPONSEFORMAT", "VOTABLE")]
     if search.wave_min is not None or search.wave_max is not None:
@@ -206,8 +257,9 @@ def sia_params(search: Search, collection: str) -> list[tuple[str, str]]:
 def spherex_tap_url(search: Search) -> str:
     """Mission adapter for the native SPHEREx plane/artifact inventory."""
     vertices = ",".join(str(v) for pair in corners(search) for v in pair)
+    region = f"CIRCLE('ICRS',{search.ra},{search.dec},{search.nearby_radius})" if search.nearby_radius else f"POLYGON('ICRS',{vertices})"
     query = (f"SELECT TOP {MAX_RECORDS + 1} p.*, a.uri FROM spherex.plane p "
              "JOIN spherex.artifact a ON p.planeid=a.planeid "
-             f"WHERE INTERSECTS(p.poly,POLYGON('ICRS',{vertices}))=1")
+             f"WHERE INTERSECTS(p.poly,{region})=1")
     return IRSA + "/TAP/sync?" + urlencode({"REQUEST": "doQuery", "LANG": "ADQL", "QUERY": query, "FORMAT": "VOTABLE", "MAXREC": MAX_RECORDS + 1})
 

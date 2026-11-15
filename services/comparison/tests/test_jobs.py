@@ -15,6 +15,30 @@ from test_inventory import ROW, votable
 
 
 class JobTests(unittest.IsolatedAsyncioTestCase):
+    async def test_nearby_results_rank_across_collections_before_pagination_and_keep_crop(self):
+        def handler(request):
+            near = request.url.params.get("COLLECTION") == "spherex_qr3"
+            rows = [{**ROW, "access_url": f"/data/{'near' if near else 'far'}-{n}.fits",
+                     "s_ra": str(.01 if near else .5), "s_dec": "0", "t_min": str(61001 if near else 61000)}
+                    for n in range(110 if not near else 1)]
+            return httpx.Response(200, content=votable(rows))
+        coordinator = self.setup(handler)
+        search = Search(0, 0, 2, nearby_radius=1)
+        first = coordinator.start(search)
+        await self.finish()
+        job = self.store.get(first["id"])
+        page = self.store.page(job["id"], job["version"])
+        self.assertEqual(page["total"], 111)
+        self.assertIn("near-0.fits", page["products"][0]["accessUrl"])
+        self.assertEqual(page["nextCursor"], "100")
+        stored, product = self.store.product(job["id"], job["version"], page["products"][0]["id"])
+        self.assertEqual(stored.size, 2)
+        self.assertEqual(stored.ra, 0)
+        self.assertEqual(product["center"], {"ra": .01, "dec": 0})
+        self.assertNotEqual(search_key(search), search_key(Search(0, 0, 2)))
+        self.assertNotEqual(search_key(search), search_key(Search(0, 0, 2, nearby_radius=2)))
+        self.assertEqual(search_key(search), search_key(Search(0, 0, 2, nearby_radius=1.0)))
+
     async def asyncSetUp(self):
         self.directory = tempfile.TemporaryDirectory()
         self.path = str(Path(self.directory.name) / "metadata.sqlite3")

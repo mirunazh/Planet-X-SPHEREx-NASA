@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { PreviewLoader, type LoadedPreview } from '@/lib/comparison/previews';
 import type { ImageProduct, InventoryPage, PreviewProgress } from '@/lib/comparison/types';
 
@@ -15,6 +15,8 @@ interface Props {
   onLoadMore: () => Promise<void>;
   loadingMore: boolean;
   onRetrySearch: () => void;
+  emptyTitle?: string;
+  emptyActions?: ReactNode;
   /** data-tour ids for the guided tour: the photo and its Previous / Play / Next buttons. */
   tour?: { viewer: string; controls: string };
 }
@@ -24,7 +26,7 @@ function observation(product: ImageProduct) {
   return date ? new Date(date).toLocaleString(undefined, { timeZone: 'UTC', dateStyle: 'medium', timeStyle: 'medium' }) + ' UTC' : 'Observation time unknown';
 }
 
-export function Slideshow({ page, prepared, searching, status, activeId, onSelect, onLoadMore, loadingMore, onRetrySearch, tour }: Props) {
+export function Slideshow({ page, prepared, searching, status, activeId, onSelect, onLoadMore, loadingMore, onRetrySearch, emptyTitle, emptyActions, tour }: Props) {
   const products = useMemo(() => [...(page?.products ?? [])].sort((a, b) =>
     (a.observedStart ?? a.observedEnd ?? '9999').localeCompare(b.observedStart ?? b.observedEnd ?? '9999') || a.id.localeCompare(b.id)), [page?.products]);
   const index = Math.max(0, products.findIndex((p) => p.id === activeId));
@@ -45,8 +47,9 @@ export function Slideshow({ page, prepared, searching, status, activeId, onSelec
   const lastScroll = useRef(0);
 
   useEffect(() => {
+    setPlaying(false); setSkipped(0); setError(null); setLoaded(null); setImageLoaded(false);
+    hasShownImage.current = false; pendingAdvance.current = false;
     if (!page) return;
-    setPlaying(false); setSkipped(0); hasShownImage.current = false;
     const instance = new PreviewLoader(page.searchId, page.version, undefined, undefined, undefined, prepared);
     loader.current = instance;
     return () => { instance.dispose(); loader.current = null; };
@@ -138,11 +141,12 @@ export function Slideshow({ page, prepared, searching, status, activeId, onSelec
       {loaded && loaded.productId === product?.id && <img className="slideshow-image" src={loaded.url} alt={`SPHEREx exposure of the selected sky region, ${product ? observation(product) : ''}`}
         onLoad={() => { hasShownImage.current = true; setImageLoaded(true); }} onError={() => { setError('The browser could not display this image. Retry.'); setPlaying(false); }} />}
       {(!loaded || loaded.productId !== product?.id || !imageLoaded || error) && <div className="slideshow-placeholder" role="status">
-        <p>{error ? 'This exposure could not be displayed' : product ? loadingLabel : searching ? 'Searching the SPHEREx archive…' : 'No exposures available yet'}</p>
+        <p>{error ? 'This exposure could not be displayed' : product ? loadingLabel : searching ? 'Searching the SPHEREx archive…' : emptyTitle ?? 'No exposures available yet'}</p>
         <p className={`small ${error ? 'comparison-error' : 'muted'}`}>{error ?? (product ? 'You can move to another image while this one loads.' : status)}</p>
         {tryingNext && <p className="small muted">Trying the next available exposure…</p>}
         {error && <button className="btn" onClick={() => { retryProduct.current = product?.id ?? null; setRetry((value) => value + 1); }}>Retry image</button>}
         {!product && !searching && <button className="btn" onClick={onRetrySearch}>Retry search</button>}
+        {!product && !searching && emptyActions}
       </div>}
     </div>
     <div className="slideshow-controls" aria-label="Slideshow controls">

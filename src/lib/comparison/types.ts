@@ -15,6 +15,8 @@ export interface ImageProduct {
   kind: 'individual' | 'combined' | 'unknown';
   coverage: string;
   footprint: string | null;
+  /** Archive image centre (ICRS), used only to suggest a nearby comparison region. */
+  center?: { ra: number; dec: number } | null;
   sourceUrl: string;
   accessUrl: string;
 }
@@ -40,11 +42,15 @@ export function isInventoryPage(value: unknown): value is InventoryPage {
   return Array.isArray(page.products) && page.products.every((value: unknown) => {
     if (!value || typeof value !== 'object') return false;
     const product = value as Record<string, unknown>;
+    const center = product.center as ImageProduct['center'];
     return ['id', 'collection', 'title', 'coverage', 'sourceUrl', 'accessUrl'].every((key) => typeof product[key] === 'string')
       && MISSIONS.includes(product.mission as Mission)
       && ['individual', 'combined', 'unknown'].includes(product.kind as string)
       && ['band', 'observedStart', 'observedEnd', 'footprint'].every((key) => nullableString(product[key]))
-      && ['wavelengthMin', 'wavelengthMax'].every((key) => nullableNumber(product[key]));
+      && ['wavelengthMin', 'wavelengthMax'].every((key) => nullableNumber(product[key]))
+      && (center === undefined || center === null || typeof center === 'object'
+        && Number.isFinite(center.ra) && center.ra >= 0 && center.ra < 360
+        && Number.isFinite(center.dec) && Math.abs(center.dec) <= 90);
   }) && typeof page.total === 'number' && Number.isSafeInteger(page.total) && page.total >= page.products.length
     && ['complete', 'empty', 'partial', 'error'].includes(page.status as string)
     && typeof page.truncated === 'boolean' && nullableString(page.nextCursor)

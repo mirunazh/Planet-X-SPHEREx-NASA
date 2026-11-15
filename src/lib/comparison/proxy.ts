@@ -1,7 +1,7 @@
 import { isInventoryPage, isSearchProgress, isPreviewProgress, isWeeklyChallenge } from './types';
 
 type Path = 'challenge' | `challenge/previews/${string}` | 'inventory' | 'health' | 'searches' | `searches/${string}` | `previews/${string}`;
-const FILTERS = new Set(['ra', 'dec', 'size', 'mission', 'band', 'wave_min', 'wave_max', 'start', 'end', 'kind', 'refresh']);
+const FILTERS = new Set(['ra', 'dec', 'size', 'mission', 'band', 'wave_min', 'wave_max', 'start', 'end', 'kind', 'refresh', 'nearby_radius']);
 const MAX_BODY_BYTES = 4096;
 /** New searches per minute, for one client and for everyone together: each one queries NASA's archive. */
 const SEARCHES_PER_CLIENT = 6;

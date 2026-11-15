@@ -34,6 +34,7 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
                     self.assertEqual(bad.status_code, 400)
                     self.assertEqual((await client.post('/searches', json={"ra": 0, "dec": 0, "size": 10, "extra": True})).status_code, 422)
                     self.assertEqual((await client.post('/searches', json={"ra": 0, "dec": 91, "size": 10})).status_code, 400)
+                    self.assertEqual((await client.post('/searches', json={"ra": 0, "dec": 0, "size": 10, "nearby_radius": 6})).status_code, 400)
                     created = await client.post('/searches', json={"ra": 0, "dec": 0, "size": 10})
                     self.assertEqual(created.status_code, 202)
                     job_id = created.json()["id"]
@@ -46,6 +47,9 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
                     self.assertEqual((await client.get(f'/searches/{job_id}/results', params={"version": progress["version"], "cursor": "1"})).status_code, 400)
                     self.assertEqual((await client.get('/searches/missing')).status_code, 404)
                     self.assertEqual((await client.get('/inventory')).status_code, 410)
+                    nearby = await client.post('/searches', json={"ra": 0, "dec": 0, "size": 10, "nearby_radius": 1})
+                    self.assertEqual(nearby.status_code, 202)
+                    await asyncio.gather(*coordinator.tasks)
                     archive.last = {"ok": False, "error": "Simulated outage"}
                     health = (await client.get('/health')).json()
                     self.assertTrue(health["ok"])

@@ -11,10 +11,10 @@ import sqlite3
 import time
 from urllib.parse import urlencode
 
-from inventory import COLLECTIONS, IRSA, MAX_RECORDS, Search, matches, normalize, sia_params, spherex_tap_url
+from inventory import COLLECTIONS, IRSA, MAX_RECORDS, Search, matches, nearby_distance, normalize, sia_params, spherex_tap_url
 from transport import Suspended
 
-ADAPTER_VERSION = "spherex-slideshow-4-circle"
+ADAPTER_VERSION = "spherex-slideshow-5-nearby"
 DAY = 86400
 ACTIVE = ("queued", "running")
 log = logging.getLogger("comparison.jobs")
@@ -26,7 +26,7 @@ def stamp():
 
 def search_key(search):
     values = asdict(search)
-    for field in ("ra", "dec", "size", "wave_min", "wave_max"):
+    for field in ("ra", "dec", "size", "wave_min", "wave_max", "nearby_radius"):
         if values[field] is not None:
             values[field] = float(values[field])
     return hashlib.sha256(json.dumps([ADAPTER_VERSION, values], sort_keys=True).encode()).hexdigest()
@@ -87,6 +87,9 @@ class Store:
             for product in collection.get("products", []):
                 products.setdefault(product["id"], product)
         items = sorted(products.values(), key=lambda p: (not (p["observedStart"] or p["observedEnd"]), p["observedStart"] or p["observedEnd"] or "", p["id"]))
+        search = Search(**job["search"])
+        if search.nearby_radius:
+            items.sort(key=lambda p: (nearby_distance(p, search), p["id"]))
         job["truncated"] = len(items) > MAX_RECORDS or any(c.get("truncated", False) for c in job["collections"].values())
         job["total"] = min(len(items), MAX_RECORDS)
         version = secrets.token_urlsafe(18)
@@ -307,7 +310,8 @@ class Coordinator:
                 if product and matches(product, search):
                     products.setdefault(product["id"], product)
             bounded, used, limited = [], 0, False
-            for product in products.values():
+            ordered = sorted(products.values(), key=lambda p: (nearby_distance(p, search), p["id"])) if search.nearby_radius else products.values()
+            for product in ordered:
                 size = len(json.dumps(product).encode("utf-8"))
                 if len(bounded) >= MAX_RECORDS or used + size > self.store.collection_bytes:
                     limited = True

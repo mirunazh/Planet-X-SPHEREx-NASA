@@ -74,6 +74,7 @@ class SearchInput(BaseModel):
     start: str = ""
     end: str = ""
     kind: str = "all"
+    nearby_radius: float | None = None
     refresh: bool = False
 
 

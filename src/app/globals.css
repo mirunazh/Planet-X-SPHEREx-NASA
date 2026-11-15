@@ -922,8 +922,15 @@ summary { cursor: pointer; min-height: 32px; }
 .slideshow-stage { position: relative; display: grid; place-items: center; min-height: 320px; height: min(58vh, 620px); background: #000; border: 1px solid var(--border-strong); border-radius: 12px; overflow: hidden; }
 .slideshow-stage:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .slideshow-image { width: 100%; height: 100%; min-height: 0; object-fit: contain; }
-.slideshow-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; padding: 24px; text-align: center; background: #000; }
+.slideshow-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: safe center; align-items: center; gap: 12px; padding: 24px; text-align: center; background: #000; overflow-y: auto; }
 .slideshow-placeholder p { margin: 0; max-width: 52ch; }
+.nearby-search { display: grid; gap: 16px; justify-items: center; width: 100%; max-width: 65ch; }
+.nearby-search > .btn { white-space: normal; }
+.nearby-regions { list-style: none; width: 100%; padding: 0; margin: 0; text-align: left; }
+.nearby-regions li { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-block: 14px; border-top: 1px solid var(--border); }
+.nearby-regions li > div { min-width: 0; overflow-wrap: anywhere; }
+.nearby-regions p { margin-top: 6px; }
+.nearby-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
 .slideshow-controls { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; padding-block: 16px; }
 .slideshow-navigation { display: flex; flex-wrap: wrap; gap: 8px; }
 .slideshow-speed { display: flex; align-items: center; gap: 8px; }
